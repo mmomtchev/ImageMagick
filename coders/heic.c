@@ -76,10 +76,10 @@
 #include "MagickCore/module.h"
 #include "MagickCore/utility.h"
 #if defined(MAGICKCORE_HEIC_DELEGATE)
-#if defined(MAGICKCORE_WINDOWS_SUPPORT) && !defined(__MINGW32__)
-#include <heif.h>
-#else
+#if defined(MAGICKCORE_HAVE_LIBHEIF_LIBHEIF_H)
 #include <libheif/heif.h>
+#else
+#include <heif.h>
 #endif
 
 #define HEIC_COMPUTE_NUMERIC_VERSION(major,minor,patch) \
