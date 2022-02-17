@@ -514,3 +514,9 @@ endif()
 if(BUILD_UTILITIES)
   add_subdirectory("utilities")
 endif()
+
+install(FILES
+  LICENSE
+  NOTICE
+  DESTINATION licenses
+)
