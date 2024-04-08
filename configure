@@ -856,6 +856,7 @@ JBIG_DELEGATE_FALSE
 JBIG_DELEGATE_TRUE
 HEIC_DELEGATE_FALSE
 HEIC_DELEGATE_TRUE
+HAVE_LIBHEIF_LIBHEIF_H
 HEIF_LIBS
 HEIF_CFLAGS
 DMR_LIBS
@@ -5257,7 +5258,7 @@ MAGICK_PATCHLEVEL_VERSION=43
 
 MAGICK_VERSION=7.1.1-43
 
-MAGICK_GIT_REVISION=afd817ca6:20241222
+MAGICK_GIT_REVISION=4ffbe56c8:20250111
 
 
 # Substitute library versioning
@@ -5291,7 +5292,7 @@ PACKAGE_LIB_VERSION=0x711
 
 PACKAGE_LIB_VERSION_NUMBER=7,1,1,43
 
-PACKAGE_RELEASE_DATE=2024-12-22
+PACKAGE_RELEASE_DATE=2025-01-11
 
 
 # Ensure that make can run correctly
@@ -32536,6 +32537,13 @@ if test "$have_heic" = 'yes'; then
 printf "%s\n" "#define HEIC_DELEGATE 1" >>confdefs.h
 
   CFLAGS="$HEIF_CFLAGS $CFLAGS"
+  ac_fn_c_check_header_compile "$LINENO" "libheif/heif.h" "ac_cv_header_libheif_heif_h" "$ac_includes_default"
+if test "x$ac_cv_header_libheif_heif_h" = xyes
+then :
+  HAVE_LIBHEIF_LIBHEIF_H=1
+fi
+
+
 fi
 
  if test "$have_heic" = 'yes'; then
