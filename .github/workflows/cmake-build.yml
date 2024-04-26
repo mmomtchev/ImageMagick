@@ -17,6 +17,7 @@ jobs:
         libtype: [shared, static]
         provider: [conan, system, pkgconf]
         buildtype: [Release, Debug]
+        zeroconf: [true, false]
         exclude:
           - buildtype: Debug
             os: macos-latest
@@ -35,6 +36,14 @@ jobs:
             os: ubuntu-latest
             libtype: shared
             provider: conan
+          - zeroconf: false
+            buildtype: shared
+          - zeroconf: false
+            provider: pkgconf
+          - zeroconf: false
+            provider: system
+          - zeroconf: false
+            buildtype: Debug
 
 
     steps:
@@ -83,6 +92,10 @@ jobs:
       if: matrix.libtype == 'static'
       run: echo "LIBTYPE=-DMAGICK_BUILD_STATIC=ON" >> $GITHUB_ENV
 
+    - name: Set zero configuration
+      shell: bash
+      run: echo "ZERO_CONF=-DZERO_CONFIGURATION_SUPPORT=ON" >> $GITHUB_ENV
+
     - name: Set install prefix
       shell: bash
       run: echo "INSTALL_PREFIX=${{ github.workspace }}/install" >> $GITHUB_ENV
@@ -97,7 +110,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }}"
+        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }} ${{ env.ZERO_CONF }}"
 
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
