@@ -17,7 +17,7 @@ jobs:
         libtype: [shared, static]
         provider: [conan, system, pkgconf]
         buildtype: [Release, Debug]
-        zeroconf: [true, false]
+        zeroconf: [zeroconf, support]
         exclude:
           - buildtype: Debug
             os: macos-latest
@@ -36,13 +36,13 @@ jobs:
             os: ubuntu-latest
             libtype: shared
             provider: conan
-          - zeroconf: false
+          - zeroconf: zeroconf
             buildtype: shared
-          - zeroconf: false
+          - zeroconf: zeroconf
             provider: pkgconf
-          - zeroconf: false
+          - zeroconf: zeroconf
             provider: system
-          - zeroconf: false
+          - zeroconf: zeroconf
             buildtype: Debug
 
 
@@ -95,6 +95,7 @@ jobs:
     - name: Set zero configuration
       shell: bash
       run: echo "ZERO_CONF=-DZERO_CONFIGURATION_SUPPORT=ON" >> $GITHUB_ENV
+      if: matrix.zeroconf == 'zeroconf'
 
     - name: Set install prefix
       shell: bash
@@ -110,7 +111,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }} ${{ env.ZERO_CONF }}"
+        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }}" ${{ env.ZERO_CONF }}
 
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
