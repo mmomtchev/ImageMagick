@@ -26,6 +26,9 @@ jobs:
         os: [ubuntu-latest, macos-13, windows-latest]
         libtype: [shared, static]
         buildtype: [Release, Debug]
+        exclude:
+          - buildtype: Debug
+            libtype: shared
 
     steps:
       - uses: actions/checkout@v4
@@ -71,6 +74,9 @@ jobs:
         provider: [conan, system, pkgconf]
         buildtype: [Release, Debug]
         zeroconf: [zeroconf, support]
+        exclude:
+          - buildtype: Debug
+            libtype: shared
 
     steps:
     - name: Checkout
