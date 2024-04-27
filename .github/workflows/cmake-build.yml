@@ -29,6 +29,8 @@ jobs:
         exclude:
           - buildtype: Debug
             libtype: shared
+          - buildtype: Debug
+            os: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -77,6 +79,12 @@ jobs:
         exclude:
           - buildtype: Debug
             libtype: shared
+          - buildtype: Debug
+            os: windows-latest
+            provider: conan
+          - buildtype: Debug
+            os: windows-latest
+            provider: pkgconf
 
     steps:
     - name: Checkout
