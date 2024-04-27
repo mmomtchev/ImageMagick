@@ -6,6 +6,10 @@ on:
       - cmake-portable-build
       - cmake-testing
 
+concurrency:
+  group: cmake-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   native:
 
