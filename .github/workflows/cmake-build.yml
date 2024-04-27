@@ -5,6 +5,10 @@ on:
     branches:
       - cmake-portable-build
       - cmake-testing
+  schedule:
+      # schedule a regular Sunday Mass to check that
+      # everything still works
+      - cron: '30 12 * * 0'
 
 concurrency:
   group: cmake-${{ github.ref }}
@@ -39,6 +43,11 @@ jobs:
         with:
           path: ~/.conan2
           key: ${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
+
+      - name: Restart from scratch every Sunday
+        run: rm -rf ~/.conan2
+        shell: bash
+        if: github.event_name == 'schedule'
 
       - name: Install all delegates
         run: |
