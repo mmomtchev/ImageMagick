@@ -37,7 +37,7 @@ jobs:
             libtype: shared
             provider: conan
           - zeroconf: zeroconf
-            buildtype: shared
+            provider: shared
           - zeroconf: zeroconf
             provider: pkgconf
           - zeroconf: zeroconf
