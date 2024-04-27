@@ -71,32 +71,6 @@ jobs:
         provider: [conan, system, pkgconf]
         buildtype: [Release, Debug]
         zeroconf: [zeroconf, support]
-        exclude:
-          - buildtype: Debug
-            os: macos-latest
-          - buildtype: Debug
-            os: windows-latest
-          - provider: pkgconf
-            os: windows-latest
-          - buildtype: Debug
-            os: ubuntu-latest
-            provider: pkgconf
-          - buildtype: Debug
-            os: ubuntu-latest
-            libtype: static
-            provider: system
-          - buildtype: Debug
-            os: ubuntu-latest
-            libtype: shared
-            provider: conan
-          - zeroconf: zeroconf
-            provider: shared
-          - zeroconf: zeroconf
-            provider: pkgconf
-          - zeroconf: zeroconf
-            provider: system
-          - zeroconf: zeroconf
-            buildtype: Debug
 
     steps:
     - name: Checkout
