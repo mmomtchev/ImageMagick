@@ -10,10 +10,45 @@ concurrency:
   group: cmake-${{ github.ref }}
   cancel-in-progress: true
 
+
 jobs:
+
+  conan:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-latest]
+        libtype: [shared, static]
+        buildtype: [Release, Debug]
+
+    steps:
+      - name: Get conan
+        id : conan
+        uses: turtlebrowser/get-conan@main
+
+      - name: Cache conan artifacts
+        id: conan-artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2
+          key: ${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
+
+      - name: Install all delegates
+        run: |
+          conan profile detect || echo ok
+          conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }}
+          echo 'CONAN_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake"' >> $GITHUB_ENV
+        shell: bash
+
+
   native:
 
     runs-on: ${{ matrix.os }}
+    # This build job is self-contained but it will run faster if
+    # the conan job has completed (ie all the artifacts are prebuilt)
+    needs: conan
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +84,6 @@ jobs:
           - zeroconf: zeroconf
             buildtype: Debug
 
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -63,12 +97,12 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows' && matrix.provider != 'conan'
 
-    - name: Cache conan artifacts (conan/pkgconf)
+    - name: Restore conan artifacts from shared cache (conan/pkgconf)
       id: conan-artifacts
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v3
       with:
         path: ~/.conan2
-        key: ${{ matrix.provider }}-${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.zeroconf }}-${{ matrix.buildtype }}
+        key: ${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
       if: matrix.provider == 'conan' || matrix.provider == 'pkgconf'
 
     - name: Install all delegates (conan)
