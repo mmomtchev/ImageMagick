@@ -159,7 +159,7 @@ class ImageMagickDelegates(ConanFile):
         self.requires('openjpeg/2.5.0', force=True)
 
       if self.options.cairo and self.settings.arch != 'wasm':
-        self.requires('cairo/1.18.0', force=True)
+        self.requires('cairo/1.17.8', force=True)
         self.requires('expat/2.6.0', force=True)
 
       if self.options.simd and self.settings.arch != 'wasm':
