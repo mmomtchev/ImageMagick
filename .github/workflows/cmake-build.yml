@@ -82,8 +82,7 @@ jobs:
           - buildtype: Debug
             os: windows-latest
             provider: conan
-          - buildtype: Debug
-            os: windows-latest
+          - os: windows-latest
             provider: pkgconf
 
     steps:
