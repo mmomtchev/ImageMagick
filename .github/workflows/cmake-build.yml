@@ -24,6 +24,11 @@ jobs:
         buildtype: [Release, Debug]
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: conanfile.py
+          sparse-checkout-cone-mode: false
+
       - name: Get conan
         id : conan
         uses: turtlebrowser/get-conan@main
