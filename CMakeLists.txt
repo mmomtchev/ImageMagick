@@ -332,8 +332,8 @@ magick_find_delegate(DELEGATE BZLIB_DELEGATE NAME BZip2 DEFAULT TRUE)
 magick_find_delegate(DELEGATE LZMA_DELEGATE NAME LibLZMA DEFAULT TRUE)
 magick_find_delegate(DELEGATE ZLIB_DELEGATE NAME ZLIB DEFAULT TRUE)
 magick_find_delegate(DELEGATE ZIP_DELEGATE NAME ZIP DEFAULT TRUE TARGETS libzip::zip)
-# TODO: Detect whether zstd is static or not
-magick_find_delegate(DELEGATE ZSTD_DELEGATE NAME zstd DEFAULT TRUE TARGETS zstd::libzstd_static)
+magick_find_delegate(DELEGATE ZSTD_DELEGATE NAME zstd DEFAULT TRUE
+    TARGETS zstd::libzstd_static PKGCONFIG libzstd)
 magick_find_delegate(DELEGATE BROTLI_DELEGATE NAME brotli DEFAULT TRUE)
 magick_find_delegate(DELEGATE FREETYPE_DELEGATE NAME Freetype DEFAULT TRUE)
 
