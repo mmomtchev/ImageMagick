@@ -265,7 +265,7 @@
 #cmakedefine HAVE_LIBRAW_LIBRAW_H
 
 /* Define if you have the <libheif/heif.h> header file. */
-#cmakedefine HAVE_LIBHEIF_LIBHEIF_H
+#cmakedefine HAVE_LIBHEIF_HEIF_H
 
 /* Define to 1 if you have the `gcov' library (-lgcov). */
 #cmakedefine HAVE_LIBGCOV @HAVE_LIBGCOV@

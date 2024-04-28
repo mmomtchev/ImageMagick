@@ -382,7 +382,7 @@ if(libraw_FOUND)
 endif()
 magick_find_delegate(DELEGATE HEIC_DELEGATE NAME libheif DEFAULT TRUE TARGETS libheif::heif)
 if(libheif_FOUND)
-  set(HAVE_LIBHEIF_LIBHEIF_H 1)
+  set(HAVE_LIBHEIF_HEIF_H 1)
 endif()
 
 magick_find_delegate(DELEGATE JBIG_DELEGATE NAME jbig DEFAULT TRUE)
