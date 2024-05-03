@@ -39,8 +39,7 @@ macro(magick_find_delegate)
   unset(MAGICK_FIND_SEARCH_TARGET)
   if((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE})
     find_package(${MAGICK_FIND_NAME} QUIET)
-    set(${MAGICK_FIND_DELEGATE} ${${MAGICK_FIND_NAME}_FOUND})
-    if(${MAGICK_FIND_DELEGATE})
+    if(${${MAGICK_FIND_NAME}_FOUND})
     # CMake config
       message("-- Found CMake package ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
       if(MAGICK_FIND_TARGETS)
@@ -59,15 +58,14 @@ macro(magick_find_delegate)
         endif()
         # This goes into the FindImageMagick.cmake dependencies
         list(APPEND IMAGEMAGICK_DEPENDENCIES ${MAGICK_FIND_NAME})
-        set(MAGICK_FIND_CURRENT_FOUND TRUE)
+        set(${MAGICK_FIND_DELEGATE} TRUE)
       else()
         message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
-        set(${MAGICK_FIND_DELEGATE} FALSE)
       endif()
     endif()
   endif()
 
-  if(NOT ${MAGICK_FIND_DELEGATE} AND PkgConfig_FOUND)
+  if(((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE}) AND PkgConfig_FOUND)
   # pkg-config
     if(MAGICK_FIND_PKGCONFIG)
       # Custom pkgconfig name
