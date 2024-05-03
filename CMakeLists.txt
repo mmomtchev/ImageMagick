@@ -38,9 +38,10 @@ macro(magick_find_delegate)
 
   unset(MAGICK_FIND_SEARCH_TARGET)
   if((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE})
+    # package is enabled by default or explicitly enabled
     find_package(${MAGICK_FIND_NAME} QUIET)
     if(${${MAGICK_FIND_NAME}_FOUND})
-    # CMake config
+      # CMake config
       message("-- Found CMake package ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
       if(MAGICK_FIND_TARGETS)
         # Custom target
@@ -62,33 +63,33 @@ macro(magick_find_delegate)
       else()
         message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
       endif()
+
+    elseif(PkgConfig_FOUND)
+      # pkg-config
+      if(MAGICK_FIND_PKGCONFIG)
+        # Custom pkgconfig name
+        set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_PKGCONFIG})
+      else()
+        # Default name
+        set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME})
+      endif()
+      pkg_check_modules(${MAGICK_FIND_NAME} ${MAGICK_FIND_SEARCH_TARGET})
+      if(${${MAGICK_FIND_NAME}_FOUND})
+        get_pkgconfig_setting(CMAKE_REQUIRED_INCLUDES ${MAGICK_FIND_NAME} INCLUDE_DIRS)
+        get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${MAGICK_FIND_NAME} INCLUDE_DIRS)
+        get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARIES ${MAGICK_FIND_NAME} LIBRARIES)
+        get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARY_DIRS ${MAGICK_FIND_NAME} LIBRARY_DIRS)
+        get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_CFLAGS ${MAGICK_FIND_NAME} CFLAGS)
+        get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LDFLAGS ${MAGICK_FIND_NAME} LDFLAGS_OTHER)
+        set(${MAGICK_FIND_DELEGATE} TRUE)
+      endif()
     endif()
   endif()
 
-  if(((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE}) AND PkgConfig_FOUND)
-  # pkg-config
-    if(MAGICK_FIND_PKGCONFIG)
-      # Custom pkgconfig name
-      set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_PKGCONFIG})
-    else()
-      # Default name
-      set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME})
-    endif()
-    pkg_check_modules(${MAGICK_FIND_NAME} ${MAGICK_FIND_SEARCH_TARGET})
-    if(${${MAGICK_FIND_NAME}_FOUND})
-      get_pkgconfig_setting(CMAKE_REQUIRED_INCLUDES ${MAGICK_FIND_NAME} INCLUDE_DIRS)
-      get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${MAGICK_FIND_NAME} INCLUDE_DIRS)
-      get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARIES ${MAGICK_FIND_NAME} LIBRARIES)
-      get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARY_DIRS ${MAGICK_FIND_NAME} LIBRARY_DIRS)
-      get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_CFLAGS ${MAGICK_FIND_NAME} CFLAGS)
-      get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LDFLAGS ${MAGICK_FIND_NAME} LDFLAGS_OTHER)
-      set(${MAGICK_FIND_DELEGATE} TRUE)
-    endif()
-  endif()
   if(${MAGICK_FIND_DELEGATE})
     message("Delegate ${MAGICK_FIND_NAME} enabled")
   else()
-    message("Delegate ${MAGICK_FIND_NAME} not found")
+    message("Delegate ${MAGICK_FIND_NAME} not found or disabled")
   endif()
 endmacro()
 
