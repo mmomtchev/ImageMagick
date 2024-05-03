@@ -62,9 +62,11 @@ macro(magick_find_delegate)
         set(${MAGICK_FIND_DELEGATE} TRUE)
       else()
         message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
+        set(${MAGICK_FIND_NAME}_FOUND FALSE)
       endif()
+    endif()
 
-    elseif(PkgConfig_FOUND)
+    if(NOT ${${MAGICK_FIND_NAME}_FOUND} AND PkgConfig_FOUND)
       # pkg-config
       if(MAGICK_FIND_PKGCONFIG)
         # Custom pkgconfig name
