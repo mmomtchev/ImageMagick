@@ -39,6 +39,7 @@ macro(magick_find_delegate)
   unset(MAGICK_FIND_SEARCH_TARGET)
   if((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE})
     # package is enabled by default or explicitly enabled
+    set(${MAGICK_FIND_NAME}_FOUND FALSE)
     find_package(${MAGICK_FIND_NAME} QUIET)
     if(${${MAGICK_FIND_NAME}_FOUND})
       # CMake config
@@ -66,7 +67,7 @@ macro(magick_find_delegate)
       endif()
     endif()
 
-    if(NOT ${${MAGICK_FIND_NAME}_FOUND} AND PkgConfig_FOUND)
+    if(NOT ${${MAGICK_FIND_NAME}_FOUND} AND DEFINED PkgConfig_FOUND)
       # pkg-config
       if(MAGICK_FIND_PKGCONFIG)
         # Custom pkgconfig name
