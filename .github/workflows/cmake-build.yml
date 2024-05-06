@@ -157,7 +157,7 @@ jobs:
       shell: bash
       run: |
         echo "CUSTOM_DELEGATES=-DHASJEMALLOC=ON -DPNG_DELEGATE=OFF" >> $GITHUB_ENV
-        echo "EXPECTED_DELEGATES=${EXPECTED_DELEGATES} jemalloc -png" >> $GITHUB_ENV
+        echo "EXPECTED_DELEGATES=jemalloc -png" >> $GITHUB_ENV
       if: matrix.delegates == 'custom-delegates'
 
     - name: Generate CMake build
