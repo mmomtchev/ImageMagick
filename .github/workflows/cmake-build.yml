@@ -156,7 +156,7 @@ jobs:
     - name: Set custom delegates
       shell: bash
       run: |
-        echo "DELEGATES=-DHASJEMALLOC=ON -DPNG_DELEGATE=OFF" >> $GITHUB_ENV
+        echo "CUSTOM_DELEGATES=-DHASJEMALLOC=ON -DPNG_DELEGATE=OFF" >> $GITHUB_ENV
         echo "EXPECTED_DELEGATES=${EXPECTED_DELEGATES} jemalloc -png" >> $GITHUB_ENV
       if: matrix.delegates == 'custom-delegates'
 
@@ -165,7 +165,8 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }}" ${{ env.ZERO_CONF }}
+        cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }} \
+          -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }}" ${{ env.ZERO_CONF }} ${{ env.CUSTOM_DELEGATES }}
 
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
