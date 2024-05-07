@@ -98,6 +98,8 @@ endmacro()
 
 # Get the platform
 if(WIN32)
+  # CMake being a portable build system, all OS use the POSIX file system structure
+  set(POSIX_ON_WINDOWS_SUPPORT TRUE)
   if(NOT WINDOWS)
     set(WINDOWS TRUE)
   endif()
