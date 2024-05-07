@@ -842,9 +842,9 @@ MagickExport LinkedListInfo *GetConfigurePaths(const char *filename,
     if (home != (char *) NULL)
       {
 #if !defined(MAGICKCORE_POSIX_SUPPORT) && !defined(MAGICKCORE_POSIX_ON_WINDOWS_SUPPORT) || defined(__VMS)
-        (void)FormatLocaleString(path, MagickPathExtent, "%s%s", home,
+        (void)FormatLocaleString(path,MagickPathExtent,"%s%s",home,
           DirectorySeparator);
-        (void)AppendValueToLinkedList(paths, ConstantString(path));
+        (void)AppendValueToLinkedList(paths,ConstantString(path));
 #else
         (void) FormatLocaleString(path,MagickPathExtent,"%s/etc/%s/",home,
           MAGICKCORE_CONFIGURE_RELATIVE_PATH);
@@ -862,7 +862,7 @@ MagickExport LinkedListInfo *GetConfigurePaths(const char *filename,
   if (*GetClientPath() != '\0')
     {
 #if !defined(MAGICKCORE_POSIX_SUPPORT) && !defined(MAGICKCORE_POSIX_ON_WINDOWS_SUPPORT) || defined(__VMS)
-      (void)FormatLocaleString(path, MagickPathExtent, "%s%s", GetClientPath(),
+      (void)FormatLocaleString(path,MagickPathExtent,"%s%s",GetClientPath(),
         DirectorySeparator);
       (void)AppendValueToLinkedList(paths, ConstantString(path));
 #else
