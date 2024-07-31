@@ -40,6 +40,14 @@ macro(magick_find_delegate)
   if((NOT DEFINED ${MAGICK_FIND_DELEGATE} AND ${MAGICK_FIND_DEFAULT}) OR ${MAGICK_FIND_DELEGATE})
     # package is enabled by default or explicitly enabled
     set(${MAGICK_FIND_NAME}_FOUND FALSE)
+    # CMake insists on overwriting this variable to it must be set just before looking for a library
+    if(NOT ${BUILD_SHARED_LIBS})
+      if(APPLE)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a;.dylib;.so)
+      elseif(UNIX AND NOT APPLE)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a;.so)
+      endif()
+    endif()
     find_package(${MAGICK_FIND_NAME} QUIET)
     if(${${MAGICK_FIND_NAME}_FOUND})
       # CMake config
@@ -470,7 +478,15 @@ endif()
 # Compile with X11 if present
 magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE)
 if(X11_DELEGATE)
-  set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} X11::Xext)
+  set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} X11::Xext X11::xcb X11::Xau X11::Xdmcp)
+  # Check supported X11 extensions  
+  find_package(X11)
+  if(X11_Xshape_FOUND)
+    set(HAVE_SHAPE 1)
+  endif()
+  if(X11_XShm_FOUND)
+    set(HAVE_SHARED_MEMORY 1)
+  endif()
 endif()
 
 # Set ImageMagick base dir to be used inside sub-projects
