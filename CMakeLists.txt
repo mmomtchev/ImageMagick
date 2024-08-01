@@ -55,7 +55,7 @@ macro(magick_find_delegate)
 
     # First attempt, CMake config file
     find_package(${MAGICK_FIND_NAME} QUIET NO_MODULE)
-    if(${${MAGICK_FIND_NAME}_FOUND})
+    if(${MAGICK_FIND_NAME}_FOUND)
       message("-- Found CMake config ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
       if(MAGICK_FIND_TARGETS)
         # Custom target
@@ -81,7 +81,7 @@ macro(magick_find_delegate)
     endif()
 
     # Second attempt, pkg-config
-    if(NOT ${${MAGICK_FIND_NAME}_FOUND} AND DEFINED PkgConfig_FOUND)
+    if(NOT ${MAGICK_FIND_NAME}_FOUND AND DEFINED PkgConfig_FOUND)
       if(MAGICK_FIND_PKGCONFIG)
         # Custom pkgconfig name
         set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_PKGCONFIG})
@@ -89,8 +89,9 @@ macro(magick_find_delegate)
         # Default name
         set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME})
       endif()
-      pkg_check_modules(${MAGICK_FIND_NAME} ${MAGICK_FIND_SEARCH_TARGET})
+      pkg_check_modules(${MAGICK_FIND_NAME} QUIET ${MAGICK_FIND_SEARCH_TARGET})
       if(${${MAGICK_FIND_NAME}_FOUND})
+        message("-- Found pkg-config module ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
         get_pkgconfig_setting(CMAKE_REQUIRED_INCLUDES ${MAGICK_FIND_NAME} INCLUDE_DIRS)
         get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${MAGICK_FIND_NAME} INCLUDE_DIRS)
         get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARIES ${MAGICK_FIND_NAME} LIBRARIES)
@@ -102,9 +103,9 @@ macro(magick_find_delegate)
     endif()
 
     # Third attempt, built-in CMake find module
-    if(NOT DEFINED(${MAGICK_FIND_NAME}_FOUND) OR NOT ${${MAGICK_FIND_NAME}_FOUND})
+    if(NOT ${MAGICK_FIND_NAME}_FOUND)
       find_package(${MAGICK_FIND_NAME} QUIET)
-      if(${${MAGICK_FIND_NAME}_FOUND})
+      if(${MAGICK_FIND_NAME}_FOUND)
         message("-- Found CMake module ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
         if(MAGICK_FIND_TARGETS)
           # Custom target
@@ -448,12 +449,19 @@ magick_find_delegate(DELEGATE HEIC_DELEGATE NAME libheif DEFAULT TRUE
 magick_find_delegate(DELEGATE JBIG_DELEGATE NAME jbig DEFAULT TRUE)
 magick_find_delegate(DELEGATE JPEG_DELEGATE NAME JPEG DEFAULT TRUE
     PKGCONFIG libjpeg)
-magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
-    TARGETS openjp2 PKGCONFIG libopenjp2)
+
 # OpenJPEG has an ancient CMake that wasn't fixed until 2.5
+if(NOT BUILD_SHARED_LIBS)
+  magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
+      TARGETS openjp2_static PKGCONFIG libopenjp2)
+else()
+  magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
+      TARGETS openjp2 PKGCONFIG libopenjp2)
+endif()
 if(OPENJPEG_INCLUDE_DIRS)
   list(APPEND IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${OPENJPEG_INCLUDE_DIRS})
 endif()
+
 magick_find_delegate(DELEGATE OPENEXR_DELEGATE NAME OpenEXR DEFAULT TRUE)
 magick_find_delegate(DELEGATE PNG_DELEGATE NAME PNG DEFAULT TRUE
     PKGCONFIG libpng)
@@ -524,6 +532,7 @@ endif()
 magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE
     PKGCONFIG FALSE)
 if(X11_DELEGATE)
+  set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} X11::Xext X11::xcb X11::Xau X11::Xdmcp)
   # Check supported X11 extensions
   find_package(X11)
   if(X11_Xshape_FOUND)
