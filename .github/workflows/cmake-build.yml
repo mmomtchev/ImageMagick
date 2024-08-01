@@ -160,6 +160,12 @@ jobs:
         echo "EXPECTED_DELEGATES=jemalloc -png" >> $GITHUB_ENV
       if: matrix.delegates == 'custom-delegates'
 
+    - name: https://github.com/actions/runner-images/issues/10378
+      shell: bash
+      run: |
+        echo "CUSTOM_DELEGATES=-DTIFF_DELEGATE=OFF" >> $GITHUB_ENV
+      if: matrix.provider == 'system' && runner.os == 'Linux'
+
     - name: Generate CMake build
       shell: bash
       run: |
