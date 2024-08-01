@@ -102,7 +102,7 @@ macro(magick_find_delegate)
     endif()
 
     # Third attempt, built-in CMake find module
-    if(NOT ${${MAGICK_FIND_NAME}_FOUND})
+    if(NOT DEFINED(${MAGICK_FIND_NAME}_FOUND) OR NOT ${${MAGICK_FIND_NAME}_FOUND})
       find_package(${MAGICK_FIND_NAME} QUIET)
       if(${${MAGICK_FIND_NAME}_FOUND})
         message("-- Found CMake module ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
@@ -522,7 +522,7 @@ endif()
 
 # Compile with X11 if present
 magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE
-    TARGETS X11:X11 X11::Xext X11::xcb X11::Xau X11::Xdmcp)
+    PKGCONFIG FALSE)
 if(X11_DELEGATE)
   # Check supported X11 extensions
   find_package(X11)
