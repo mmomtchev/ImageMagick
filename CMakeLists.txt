@@ -530,7 +530,7 @@ endif()
 
 # Compile with X11 if present
 magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE
-    PKGCONFIG FALSE)
+    PKGCONFIG "do-not-use-X11-pkgconfig")
 if(X11_DELEGATE)
   set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} X11::Xext X11::xcb X11::Xau X11::Xdmcp)
   # Check supported X11 extensions
