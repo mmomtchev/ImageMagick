@@ -259,7 +259,7 @@ jobs:
     - name: Generate CMake options
       shell: bash
       run: |
-        echo "HDRI=-DMMAGICK_HDRI_ENABLE=${{ matrix.hdri && 'ON' || 'OFF' }}" >> $GITHUB_ENV
+        echo "HDRI=-DMAGICK_HDRI_ENABLE=${{ matrix.hdri && 'ON' || 'OFF' }}" >> $GITHUB_ENV
         echo "QUANT=-DMAGICKCORE_QUANTUM_DEPTH=${{ matrix.quant }}" >> $GITHUB_ENV
 
     - name: Generate CMake build
