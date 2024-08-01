@@ -451,13 +451,8 @@ magick_find_delegate(DELEGATE JPEG_DELEGATE NAME JPEG DEFAULT TRUE
     PKGCONFIG libjpeg)
 
 # OpenJPEG has an ancient CMake that wasn't fixed until 2.5
-if(NOT BUILD_SHARED_LIBS)
-  magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
-      TARGETS openjp2_static PKGCONFIG libopenjp2)
-else()
-  magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
-      TARGETS openjp2 PKGCONFIG libopenjp2)
-endif()
+magick_find_delegate(DELEGATE LIBOPENJP2_DELEGATE NAME OpenJPEG DEFAULT TRUE
+    TARGETS openjp2 PKGCONFIG libopenjp2)
 if(OPENJPEG_INCLUDE_DIRS)
   list(APPEND IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${OPENJPEG_INCLUDE_DIRS})
 endif()
