@@ -82,6 +82,8 @@ macro(magick_find_delegate)
     handle_cmake_dep("-- Found CMake config ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
 
     # Second attempt, pkg-config
+    # TODO: This should resolve only pkg-config modules in non-standard locations
+    # with the system-wide default locations being a seperate fourth attempt
     if(NOT ${MAGICK_FIND_NAME}_FOUND AND DEFINED PkgConfig_FOUND)
       if(MAGICK_FIND_PKGCONFIG)
         # Custom pkgconfig name
