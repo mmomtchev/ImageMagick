@@ -521,9 +521,9 @@ if(WIN32)
 endif()
 
 # Compile with X11 if present
-magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE)
+magick_find_delegate(DELEGATE X11_DELEGATE NAME X11 DEFAULT TRUE
+    TARGETS X11:X11 X11::Xext X11::xcb X11::Xau X11::Xdmcp)
 if(X11_DELEGATE)
-  set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} X11::Xext X11::xcb X11::Xau X11::Xdmcp)
   # Check supported X11 extensions
   find_package(X11)
   if(X11_Xshape_FOUND)
