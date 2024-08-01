@@ -31,6 +31,30 @@ macro(get_pkgconfig_setting TARGET_LIST PKG SETTING)
 endmacro()
 
 macro(handle_cmake_dep)
+  if(${MAGICK_FIND_NAME}_FOUND)
+    message(${ARGV0})
+    if(MAGICK_FIND_TARGETS)
+      # Custom target
+      set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_TARGETS})
+    else()
+      # Default target
+      set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME}::${MAGICK_FIND_NAME})
+    endif()
+    if(TARGET ${MAGICK_FIND_SEARCH_TARGET})
+      set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} ${MAGICK_FIND_SEARCH_TARGET})
+      # Add the include directories to CMAKE_REQUIRED_INCLUDES to check for header files
+      get_target_property(TARGET_INCLUDES ${MAGICK_FIND_SEARCH_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+      if(TARGET_INCLUDES)
+        list(APPEND CMAKE_REQUIRED_INCLUDES ${TARGET_INCLUDES})
+      endif()
+      # This goes into the FindImageMagick.cmake dependencies
+      list(APPEND IMAGEMAGICK_DEPENDENCIES ${MAGICK_FIND_NAME})
+      set(${MAGICK_FIND_DELEGATE} TRUE)
+    else()
+      message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
+      set(${MAGICK_FIND_NAME}_FOUND FALSE)
+    endif()
+  endif()
 endmacro()
 
 #
@@ -55,30 +79,7 @@ macro(magick_find_delegate)
 
     # First attempt, CMake config file
     find_package(${MAGICK_FIND_NAME} QUIET NO_MODULE)
-    if(${MAGICK_FIND_NAME}_FOUND)
-      message("-- Found CMake config ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
-      if(MAGICK_FIND_TARGETS)
-        # Custom target
-        set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_TARGETS})
-      else()
-        # Default target
-        set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME}::${MAGICK_FIND_NAME})
-      endif()
-      if(TARGET ${MAGICK_FIND_SEARCH_TARGET})
-        set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} ${MAGICK_FIND_SEARCH_TARGET})
-        # Add the include directories to CMAKE_REQUIRED_INCLUDES to check for header files
-        get_target_property(TARGET_INCLUDES ${MAGICK_FIND_SEARCH_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
-        if(TARGET_INCLUDES)
-          list(APPEND CMAKE_REQUIRED_INCLUDES ${TARGET_INCLUDES})
-        endif()
-        # This goes into the FindImageMagick.cmake dependencies
-        list(APPEND IMAGEMAGICK_DEPENDENCIES ${MAGICK_FIND_NAME})
-        set(${MAGICK_FIND_DELEGATE} TRUE)
-      else()
-        message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
-        set(${MAGICK_FIND_NAME}_FOUND FALSE)
-      endif()
-    endif()
+    handle_cmake_dep("-- Found CMake config ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
 
     # Second attempt, pkg-config
     if(NOT ${MAGICK_FIND_NAME}_FOUND AND DEFINED PkgConfig_FOUND)
@@ -105,30 +106,7 @@ macro(magick_find_delegate)
     # Third attempt, built-in CMake find module
     if(NOT ${MAGICK_FIND_NAME}_FOUND)
       find_package(${MAGICK_FIND_NAME} QUIET)
-      if(${MAGICK_FIND_NAME}_FOUND)
-        message("-- Found CMake module ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
-        if(MAGICK_FIND_TARGETS)
-          # Custom target
-          set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_TARGETS})
-        else()
-          # Default target
-          set(MAGICK_FIND_SEARCH_TARGET ${MAGICK_FIND_NAME}::${MAGICK_FIND_NAME})
-        endif()
-        if(TARGET ${MAGICK_FIND_SEARCH_TARGET})
-          set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} ${MAGICK_FIND_SEARCH_TARGET})
-          # Add the include directories to CMAKE_REQUIRED_INCLUDES to check for header files
-          get_target_property(TARGET_INCLUDES ${MAGICK_FIND_SEARCH_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
-          if(TARGET_INCLUDES)
-            list(APPEND CMAKE_REQUIRED_INCLUDES ${TARGET_INCLUDES})
-          endif()
-          # This goes into the FindImageMagick.cmake dependencies
-          list(APPEND IMAGEMAGICK_DEPENDENCIES ${MAGICK_FIND_NAME})
-          set(${MAGICK_FIND_DELEGATE} TRUE)
-        else()
-          message("-- Did not find expected target ${MAGICK_FIND_SEARCH_TARGET}, not using it")
-          set(${MAGICK_FIND_NAME}_FOUND FALSE)
-        endif()
-      endif()
+      handle_cmake_dep("-- Found CMake module ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
     endif()
   endif()
 
