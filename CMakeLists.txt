@@ -389,7 +389,7 @@ magick_find_delegate(DELEGATE LZMA_DELEGATE NAME LibLZMA DEFAULT TRUE
     PKGCONFIG liblzma)
 magick_find_delegate(DELEGATE ZLIB_DELEGATE NAME ZLIB DEFAULT TRUE
     PKGCONFIG zlib)
-magick_find_delegate(DELEGATE ZIP_DELEGATE NAME ZIP DEFAULT TRUE
+magick_find_delegate(DELEGATE ZIP_DELEGATE NAME libzip DEFAULT TRUE
     TARGETS libzip::zip PKGCONFIG libzip)
 magick_find_delegate(DELEGATE ZSTD_DELEGATE NAME zstd DEFAULT TRUE
     TARGETS zstd::libzstd_static PKGCONFIG libzstd)
