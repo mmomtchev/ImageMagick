@@ -160,11 +160,17 @@ jobs:
         echo "EXPECTED_DELEGATES=jemalloc -png" >> $GITHUB_ENV
       if: matrix.delegates == 'custom-delegates'
 
-    - name: https://github.com/actions/runner-images/issues/10378
+    - name: Workaround for https://github.com/actions/runner-images/issues/10378
       shell: bash
       run: |
         echo "CUSTOM_DELEGATES=-DTIFF_DELEGATE=OFF" >> $GITHUB_ENV
       if: matrix.provider == 'system' && runner.os == 'Linux'
+
+    - name: Workaround for GHA/macOS-13 combination of zstd cmake + zip pkg-config not working for static builds
+      shell: bash
+      run: |
+        echo "CUSTOM_DELEGATES=-DZIP_DELEGATE=OFF" >> $GITHUB_ENV
+      if: matrix.provider == 'system' && runner.os == 'macOS'
 
     - name: Generate CMake build
       shell: bash
