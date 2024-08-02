@@ -2,9 +2,7 @@ name: CMake portable build
 
 on:
   push:
-    branches:
-      - cmake-portable-build
-      - cmake-testing
+    branches: '*'
   schedule:
       # schedule a regular Sunday Mass to check that
       # everything still works
