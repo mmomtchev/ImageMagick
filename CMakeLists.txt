@@ -448,12 +448,11 @@ magick_find_delegate(DELEGATE WEBPMUX_DELEGATE NAME WebP DEFAULT TRUE
     TARGETS WebP::libwebpmux PKGCONFIG libwebpmux)
 magick_find_delegate(DELEGATE WEBPDEMUX_DELEGATE NAME WebP DEFAULT TRUE
     TARGETS WebP::webpdemux PKGCONFIG libwebpdemux)
+
 magick_find_delegate(DELEGATE JXL_DELEGATE NAME libjxl DEFAULT TRUE)
-if(${JXL_DELEGATE})
-  unset(JXL_DELEGATE)
-  # ImageMagick requires the threaded version, othewise it cannot work
-  magick_find_delegate(DELEGATE JXL_DELEGATE NAME libjxl_threads DEFAULT TRUE)
-endif()
+# if there is a threaded version, ImageMagick requires it, othewise it cannot work
+magick_find_delegate(DELEGATE JXL_THREADS_DELEGATE NAME libjxl_threads DEFAULT TRUE)
+
 magick_find_delegate(DELEGATE FONTCONFIG_DELEGATE NAME Fontconfig DEFAULT TRUE
     PKGCONFIG fontconfig)
 magick_find_delegate(DELEGATE CAIRO_DELEGATE NAME Cairo DEFAULT TRUE
