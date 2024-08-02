@@ -78,7 +78,7 @@ macro(magick_find_delegate)
     endif()
 
     # First attempt, CMake config file
-    find_package(${MAGICK_FIND_NAME} QUIET NO_MODULE)
+    find_package(${MAGICK_FIND_NAME} QUIET NO_CMAKE_INSTALL_PREFIX)
     handle_cmake_dep("-- Found CMake config ${MAGICK_FIND_NAME} ${${MAGICK_FIND_NAME}_VERSION}")
 
     # Second attempt, pkg-config
