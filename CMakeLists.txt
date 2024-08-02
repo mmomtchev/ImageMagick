@@ -451,7 +451,11 @@ magick_find_delegate(DELEGATE WEBPDEMUX_DELEGATE NAME WebP DEFAULT TRUE
 
 magick_find_delegate(DELEGATE JXL_DELEGATE NAME libjxl DEFAULT TRUE)
 # if there is a threaded version, ImageMagick requires it, othewise it cannot work
-magick_find_delegate(DELEGATE JXL_THREADS_DELEGATE NAME libjxl_threads DEFAULT TRUE)
+magick_find_delegate(DELEGATE JXL_THREADS_DELEGATE NAME libjxl DEFAULT TRUE
+    TARGETS libjxl::jxl_threads PKGCONFIG libjxl_threads)
+# the _threads version may require (if present) a _cms version
+magick_find_delegate(DELEGATE JXL_CMS_DELEGATE NAME libjxl DEFAULT TRUE
+    TARGETS libjxl::jxl_cms PKGCONFIG libjxl_cms)
 
 magick_find_delegate(DELEGATE FONTCONFIG_DELEGATE NAME Fontconfig DEFAULT TRUE
     PKGCONFIG fontconfig)
