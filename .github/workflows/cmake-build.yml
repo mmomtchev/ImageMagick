@@ -173,6 +173,12 @@ jobs:
         echo "CUSTOM_DELEGATES=-DTIFF_DELEGATE=OFF" >> $GITHUB_ENV
       if: matrix.provider == 'system' && runner.os == 'Linux'
 
+    - name: Workaround for https://github.com/conan-io/conan-center-index/issues/24798
+      shell: bash
+      run: |
+        echo "CUSTOM_DELEGATES=-DJXL_DELEGATE=OFF" >> $GITHUB_ENV
+      if: matrix.provider == 'conan' && runner.os == 'Linux' && matrix.libtype == 'shared'
+
     - name: Generate CMake build
       shell: bash
       run: |
