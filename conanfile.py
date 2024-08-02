@@ -159,9 +159,6 @@ class ImageMagickDelegates(ConanFile):
         self.requires('cairo/1.17.8', force=True)
         self.requires('expat/2.6.0', force=True)
 
-      if self.options.simd and self.settings.arch != 'wasm':
-        self.requires('highway/1.0.3', force=True)
-
       if (self.options.openmp and self.settings.arch != 'wasm' and self.settings.os != 'Windows' and
           self.settings.os != 'Macos' and self.settings.arch != 'armv8' and self.settings.get_safe("build_type", default="Release") != 'Debug') :
         self.requires('llvm-openmp/17.0.6', force=True)
@@ -172,7 +169,7 @@ class ImageMagickDelegates(ConanFile):
       if self.options.jxl:
         self.requires('libjxl/0.6.1', force=True)
         self.requires('brotli/1.1.0', force=True)
-        if self.settings.arch != 'wasm':
+        if self.options.simd and self.settings.arch != 'wasm':
           self.requires('highway/1.0.3', force=True)
 
       # Although supported in theory, using jemalloc on Windows is very difficult especially
