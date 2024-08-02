@@ -177,6 +177,7 @@ jobs:
       shell: bash
       run: |
         echo "CUSTOM_DELEGATES=-DJXL_DELEGATE=OFF" >> $GITHUB_ENV
+        echo "EXPECTED_DELEGATES=${EXPECTED_DELEGATES}" | sed s/jxl// >> $GITHUB_ENV
       if: matrix.provider == 'conan' && runner.os == 'Linux' && matrix.libtype == 'shared'
 
     - name: Generate CMake build
