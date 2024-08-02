@@ -167,10 +167,7 @@ class ImageMagickDelegates(ConanFile):
         self.requires('pixman/0.42.2', force=True)
 
       if self.options.jxl:
-        self.requires('libjxl/0.6.1', force=True)
-        self.requires('brotli/1.1.0', force=True)
-        if self.options.simd and self.settings.arch != 'wasm':
-          self.requires('highway/1.0.3', force=True)
+        self.requires('libjxl/0.10.3', force=True)
 
       # Although supported in theory, using jemalloc on Windows is very difficult especially
       # with a generic build that supports options and shared/static builds
