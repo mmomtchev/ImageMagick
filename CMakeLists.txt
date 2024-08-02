@@ -69,7 +69,7 @@ macro(magick_find_delegate)
     set(${MAGICK_FIND_NAME}_FOUND FALSE)
 
     # CMake insists on overwriting this variable to it must be set just before looking for a library
-    if(NOT ${BUILD_SHARED_LIBS})
+    if(MAGICK_PREFER_STATIC_LIBS)
       if(APPLE)
         set(CMAKE_FIND_LIBRARY_SUFFIXES .a;.dylib;.so)
       elseif(UNIX AND NOT APPLE)
@@ -195,6 +195,7 @@ if(${BUILD_SHARED_LIBS})
 else()
   set(MAGICK_BUILD_DEFINES ${MAGICK_BUILD_DEFINES} _LIB STATIC_MAGICK NOAUTOLINK_MAGICK)
 endif()
+option(MAGICK_PREFER_STATIC_LIBS "Prefer using static libraries when possible (works only on POSIX for libraries using find_library())" FALSE)
 
 option(MAGICK_HDRI_ENABLE "Build ImageMagick with High dynamic-range imaging" TRUE)
 if(MAGICK_HDRI_ENABLE)

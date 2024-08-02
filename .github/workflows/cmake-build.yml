@@ -144,7 +144,7 @@ jobs:
     - name: Generate CMake options
       shell: bash
       if: matrix.libtype == 'static'
-      run: echo "LIBTYPE=-DBUILD_SHARED_LIBS=OFF" >> $GITHUB_ENV
+      run: echo "LIBTYPE=-DBUILD_SHARED_LIBS=OFF -DMAGICK_PREFER_STATIC_LIBS=ON" >> $GITHUB_ENV
 
     - name: Set zero configuration
       shell: bash
