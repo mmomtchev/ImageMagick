@@ -113,7 +113,7 @@ jobs:
 
     - name: Restore conan artifacts from shared cache (conan/pkgconf)
       id: conan-artifacts
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ~/.conan2
         key: ${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
