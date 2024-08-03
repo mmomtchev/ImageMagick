@@ -142,6 +142,14 @@ jobs:
     - name: Generate CMake options
       shell: bash
       if: matrix.libtype == 'static'
+      run: echo "LIBTYPE=-DBUILD_SHARED_LIBS=OFF" >> $GITHUB_ENV
+
+    # This option is usable only with conan, the CMake built-in find modules
+    # behave horribly with static modules
+    # Many of them call internally pkg-config and do not pass --static
+    - name: Enable fully self-contained libraries
+      shell: bash
+      if: matrix.libtype == 'static' && (matrix.provider == 'conan' || matrix.provider == 'pkgconf')
       run: echo "LIBTYPE=-DBUILD_SHARED_LIBS=OFF -DMAGICK_PREFER_STATIC_LIBS=ON" >> $GITHUB_ENV
 
     - name: Set zero configuration

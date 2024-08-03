@@ -132,6 +132,14 @@ Similarly,
 
 will build with `jemalloc` support which is disabled by default.
 
+### Produce universal binaries
+
+A somewhat hackish option, `-DMAGICK_PREFER_STATIC_LIBS=ON`, allows to tweak the CMake `find_library()` detection mechanism in order to prefer static over shared libraries. This feature is not officially supported by CMake.
+
+It tends to break many built-in find modules that search for the libraries in the system environment.
+
+When used in an environment where all the delegates are provided via user-supplied CMake config files or `pkg-config` modules - such as when using `conan` - it allows to include statically the system libraries - and especially X11. It is used for the generation of the prebuilt universal binaries.
+
 
 # Using The Library
 
