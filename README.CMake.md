@@ -20,8 +20,11 @@ Unless explicitly stated, all the build instructions are valid for all three maj
 The build process will automatically identify available dependencies. It will look, in this order, for:
 
 * Manually provided `CMake` dependency with an environment variable (`<pkg>_ROOT`, refer to https://cmake.org/cmake/help/latest/command/find_package.html)
-* User-provided CMake config file (`conan`-provided dependencies use this)
+* User-provided CMake config file
+  - `conan`-provided dependencies use this
 * User-provided `pkg-config` dependency in `PKG_CONFIG_PATH`
+* User-provided CMake find module
+  - `conan`-provided dependencies that have alternatives such as `JPEG` being resolved to either `libjpeg` or `libjpeg-turbo` use this
 * System-wide package-provided `CMake` support  (`<PKG>Config.cmake` usually somewhere in `/usr/lib/`)
 * System-wide built-in `CMake` find module (`Find<PKG>.cmake` usually in `/usr/share/cmake`, part of the `CMake` installation)
 * System-wide `pkg-config`
