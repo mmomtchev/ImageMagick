@@ -748,12 +748,7 @@ target_include_directories(${MAGICKCORE_BINARY_NAME} PRIVATE ${IMAGEMAGICK_BASE_
 target_include_directories(${MAGICKCORE_BINARY_NAME} PRIVATE ${IMAGEMAGICK_DELEGATES_INCLUDE_DIRS})
 target_compile_options(${MAGICKCORE_BINARY_NAME} PRIVATE ${IMAGEMAGICK_DELEGATES_CFLAGS})
 target_link_directories(${MAGICKCORE_BINARY_NAME} PUBLIC ${IMAGEMAGICK_DELEGATES_LIBRARY_DIRS})
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  # CMake 3.24 handles this automatically, but it is too recent to impose
-  target_link_libraries(${MAGICKCORE_BINARY_NAME} PUBLIC ${IMAGEMAGICK_DELEGATES_LIBRARIES})
-else()
-  target_link_libraries(${MAGICKCORE_BINARY_NAME} PUBLIC ${IMAGEMAGICK_DELEGATES_LIBRARIES})
-endif()
+target_link_libraries(${MAGICKCORE_BINARY_NAME} PUBLIC ${IMAGEMAGICK_DELEGATES_LIBRARIES})
 #TODO should we make a test to see if we need to link -lm ??
 if(UNIX)
   target_link_libraries(${MAGICKCORE_BINARY_NAME} PUBLIC -lm)
