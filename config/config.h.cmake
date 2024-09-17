@@ -767,7 +767,7 @@
 
 /* Absolute path of where ImageMagick architecture dependent files are
    installed. */
-#cmakedefine LIBRARY_ABSOLUTE_PATH "@LIBRARY_RELATIVE_PATH@"
+#cmakedefine LIBRARY_ABSOLUTE_PATH "@LIBRARY_ABSOLUTE_PATH@"
 
 /* Binaries in libraries path base name (will be during install linked to bin)
    */
