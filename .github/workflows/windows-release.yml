@@ -148,7 +148,9 @@ jobs:
         nmake release
 
     - name: 'Azure CLI login with federated credential'
-      if: github.event_name != 'pull_request'
+      env:
+        secrets_available: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      if: env.secrets_available
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -325,7 +327,9 @@ jobs:
         msbuild /m /t:Rebuild /p:Configuration=Release,Platform=${{matrix.platform}}
 
     - name: 'Azure CLI login with federated credential'
-      if: github.event_name != 'pull_request'
+      env:
+        secrets_available: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      if: env.secrets_available
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
