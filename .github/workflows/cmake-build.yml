@@ -116,7 +116,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ~/.conan2
-        key: ${{ runner.os }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
       if: matrix.provider == 'conan' || matrix.provider == 'pkgconf'
 
     - name: Install all delegates (conan)
