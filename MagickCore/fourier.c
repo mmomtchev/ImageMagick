@@ -343,12 +343,12 @@ MagickExport Image *ComplexImages(const Image *images,const ComplexOperator op,
         Cr[i]=(double) QuantumRange*cr;
         Ci[i]=(double) QuantumRange*ci;
       }
-      Ar+=GetPixelChannels(Ar_image);
-      Ai+=GetPixelChannels(Ai_image);
-      Br+=GetPixelChannels(Br_image);
-      Bi+=GetPixelChannels(Bi_image);
-      Cr+=GetPixelChannels(Cr_image);
-      Ci+=GetPixelChannels(Ci_image);
+      Ar+=(ptrdiff_t) GetPixelChannels(Ar_image);
+      Ai+=(ptrdiff_t) GetPixelChannels(Ai_image);
+      Br+=(ptrdiff_t) GetPixelChannels(Br_image);
+      Bi+=(ptrdiff_t) GetPixelChannels(Bi_image);
+      Cr+=(ptrdiff_t) GetPixelChannels(Cr_image);
+      Ci+=(ptrdiff_t) GetPixelChannels(Ci_image);
     }
     if (SyncCacheViewAuthenticPixels(Ci_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -627,7 +627,7 @@ static MagickBooleanType ForwardFourier(const FourierInfo *fourier_info,
         }
       }
       i++;
-      q+=GetPixelChannels(magnitude_image);
+      q+=(ptrdiff_t) GetPixelChannels(magnitude_image);
     }
     status=SyncCacheViewAuthenticPixels(magnitude_view,exception);
     if (status == MagickFalse)
@@ -679,7 +679,7 @@ static MagickBooleanType ForwardFourier(const FourierInfo *fourier_info,
         }
       }
       i++;
-      q+=GetPixelChannels(phase_image);
+      q+=(ptrdiff_t) GetPixelChannels(phase_image);
     }
     status=SyncCacheViewAuthenticPixels(phase_view,exception);
     if (status == MagickFalse)
@@ -782,7 +782,7 @@ static MagickBooleanType ForwardFourierTransform(FourierInfo *fourier_info,
         }
       }
       i++;
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
   }
   image_view=DestroyCacheView(image_view);
@@ -1213,7 +1213,7 @@ static MagickBooleanType InverseFourier(FourierInfo *fourier_info,
         }
       }
       i++;
-      p+=GetPixelChannels(magnitude_image);
+      p+=(ptrdiff_t) GetPixelChannels(magnitude_image);
     }
   }
   magnitude_view=DestroyCacheView(magnitude_view);
@@ -1261,7 +1261,7 @@ static MagickBooleanType InverseFourier(FourierInfo *fourier_info,
         }
       }
       i++;
-      p+=GetPixelChannels(phase_image);
+      p+=(ptrdiff_t) GetPixelChannels(phase_image);
     }
   }
   if (fourier_info->modulus != MagickFalse)
@@ -1440,7 +1440,7 @@ static MagickBooleanType InverseFourierTransform(FourierInfo *fourier_info,
           }
         }
       i++;
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
       break;

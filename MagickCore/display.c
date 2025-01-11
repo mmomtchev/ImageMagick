@@ -2421,7 +2421,7 @@ static MagickBooleanType XAnnotateEditImage(Display *display,
                     x=annotate_info->x+(int) annotate_info->width;
                     y=annotate_info->y;
                     if (annotate_info->width != 0)
-                      p+=strlen(annotate_info->text);
+                      p+=(ptrdiff_t) strlen(annotate_info->text);
                     break;
                   }
               }
@@ -3745,7 +3745,7 @@ static MagickBooleanType XColorEditImage(Display *display,
                         SetPixelBlue(*image,ScaleShortToQuantum(
                           color.blue),q);
                       }
-                    q+=GetPixelChannels(*image);
+                    q+=(ptrdiff_t) GetPixelChannels(*image);
                   }
                   if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
                     break;
@@ -3819,7 +3819,7 @@ static MagickBooleanType XColorEditImage(Display *display,
                 SetPixelRed(*image,ScaleShortToQuantum(color.red),q);
                 SetPixelGreen(*image,ScaleShortToQuantum(color.green),q);
                 SetPixelBlue(*image,ScaleShortToQuantum(color.blue),q);
-                q+=GetPixelChannels(*image);
+                q+=(ptrdiff_t) GetPixelChannels(*image);
               }
               if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
                 break;
@@ -4305,7 +4305,7 @@ static MagickBooleanType XCompositeImage(Display *display,
         for (x=0; x < (int) image->columns; x++)
         {
           SetPixelAlpha(image,opacity,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
           break;
@@ -5332,7 +5332,7 @@ static MagickBooleanType XCropImage(Display *display,
     for (x=0; x < (int) crop_info.width; x++)
     {
       SetPixelAlpha(image,TransparentAlpha,q);
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
       break;
@@ -6441,6 +6441,8 @@ static void XImageCache(Display *display,XResourceInfo *resource_info,
       if (undo_image == (Image *) NULL)
         {
           (void) XBell(display,0);
+          ThrowXWindowException(ImageError,"NoImagesWereFound",
+            (*image)->filename);
           return;
         }
       cache_image=undo_image;
@@ -9583,8 +9585,8 @@ static void XMakePanImage(Display *display,XResourceInfo *resource_info,
   status=XMakeImage(display,resource_info,&windows->pan,image,
     windows->pan.width,windows->pan.height,exception);
   if (status == MagickFalse)
-    ThrowXWindowException(ResourceLimitError,
-     "MemoryAllocationFailed",image->filename);
+    ThrowXWindowException(ResourceLimitError,"MemoryAllocationFailed",
+      image->filename);
   (void) XSetWindowBackgroundPixmap(display,windows->pan.id,
     windows->pan.pixmap);
   (void) XClearWindow(display,windows->pan.id);
@@ -10105,7 +10107,7 @@ static MagickBooleanType XMatteEditImage(Display *display,
                 GetPixelInfoPixel(*image,q,&pixel);
                 if (IsFuzzyEquivalencePixelInfo(&pixel,&target))
                   SetPixelAlpha(*image,(Quantum) StringToLong(matte),q);
-                q+=GetPixelChannels(*image);
+                q+=(ptrdiff_t) GetPixelChannels(*image);
               }
               if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
                 break;
@@ -10167,7 +10169,7 @@ static MagickBooleanType XMatteEditImage(Display *display,
               for (x=0; x < (int) (*image)->columns; x++)
               {
                 SetPixelAlpha(*image,(Quantum) StringToLong(matte),q);
-                q+=GetPixelChannels(*image);
+                q+=(ptrdiff_t) GetPixelChannels(*image);
               }
               if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
                 break;
@@ -10268,8 +10270,8 @@ static Image *XOpenImage(Display *display,XResourceInfo *resource_info,
       filelist=(char **) AcquireQuantumMemory((size_t) count,sizeof(*filelist));
       if (filelist == (char **) NULL)
         {
-          ThrowXWindowException(ResourceLimitError,
-            "MemoryAllocationFailed","...");
+          ThrowXWindowException(ResourceLimitError,"MemoryAllocationFailed",
+            "...");
           (void) XFreeStringList(files);
           return((Image *) NULL);
         }
@@ -13303,7 +13305,7 @@ static Image *XTileImage(Display *display,XResourceInfo *resource_info,
           for (j=0; j < (int) width; j++)
           {
             SetPixelViaPixelInfo(image,&pixel,s);
-            s+=GetPixelChannels(image);
+            s+=(ptrdiff_t) GetPixelChannels(image);
           }
           if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
             break;

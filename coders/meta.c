@@ -316,6 +316,9 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
     state,
     next;
 
+  MagickBooleanType
+    status;
+
   MagickOffsetType
     savedpos,
     currentpos;
@@ -343,6 +346,7 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
     return(-1);
   newstr = name = token = (char *) NULL;
   savedpos = 0;
+  status=MagickTrue;
   token_info=AcquireTokenInfo();
   while (super_fgets(&line,&inputlen,ifile)!=NULL)
   {
@@ -439,21 +443,21 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
                     currentpos = TellBlob(ofile);
                     if (currentpos < 0)
                       {
-                        line=DestroyString(line);
-                        return(-1);
+                        status=MagickFalse;
+                        break;
                       }
                     offset=SeekBlob(ofile,savedpos,SEEK_SET);
                     if (offset < 0)
                       {
-                        line=DestroyString(line);
-                        return(-1);
+                        status=MagickFalse;
+                        break;
                       }
                     (void) WriteBlobMSBLong(ofile,(unsigned int) diff);
                     offset=SeekBlob(ofile,currentpos,SEEK_SET);
                     if (offset < 0)
                       {
-                        line=DestroyString(line);
-                        return(-1);
+                        status=MagickFalse;
+                        break;
                       }
                     savedolen = 0L;
                   }
@@ -498,7 +502,10 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
                     /* patch in a fake length for now and fix it later */
                     savedpos = TellBlob(ofile);
                     if (savedpos < 0)
-                      return(-1);
+                      {
+                        status=MagickFalse;
+                        break;
+                      }
                     (void) WriteBlobMSBLong(ofile,0xFFFFFFFFU);
                     outputlen += 4;
                     savedolen = outputlen;
@@ -528,6 +535,8 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
       newstr=DestroyString(newstr);
     if (name != (char *) NULL)
       name=DestroyString(name);
+    if (status == MagickFalse)
+      break;
   }
   token_info=DestroyTokenInfo(token_info);
   if (token != (char *) NULL)
@@ -556,7 +565,7 @@ static ssize_t parse8BIM(Image *ifile, Image *ofile)
         return(-1);
       savedolen = 0L;
     }
-  return outputlen;
+  return(status == MagickFalse ? -1 : outputlen);
 }
 
 static char *super_fgets_w(char **b, size_t *blen, Image *file)
@@ -641,6 +650,9 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
     savedolen = 0L,
     outputlen = 0L;
 
+  MagickBooleanType
+    status;
+
   MagickOffsetType
     savedpos,
     currentpos;
@@ -656,6 +668,7 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
   newstr = name = token = (char *) NULL;
   savedpos = 0;
   token_info=AcquireTokenInfo();
+  status=MagickTrue;
   while (super_fgets_w(&line,&inputlen,ifile) != NULL)
   {
     state=0;
@@ -745,17 +758,28 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
                     MagickOffsetType
                       offset;
 
-                    ssize_t diff = outputlen - savedolen;
+                    ssize_t
+                      diff = outputlen - savedolen;
+
                     currentpos = TellBlob(ofile);
                     if (currentpos < 0)
-                      return(-1);
+                      {
+                        status=MagickFalse;
+                        break;
+                      }
                     offset=SeekBlob(ofile,savedpos,SEEK_SET);
                     if (offset < 0)
-                      return(-1);
+                      {
+                        status=MagickFalse;
+                        break;
+                      }
                     (void) WriteBlobMSBLong(ofile,(unsigned int) diff);
                     offset=SeekBlob(ofile,currentpos,SEEK_SET);
                     if (offset < 0)
-                      return(-1);
+                      {
+                        status=MagickFalse;
+                        break;
+                      }
                     savedolen = 0L;
                   }
                 if (outputlen & 1)
@@ -799,7 +823,10 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
                     /* patch in a fake length for now and fix it later */
                     savedpos = TellBlob(ofile);
                     if (savedpos < 0)
-                      return(-1);
+                      {
+                        status=MagickFalse;
+                        break;
+                      }
                     (void) WriteBlobMSBLong(ofile,0xFFFFFFFFU);
                     outputlen += 4;
                     savedolen = outputlen;
@@ -829,6 +856,8 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
       newstr=DestroyString(newstr);
     if (name != (char *) NULL)
       name=DestroyString(name);
+    if (status == MagickFalse)
+      break;
   }
   token_info=DestroyTokenInfo(token_info);
   if (token != (char *) NULL)
@@ -857,7 +886,7 @@ static ssize_t parse8BIMW(Image *ifile, Image *ofile)
         return(-1);
       savedolen = 0L;
     }
-  return(outputlen);
+  return(status == MagickFalse ? -1 : outputlen);
 }
 
 /* some defines for the different JPEG block types */
@@ -1604,23 +1633,23 @@ static size_t GetIPTCStream(unsigned char **info,size_t length)
   {
     if (strncmp((const char *) p,"8BIM",4))
       break;
-    p+=4;
+    p+=(ptrdiff_t) 4;
     extent-=4;
     marker=(unsigned int) (*p) << 8 | *(p+1);
-    p+=2;
+    p+=(ptrdiff_t) 2;
     extent-=2;
     c=*p++;
     extent--;
     c|=0x01;
     if ((size_t) c >= extent)
       break;
-    p+=c;
+    p+=(ptrdiff_t) c;
     extent=(size_t) ((ssize_t) extent-c);
     if (extent < 4)
       break;
     tag_length=(((size_t) *p) << 24) | (((size_t) *(p+1)) << 16) |
       (((size_t) *(p+2)) << 8) | ((size_t) *(p+3));
-    p+=4;
+    p+=(ptrdiff_t) 4;
     extent-=4;
     if (tag_length > extent)
       break;
@@ -1631,7 +1660,7 @@ static size_t GetIPTCStream(unsigned char **info,size_t length)
       }
     if ((tag_length & 0x01) != 0)
       tag_length++;
-    p+=tag_length;
+    p+=(ptrdiff_t) tag_length;
     extent-=tag_length;
   }
   /*
@@ -1728,7 +1757,7 @@ iptc_find:
       }
     if (tag_length > (length+1))
       break;
-    p+=tag_length;
+    p+=(ptrdiff_t) tag_length;
     length-=tag_length;
     if (length == 0)
       break;

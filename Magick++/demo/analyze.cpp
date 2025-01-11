@@ -11,11 +11,13 @@
 //
 
 #include <Magick++.h>
+#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <list>
 using namespace std; 
 using namespace Magick;
+
 int main(int argc,char **argv) 
 {
   if ( argc < 2 )
@@ -25,7 +27,7 @@ int main(int argc,char **argv)
     }
 
   // Initialize ImageMagick install location for Windows
-  InitializeMagick(*argv);
+  MagickPlusPlusGenesis genesis(*argv);
 
   {
     std::list<std::string> attributes;

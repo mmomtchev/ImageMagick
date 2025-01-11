@@ -515,7 +515,7 @@ static Image *ReadTXTImage(const ImageInfo *image_info,ExceptionInfo *exception)
         {
           if (LocaleNCompare(p,"sRGB(",5) == 0)
             {
-              p+=5;
+              p+=(ptrdiff_t) 5;
               n=2;
             }
           (void) GetNextToken(p,&p,MagickPathExtent,token);
@@ -763,7 +763,7 @@ static MagickBooleanType WriteTXTImage(const ImageInfo *image_info,Image *image,
                 (void) ConcatenateMagickString(buffer," ",MagickPathExtent);
                 (void) WriteBlobString(image,buffer);
               }
-            p+=GetPixelChannels(image);
+            p+=(ptrdiff_t) GetPixelChannels(image);
             continue;
           }
         (void) FormatLocaleString(buffer,MagickPathExtent,"%.20g,%.20g: (",
@@ -785,7 +785,7 @@ static MagickBooleanType WriteTXTImage(const ImageInfo *image_info,Image *image,
         (void) ConcatenateMagickString(buffer,tuple,MagickPathExtent);
         (void) ConcatenateMagickString(buffer,"\n",MagickPathExtent);
         (void) WriteBlobString(image,buffer);
-        p+=GetPixelChannels(image);
+        p+=(ptrdiff_t) GetPixelChannels(image);
       }
       status=SetImageProgress(image,SaveImageTag,(MagickOffsetType) y,
         image->rows);

@@ -603,7 +603,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
 #endif
         if (jxl_status != JXL_DEC_SUCCESS)
           break;
-        profile=AcquireProfileStringInfo("icm",profile_size,exception);
+        profile=AcquireProfileStringInfo("icc",profile_size,exception);
         if (profile != (StringInfo *) NULL)
           {
   #if JPEGXL_NUMERIC_VERSION >= JPEGXL_COMPUTE_NUMERIC_VERSION(0,9,0)
@@ -645,6 +645,7 @@ static Image *ReadJXLImage(const ImageInfo *image_info,
         status=SetImageExtent(image,image->columns,image->rows,exception);
         if (status == MagickFalse)
           break;
+        (void) ResetImagePixels(image,exception);
         JXLSetFormat(image,&pixel_format,exception);
         if (extent == 0)
           {

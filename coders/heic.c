@@ -523,7 +523,7 @@ static MagickBooleanType ReadHEICImageHandle(const ImageInfo *image_info,
         SetPixelBlue(image,ScaleCharToQuantum((unsigned char) *(p++)),q);
         if (image->alpha_trait != UndefinedPixelTrait)
           SetPixelAlpha(image,ScaleCharToQuantum((unsigned char) *(p++)),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       if (SyncAuthenticPixels(image,exception) == MagickFalse)
         break;
@@ -547,18 +547,18 @@ static MagickBooleanType ReadHEICImageHandle(const ImageInfo *image_info,
       for (x=0; x < (ssize_t) image->columns; x++)
       {
         unsigned short pixel = (((unsigned short) *(p+1) << 8) |
-          (*(p+0))) << shift; p+=2;
+          (*(p+0))) << shift; p+=(ptrdiff_t) 2;
         SetPixelRed(image,ScaleShortToQuantum(pixel),q);
-        pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=2;
+        pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=(ptrdiff_t) 2;
         SetPixelGreen(image,ScaleShortToQuantum(pixel),q);
-        pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=2;
+        pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=(ptrdiff_t) 2;
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
         if (image->alpha_trait != UndefinedPixelTrait)
           {
-            pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=2;
+            pixel=(((unsigned short) *(p+1) << 8) | (*(p+0))) << shift; p+=(ptrdiff_t) 2;
             SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
           }
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       if (SyncAuthenticPixels(image,exception) == MagickFalse)
         break;
@@ -641,7 +641,7 @@ static Image *ReadHEICImage(const ImageInfo *image_info,
     *image_handle;
 
   unsigned char
-    magic[12];
+    magic[128];
 
   /*
     Open image file.
@@ -866,6 +866,23 @@ ModuleExport size_t RegisterHEICImage(void)
   entry->flags^=CoderBlobSupportFlag;
   (void) RegisterMagickInfo(entry);
 #if LIBHEIF_NUMERIC_VERSION >= HEIC_COMPUTE_NUMERIC_VERSION(1,7,0)
+  entry=AcquireMagickInfo("HEIC","AVCI","AVC Image File Format");
+#if defined(MAGICKCORE_HEIC_DELEGATE)
+  if (heif_have_decoder_for_format(heif_compression_AVC))
+    entry->decoder=(DecodeImageHandler *) ReadHEICImage;
+  if (heif_have_encoder_for_format(heif_compression_AVC))
+    entry->encoder=(EncodeImageHandler *) WriteHEICImage;
+#endif
+  entry->magick=(IsImageFormatHandler *) IsHEIC;
+  entry->mime_type=ConstantString("image/avci");
+#if defined(LIBHEIF_VERSION)
+  entry->version=ConstantString(LIBHEIF_VERSION);
+#endif
+  entry->flags|=CoderDecoderSeekableStreamFlag;
+  entry->flags^=CoderBlobSupportFlag;
+  (void) RegisterMagickInfo(entry);
+#endif
+#if LIBHEIF_NUMERIC_VERSION >= HEIC_COMPUTE_NUMERIC_VERSION(1,7,0)
   entry=AcquireMagickInfo("HEIC","AVIF","AV1 Image File Format");
 #if defined(MAGICKCORE_HEIC_DELEGATE)
   if (heif_have_decoder_for_format(heif_compression_AV1))
@@ -1084,7 +1101,7 @@ static MagickBooleanType WriteHEICImageYCbCr(Image *image,
       for (x=0; x < (ssize_t) image->columns; x++)
       {
         q_y[y*p_y+x]=ScaleQuantumToChar(GetPixelRed(image,p));
-        p+=GetPixelChannels(image);
+        p+=(ptrdiff_t) GetPixelChannels(image);
       }
     else
       for (x=0; x < (ssize_t) image->columns; x+=2)
@@ -1092,11 +1109,11 @@ static MagickBooleanType WriteHEICImageYCbCr(Image *image,
         q_y[y*p_y+x]=ScaleQuantumToChar(GetPixelRed(image,p));
         q_cb[y/2*p_cb+x/2]=ScaleQuantumToChar(GetPixelGreen(image,p));
         q_cr[y/2*p_cr+x/2]=ScaleQuantumToChar(GetPixelBlue(image,p));
-        p+=GetPixelChannels(image);
+        p+=(ptrdiff_t) GetPixelChannels(image);
         if ((x+1) < (ssize_t) image->columns)
           {
             q_y[y*p_y+x+1]=ScaleQuantumToChar(GetPixelRed(image,p));
-            p+=GetPixelChannels(image);
+            p+=(ptrdiff_t) GetPixelChannels(image);
           }
       }
     if (image->previous == (Image *) NULL)
@@ -1172,7 +1189,7 @@ static MagickBooleanType WriteHEICImageRGBA(Image *image,
           if (image->alpha_trait != UndefinedPixelTrait)
             *(q++)=ScaleQuantumToChar(GetPixelAlpha(image,p));
         }
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (image->previous == (Image *) NULL)
       {
@@ -1261,7 +1278,7 @@ static MagickBooleanType WriteHEICImageRRGGBBAA(Image *image,
               *(q++)=(uint8_t) (pixel >> 8);
             }
         }
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (image->previous == (Image *) NULL)
       {

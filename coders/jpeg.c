@@ -770,32 +770,9 @@ static boolean ReadAPPProfiles(j_decompress_ptr jpeg_info)
         }
     }
   else
-    if (length > 4)
-      {
-        if ((LocaleNCompare((char *) p,"exif",4) == 0) ||
-            (LocaleNCompare((char *) p,"MM",2) == 0) ||
-            (LocaleNCompare((char *) p,"II",2) == 0))
-          {
-            /*
-              Extract EXIF profile.
-            */
-            profile=AcquireProfileStringInfo("exif",length,exception);
-            if (profile != (StringInfo*) NULL)
-              {
-                (void) memcpy(GetStringInfoDatum(profile),p,length);
-                status=SetImageProfilePrivate(image,profile,exception);
-              }
-            client_info->profiles[marker]=DestroyStringInfo(
-              client_info->profiles[marker]);
-          }
-        else
-          status=SetImageProfile(image,"app1",client_info->profiles[marker],
-            exception);
-      }
-    else
-      status=SetImageProfile(image,"app1",client_info->profiles[marker],
-        exception);
-  return(status);
+    status=SetImageProfile(image,"app1",client_info->profiles[marker],
+      exception);
+  return(status == MagickFalse ? FALSE : TRUE);
 }
 
 static void SkipInputData(j_decompress_ptr compress_info,long number_bytes)
@@ -1533,8 +1510,8 @@ static Image *ReadOneJPEGImage(const ImageInfo *image_info,
           index=(Quantum) ConstrainColormapIndex(image,pixel,exception);
           SetPixelViaPixelInfo(image,image->colormap+(ssize_t) index,q);
           SetPixelIndex(image,index,q);
-          p+=bytes_per_pixel;
-          q+=GetPixelChannels(image);
+          p+=(ptrdiff_t) bytes_per_pixel;
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }
@@ -1547,18 +1524,18 @@ static Image *ReadOneJPEGImage(const ImageInfo *image_info,
         {
           SetPixelCyan(image,QuantumRange-ScaleShortToQuantum((unsigned short)
             (scale*JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelMagenta(image,QuantumRange-ScaleShortToQuantum(
             (unsigned short) (scale*JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelYellow(image,QuantumRange-ScaleShortToQuantum((unsigned short)
             (scale*JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelBlack(image,QuantumRange-ScaleShortToQuantum((unsigned short)
             (scale*JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelAlpha(image,OpaqueAlpha,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }
@@ -1571,15 +1548,15 @@ static Image *ReadOneJPEGImage(const ImageInfo *image_info,
         {
           SetPixelRed(image,ScaleShortToQuantum((unsigned short) (scale*
             JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelGreen(image,ScaleShortToQuantum((unsigned short) (scale*
             JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelBlue(image,ScaleShortToQuantum((unsigned short) (scale*
             JPEGGetSample(jpeg_info,p))),q);
-          p+=bytes_per_pixel;
+          p+=(ptrdiff_t) bytes_per_pixel;
           SetPixelAlpha(image,OpaqueAlpha,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }
@@ -2217,7 +2194,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image,
            jpeg_write_marker(jpeg_info,marker,GetStringInfoDatum(profile)+i,
              MagickMin((unsigned int) length-i,65533L));
       }
-    if ((LocaleCompare(name,"EXIF") == 0) && (length < 65533L))
+    else if (LocaleCompare(name,"EXIF") == 0)
       {
         if (length > 65533L)
           (void) ThrowMagickException(exception,GetMagickModule(),CoderWarning,
@@ -2226,7 +2203,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image,
           jpeg_write_marker(jpeg_info,APP_MARKER+1,GetStringInfoDatum(profile),
             (unsigned int) length);
       }
-    if (LocaleCompare(name,"ICC") == 0)
+    else if (LocaleCompare(name,"ICC") == 0)
       {
         unsigned char
           *p;
@@ -2247,7 +2224,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image,
             custom_profile),(unsigned int) (length+tag_length+3));
         }
       }
-    if (((LocaleCompare(name,"IPTC") == 0) ||
+    else if (((LocaleCompare(name,"IPTC") == 0) ||
         (LocaleCompare(name,"8BIM") == 0)) && (iptc == MagickFalse))
       {
         size_t
@@ -2283,7 +2260,7 @@ static void WriteProfiles(j_compress_ptr jpeg_info,Image *image,
             custom_profile),(unsigned int) (length+tag_length+roundup));
         }
       }
-    if (LocaleCompare(name,"XMP") == 0)
+    else if (LocaleCompare(name,"XMP") == 0)
       {
         StringInfo
           *xmp_profile;
@@ -2490,10 +2467,10 @@ static MagickBooleanType WriteJPEGImage_(const ImageInfo *image_info,
 #if defined(C_LOSSLESS_SUPPORTED)
   if (image_info->compression == LosslessJPEGCompression)
     {
-      if (image->depth > 8)
-        jpeg_info->data_precision=12;
       if (image->depth > 12)
         jpeg_info->data_precision=16;
+      else if (image->depth > 8)
+        jpeg_info->data_precision=12;
     }
 #endif
   jpeg_info->in_color_space=JCS_RGB;
@@ -2536,6 +2513,9 @@ static MagickBooleanType WriteJPEGImage_(const ImageInfo *image_info,
     }
   }
   jpeg_set_defaults(jpeg_info);
+  option=GetImageOption(image_info,"jpeg:restart-interval");
+  if (option != (const char *) NULL)
+    jpeg_info->restart_interval=StringToInteger(option);
   if (jpeg_info->in_color_space == JCS_CMYK)
     jpeg_set_colorspace(jpeg_info,JCS_YCCK);
   if (image->debug != MagickFalse)
@@ -3035,8 +3015,8 @@ static MagickBooleanType WriteJPEGImage_(const ImageInfo *image_info,
         {
           JPEGSetSample(jpeg_info,scale,ClampToQuantum(GetPixelLuma(image,p)),
             q);
-          q+=bytes_per_pixel;
-          p+=GetPixelChannels(image);
+          q+=(ptrdiff_t) bytes_per_pixel;
+          p+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }
@@ -3052,17 +3032,17 @@ static MagickBooleanType WriteJPEGImage_(const ImageInfo *image_info,
           */
           JPEGSetSample(jpeg_info,scale,(Quantum) ((QuantumRange-
             GetPixelCyan(image,p))),q);
-          q+=bytes_per_pixel;
+          q+=(ptrdiff_t) bytes_per_pixel;
           JPEGSetSample(jpeg_info,scale,(Quantum) ((QuantumRange-
             GetPixelMagenta(image,p))),q);
-          q+=bytes_per_pixel;
+          q+=(ptrdiff_t) bytes_per_pixel;
           JPEGSetSample(jpeg_info,scale,(Quantum) ((QuantumRange-
             GetPixelYellow(image,p))),q);
-          q+=bytes_per_pixel;
+          q+=(ptrdiff_t) bytes_per_pixel;
           JPEGSetSample(jpeg_info,scale,(Quantum) ((QuantumRange-
             GetPixelBlack(image,p))),q);
-          q+=bytes_per_pixel;
-          p+=GetPixelChannels(image);
+          q+=(ptrdiff_t) bytes_per_pixel;
+          p+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }
@@ -3074,12 +3054,12 @@ static MagickBooleanType WriteJPEGImage_(const ImageInfo *image_info,
         for (x=0; x < (ssize_t) image->columns; x++)
         {
           JPEGSetSample(jpeg_info,scale,GetPixelRed(image,p),q);
-          q+=bytes_per_pixel;
+          q+=(ptrdiff_t) bytes_per_pixel;
           JPEGSetSample(jpeg_info,scale,GetPixelGreen(image,p),q);
-          q+=bytes_per_pixel;
+          q+=(ptrdiff_t) bytes_per_pixel;
           JPEGSetSample(jpeg_info,scale,GetPixelBlue(image,p),q);
-          q+=bytes_per_pixel;
-          p+=GetPixelChannels(image);
+          q+=(ptrdiff_t) bytes_per_pixel;
+          p+=(ptrdiff_t) GetPixelChannels(image);
         }
         break;
       }

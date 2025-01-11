@@ -359,9 +359,8 @@ static Image *ReadGROUP4Image(const ImageInfo *image_info,
   size_t
     length;
 
-  ssize_t
-    offset,
-    strip_offset;
+  TIFF
+    *tiff;
 
   /*
     Open image file.
@@ -380,6 +379,7 @@ static Image *ReadGROUP4Image(const ImageInfo *image_info,
       image=DestroyImageList(image);
       return((Image *) NULL);
     }
+  (void) SetMagickThreadValue(tiff_exception,exception);
   /*
     Write raw CCITT Group 4 wrapped as a TIFF image file.
   */
@@ -389,47 +389,43 @@ static Image *ReadGROUP4Image(const ImageInfo *image_info,
     file=fdopen(unique_file,"wb");
   if ((unique_file == -1) || (file == (FILE *) NULL))
     ThrowImageException(FileOpenError,"UnableToCreateTemporaryFile");
-  length=fwrite("\111\111\052\000\010\000\000\000\016\000",1,10,file);
-  if (length != 10)
-    ThrowReaderException(CorruptImageError,"UnexpectedEndOfFile");
-  length=fwrite("\376\000\003\000\001\000\000\000\000\000\000\000",1,12,file);
-  length=fwrite("\000\001\004\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) image->columns);
-  length=fwrite("\001\001\004\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) image->rows);
-  length=fwrite("\002\001\003\000\001\000\000\000\001\000\000\000",1,12,file);
-  length=fwrite("\003\001\003\000\001\000\000\000\004\000\000\000",1,12,file);
-  length=fwrite("\006\001\003\000\001\000\000\000\000\000\000\000",1,12,file);
-  length=fwrite("\021\001\003\000\001\000\000\000",1,8,file);
-  strip_offset=10+(12*14)+4+8;
-  length=WriteLSBLong(file,(unsigned int) strip_offset);
-  length=fwrite("\022\001\003\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) image_info->orientation);
-  length=fwrite("\025\001\003\000\001\000\000\000\001\000\000\000",1,12,file);
-  length=fwrite("\026\001\004\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) image->rows);
-  length=fwrite("\027\001\004\000\001\000\000\000\000\000\000\000",1,12,file);
-  offset=(ssize_t) ftell(file)-4;
-  length=fwrite("\032\001\005\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) (strip_offset-8));
-  length=fwrite("\033\001\005\000\001\000\000\000",1,8,file);
-  length=WriteLSBLong(file,(unsigned int) (strip_offset-8));
-  length=fwrite("\050\001\003\000\001\000\000\000\002\000\000\000",1,12,file);
-  length=fwrite("\000\000\000\000",1,4,file);
-  length=WriteLSBLong(file,(unsigned int) image->resolution.x);
-  length=WriteLSBLong(file,1);
-  status=MagickTrue;
-  for (length=0; (c=ReadBlobByte(image)) != EOF; length++)
-    if (fputc(c,file) != c)
-      status=MagickFalse;
-  offset=(ssize_t) fseek(file,(off_t) offset,SEEK_SET);
-  length=WriteLSBLong(file,(unsigned int) length);
-  if (ferror(file) != 0)
+  tiff=TIFFOpen(filename,"w");
+  if (tiff == (TIFF *) NULL)
     {
-      (void) fclose(file);
+      (void) RelinquishUniqueFileResource(filename);
       ThrowImageException(FileOpenError,"UnableToCreateTemporaryFile");
     }
-  (void) fclose(file);
+  TIFFSetField(tiff,TIFFTAG_IMAGEWIDTH,(uint32) image->columns);
+  TIFFSetField(tiff,TIFFTAG_IMAGELENGTH,(uint32) image->rows);
+  TIFFSetField(tiff,TIFFTAG_BITSPERSAMPLE,1);
+  TIFFSetField(tiff,TIFFTAG_SAMPLESPERPIXEL,1);
+  TIFFSetField(tiff,TIFFTAG_PHOTOMETRIC,PHOTOMETRIC_MINISBLACK);
+  TIFFSetField(tiff,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+  TIFFSetField(tiff,TIFFTAG_COMPRESSION,COMPRESSION_CCITTFAX4);
+  TIFFSetField(tiff,TIFFTAG_ROWSPERSTRIP,(uint32) image->rows);
+  if ((image->resolution.x > 0.0) && (image->resolution.y > 0.0))
+    {
+      if (image->units == PixelsPerCentimeterResolution)
+        TIFFSetField(tiff,TIFFTAG_RESOLUTIONUNIT,RESUNIT_CENTIMETER);
+      else
+        TIFFSetField(tiff,TIFFTAG_RESOLUTIONUNIT,RESUNIT_INCH);
+      TIFFSetField(tiff,TIFFTAG_XRESOLUTION,(uint32) image->resolution.x);
+      TIFFSetField(tiff,TIFFTAG_YRESOLUTION,(uint32) image->resolution.y);
+    }
+  status=MagickTrue;
+  c=ReadBlobByte(image);
+  for (length=0; c != EOF; length++)
+  {
+    unsigned char byte = (unsigned char) c;
+    if (TIFFWriteRawStrip(tiff,0,&byte,1) < 0)
+      {
+        status=MagickFalse;
+        break;
+      }
+    c=ReadBlobByte(image);
+  }
+  TIFFSetField(tiff,TIFFTAG_STRIPBYTECOUNTS,(uint32) length);
+  TIFFClose(tiff);
   (void) CloseBlob(image);
   image=DestroyImage(image);
   /*
@@ -448,8 +444,6 @@ static Image *ReadGROUP4Image(const ImageInfo *image_info,
       (void) CopyMagickString(image->magick,"GROUP4",MagickPathExtent);
     }
   (void) RelinquishUniqueFileResource(filename);
-  if (status == MagickFalse)
-    image=DestroyImage(image);
   return(image);
 }
 #endif
@@ -534,7 +528,7 @@ static MagickBooleanType DecodeLabImage(Image *image,ExceptionInfo *exception)
         b-=1.0;
       SetPixela(image,(double) QuantumRange*a,q);
       SetPixelb(image,(double) QuantumRange*b,q);
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
       {
@@ -1348,8 +1342,6 @@ static Image *ReadTIFFImage(const ImageInfo *image_info,
         TIFFClose(tiff);
         ThrowReaderException(CorruptImageError,"UnsupportedBitsPerPixel");
       }
-    tiff_status=TIFFGetFieldDefaulted(tiff,TIFFTAG_EXTRASAMPLES,&extra_samples,
-      &sample_info,sans);
     if (samples_per_pixel > MaxPixelChannels)
       {
         TIFFClose(tiff);
@@ -1685,57 +1677,56 @@ static Image *ReadTIFFImage(const ImageInfo *image_info,
     }
     tiff_status=TIFFGetFieldDefaulted(tiff,TIFFTAG_EXTRASAMPLES,&extra_samples,
       &sample_info,sans);
-    if (tiff_status == 1)
+    if (extra_samples == 0)
       {
-        (void) SetImageProperty(image,"tiff:alpha","unspecified",exception);
-        if (extra_samples == 0)
+        if ((samples_per_pixel == 4) && (photometric == PHOTOMETRIC_RGB))
+          image->alpha_trait=BlendPixelTrait;
+      }
+    else
+      {
+        for (i=0; i < extra_samples; i++)
+        {
+          if (sample_info[i] == EXTRASAMPLE_ASSOCALPHA)
+            {
+              image->alpha_trait=BlendPixelTrait;
+              SetQuantumAlphaType(quantum_info,AssociatedQuantumAlpha);
+              (void) SetImageProperty(image,"tiff:alpha","associated",
+                exception);
+              break;
+            }
+          else
+            if (sample_info[i] == EXTRASAMPLE_UNASSALPHA)
+              {
+                image->alpha_trait=BlendPixelTrait;
+                SetQuantumAlphaType(quantum_info,DisassociatedQuantumAlpha);
+                (void) SetImageProperty(image,"tiff:alpha","unassociated",
+                  exception);
+                break;
+              }
+        }
+        if ((image->alpha_trait == UndefinedPixelTrait) && (extra_samples >= 1))
           {
-            if ((samples_per_pixel == 4) && (photometric == PHOTOMETRIC_RGB))
+            const char
+              *option;
+
+            option=GetImageOption(image_info,"tiff:assume-alpha");
+            if (IsStringTrue(option) != MagickFalse)
               image->alpha_trait=BlendPixelTrait;
           }
-        else
+        if (image->alpha_trait != UndefinedPixelTrait)
+          extra_samples--;
+        if (extra_samples > 0)
           {
-            for (i=0; i < extra_samples; i++)
-            {
-              if (sample_info[i] == EXTRASAMPLE_ASSOCALPHA)
-                {
-                  image->alpha_trait=BlendPixelTrait;
-                  SetQuantumAlphaType(quantum_info,AssociatedQuantumAlpha);
-                  (void) SetImageProperty(image,"tiff:alpha","associated",
-                    exception);
-                  break;
-                }
-              else
-                if (sample_info[i] == EXTRASAMPLE_UNASSALPHA)
-                  {
-                    image->alpha_trait=BlendPixelTrait;
-                    SetQuantumAlphaType(quantum_info,DisassociatedQuantumAlpha);
-                    (void) SetImageProperty(image,"tiff:alpha","unassociated",
-                      exception);
-                    break;
-                  }
-            }
-            if ((image->alpha_trait == UndefinedPixelTrait) &&
-                 (extra_samples >= 1))
-              {
-                const char
-                  *option;
-
-                option=GetImageOption(image_info,"tiff:assume-alpha");
-                if (IsStringTrue(option) != MagickFalse)
-                  image->alpha_trait=BlendPixelTrait;
-              }
-            if (image->alpha_trait != UndefinedPixelTrait)
-              extra_samples--;
-            if (extra_samples > 0)
-              {
-                if (SetPixelMetaChannels(image,extra_samples,exception) == MagickFalse)
-                  ThrowTIFFException(OptionError,"SetPixelMetaChannelsFailure");
-              }
+            if (SetPixelMetaChannels(image,extra_samples,exception) == MagickFalse)
+              ThrowTIFFException(OptionError,"SetPixelMetaChannelsFailure");
           }
       }
     if (image->alpha_trait != UndefinedPixelTrait)
-      (void) SetImageAlphaChannel(image,OpaqueAlphaChannel,exception);
+      {
+        if (quantum_info->alpha_type == UndefinedQuantumAlpha)
+          (void) SetImageProperty(image,"tiff:alpha","unspecified",exception);
+        (void) SetImageAlphaChannel(image,OpaqueAlphaChannel,exception);
+      }
     method=ReadGenericMethod;
     rows_per_strip=(uint32) image->rows;
     if (TIFFGetField(tiff,TIFFTAG_ROWSPERSTRIP,&rows_per_strip) == 1)
@@ -1794,186 +1785,107 @@ static Image *ReadTIFFImage(const ImageInfo *image_info,
     quantum_type=GrayQuantum;
     if (image->storage_class == PseudoClass)
       quantum_type=IndexQuantum;
-    if (interlace != PLANARCONFIG_SEPARATE)
+    if (image->number_meta_channels != 0)
       {
-        size_t
-          pad;
-
-        pad=(size_t) MagickMax((ssize_t) samples_per_pixel-1,0);
-        if (image->alpha_trait != UndefinedPixelTrait)
-          {
-            if (image->storage_class == PseudoClass)
-              quantum_type=IndexAlphaQuantum;
-            else
-              quantum_type=samples_per_pixel == 1 ? AlphaQuantum :
-                GrayAlphaQuantum;
-          }
-        if (samples_per_pixel > 2)
-          {
-            if (image->colorspace == CMYKColorspace)
-              {
-                quantum_type=CMYKQuantum;
-                pad=(size_t) MagickMax((ssize_t) samples_per_pixel+
-                  extra_samples-4,0);
-                if (image->alpha_trait != UndefinedPixelTrait)
-                  {
-                    quantum_type=CMYKAQuantum;
-                    pad=(size_t) MagickMax((ssize_t) samples_per_pixel+
-                      extra_samples-5,0);
-                  }
-              }
-            else if (image->alpha_trait != UndefinedPixelTrait)
-              {
-                quantum_type=RGBAQuantum;
-                pad=(size_t) MagickMax((ssize_t) samples_per_pixel+
-                  extra_samples-4,0);
-              }
-            else
-              {
-                quantum_type=RGBQuantum;
-                pad=(size_t) MagickMax((ssize_t) samples_per_pixel+
-                  extra_samples-3,0);
-              }
-            status=SetQuantumPad(image,quantum_info,pad*
-              (size_t) ((bits_per_sample+7) >> 3));
-            if (status == MagickFalse)
-              ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-          }
-        if (image->number_meta_channels != 0)
-          {
-            quantum_type=MultispectralQuantum;
-            (void) SetQuantumPad(image,quantum_info,0);
-          }
+        quantum_type=MultispectralQuantum;
+        (void) SetQuantumPad(image,quantum_info,0);
       }
-    switch (method)
-    {
-      case ReadYCCKMethod:
-      {
-        /*
-          Convert YCC TIFF image.
-        */
-        for (y=0; y < (ssize_t) image->rows; y++)
+    else
+      if (interlace != PLANARCONFIG_SEPARATE)
         {
-          Quantum
-            *magick_restrict q;
-
           ssize_t
-            x;
+            pad;
 
-          unsigned char
-            *p;
-
-          tiff_status=TIFFReadPixels(tiff,0,y,(char *) pixels);
-          if (tiff_status == -1)
-            break;
-          q=QueueAuthenticPixels(image,0,y,image->columns,1,exception);
-          if (q == (Quantum *) NULL)
-            break;
-          p=pixels;
-          for (x=0; x < (ssize_t) image->columns; x++)
-          {
-            SetPixelCyan(image,ScaleCharToQuantum(ClampYCC((double) *p+
-              (1.402*(double) *(p+2))-179.456)),q);
-            SetPixelMagenta(image,ScaleCharToQuantum(ClampYCC((double) *p-
-              (0.34414*(double) *(p+1))-(0.71414*(double ) *(p+2))+
-              135.45984)),q);
-            SetPixelYellow(image,ScaleCharToQuantum(ClampYCC((double) *p+
-              (1.772*(double) *(p+1))-226.816)),q);
-            SetPixelBlack(image,ScaleCharToQuantum((unsigned char) *(p+3)),q);
-            q+=GetPixelChannels(image);
-            p+=4;
-          }
-          if (SyncAuthenticPixels(image,exception) == MagickFalse)
-            break;
-          if (image->previous == (Image *) NULL)
+          pad=(ssize_t) samples_per_pixel;
+          if (samples_per_pixel > 2)
             {
-              status=SetImageProgress(image,LoadImageTag,(MagickOffsetType) y,
-                image->rows);
+              if (image->colorspace == CMYKColorspace)
+                {
+                  pad-=4;
+                  quantum_type=CMYKQuantum;
+                  if (image->alpha_trait != UndefinedPixelTrait)
+                    {
+                      pad--;
+                      quantum_type=CMYKAQuantum;
+                    }
+                }
+              else
+                {
+                  pad-=3;
+                  quantum_type=RGBQuantum;
+                  if (image->alpha_trait != UndefinedPixelTrait)
+                    {
+                      pad--;
+                      quantum_type=RGBAQuantum;
+                    }
+                }
+            }
+          else
+            {
+              pad--;
+              if (image->alpha_trait != UndefinedPixelTrait)
+                {
+                  if (samples_per_pixel == 1)
+                    quantum_type=AlphaQuantum;
+                  else
+                    {
+                      pad--;
+                      if (image->storage_class == PseudoClass)
+                        quantum_type=IndexAlphaQuantum;
+                      else
+                        quantum_type=GrayAlphaQuantum;
+                    }
+                }
+            }
+          if (pad < 0)
+            ThrowTIFFException(CorruptImageError,"CorruptImage");
+          if (pad > 0)
+            {
+              status=SetQuantumPad(image,quantum_info,(size_t) pad*
+                ((bits_per_sample+7) >> 3));
               if (status == MagickFalse)
-                break;
+                ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
             }
         }
-        break;
-      }
-      case ReadStripMethod:
+    if (exception->severity < ErrorException)
+      switch (method)
       {
-        size_t
-          extent,
-          length;
-
-        ssize_t
-          stride,
-          strip_id;
-
-        tmsize_t
-          strip_size;
-
-        unsigned char
-          *p,
-          *strip_pixels;
-
-        /*
-          Convert stripped TIFF image.
-        */
-        strip_size=TIFFStripSize(tiff);
-        stride=(ssize_t) TIFFVStripSize(tiff,1);
-        length=GetQuantumExtent(image,quantum_info,quantum_type);
-        extent=(size_t) MagickMax((size_t) strip_size,rows_per_strip*
-          MagickMax((size_t) stride,length));
-        strip_pixels=(unsigned char *) AcquireQuantumMemory(extent,
-          sizeof(*strip_pixels));
-        if (strip_pixels == (unsigned char *) NULL)
-          ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-        (void) memset(strip_pixels,0,extent*sizeof(*strip_pixels));
-        strip_id=0;
-        p=strip_pixels;
-        for (i=0; i < (ssize_t) samples_per_pixel; i++)
+        case ReadYCCKMethod:
         {
-          size_t
-            rows_remaining;
-
-          tmsize_t
-            size = 0;
-
-          switch (i)
-          {
-            case 0: break;
-            case 1: quantum_type=GreenQuantum; break;
-            case 2: quantum_type=BlueQuantum; break;
-            case 3:
-            {
-              quantum_type=AlphaQuantum;
-              if (image->colorspace == CMYKColorspace)
-                quantum_type=BlackQuantum;
-              break;
-            }
-            case 4: quantum_type=AlphaQuantum; break;
-            default:
-              break;
-          }
-          rows_remaining=0;
+          /*
+            Convert YCC TIFF image.
+          */
           for (y=0; y < (ssize_t) image->rows; y++)
           {
             Quantum
               *magick_restrict q;
 
-            q=GetAuthenticPixels(image,0,y,image->columns,1,exception);
+            ssize_t
+              x;
+
+            unsigned char
+              *p;
+
+            tiff_status=TIFFReadPixels(tiff,0,y,(char *) pixels);
+            if (tiff_status == -1)
+              break;
+            q=QueueAuthenticPixels(image,0,y,image->columns,1,exception);
             if (q == (Quantum *) NULL)
               break;
-            if (rows_remaining == 0)
-              {
-                size=TIFFReadEncodedStrip(tiff,strip_id,strip_pixels,
-                  strip_size);
-                if (size == -1)
-                  break;
-                rows_remaining=rows_per_strip;
-                p=strip_pixels;
-                strip_id++;
-              }
-            (void) ImportQuantumPixels(image,(CacheView *) NULL,
-              quantum_info,quantum_type,p,exception);
-            p+=stride;
-            rows_remaining--;
+            p=pixels;
+            for (x=0; x < (ssize_t) image->columns; x++)
+            {
+              SetPixelCyan(image,ScaleCharToQuantum(ClampYCC((double) *p+
+                (1.402*(double) *(p+2))-179.456)),q);
+              SetPixelMagenta(image,ScaleCharToQuantum(ClampYCC((double) *p-
+                (0.34414*(double) *(p+1))-(0.71414*(double ) *(p+2))+
+                135.45984)),q);
+              SetPixelYellow(image,ScaleCharToQuantum(ClampYCC((double) *p+
+                (1.772*(double) *(p+1))-226.816)),q);
+              SetPixelBlack(image,ScaleCharToQuantum((unsigned char) *(p+3)),q);
+              q+=(ptrdiff_t) GetPixelChannels(image);
+              p+=(ptrdiff_t) 4;
+            }
             if (SyncAuthenticPixels(image,exception) == MagickFalse)
               break;
             if (image->previous == (Image *) NULL)
@@ -1984,199 +1896,290 @@ static Image *ReadTIFFImage(const ImageInfo *image_info,
                   break;
               }
           }
-          if ((size == -1) || ((samples_per_pixel > 1) &&
-              (interlace != PLANARCONFIG_SEPARATE)))
-            break;
+          break;
         }
-        strip_pixels=(unsigned char *) RelinquishMagickMemory(strip_pixels);
-        break;
-      }
-      case ReadTileMethod:
-      {
-        unsigned char
-          *p;
-
-        size_t
-          extent,
-          length;
-
-        ssize_t
-          stride;
-
-        tmsize_t
-          tile_size;
-
-        uint32
-          columns,
-          rows;
-
-        unsigned char
-          *tile_pixels;
-
-        /*
-          Convert tiled TIFF image.
-        */
-        if ((TIFFGetField(tiff,TIFFTAG_TILEWIDTH,&columns) != 1) ||
-            (TIFFGetField(tiff,TIFFTAG_TILELENGTH,&rows) != 1))
-          ThrowTIFFException(CoderError,"ImageIsNotTiled");
-        number_pixels=(MagickSizeType) columns*rows;
-        if (HeapOverflowSanityCheck(rows,sizeof(*tile_pixels)) != MagickFalse)
-          ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-        tile_size=TIFFTileSize(tiff);
-        stride=(ssize_t) TIFFTileRowSize(tiff);
-        length=GetQuantumExtent(image,quantum_info,quantum_type);
-        extent=(size_t) MagickMax((size_t) tile_size,rows*
-          MagickMax((size_t) stride,length));
-        tile_pixels=(unsigned char *) AcquireQuantumMemory(extent,
-          sizeof(*tile_pixels));
-        if (tile_pixels == (unsigned char *) NULL)
-          ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-        (void) memset(tile_pixels,0,extent*sizeof(*tile_pixels));
-        for (i=0; i < (ssize_t) samples_per_pixel; i++)
+        case ReadStripMethod:
         {
-          tmsize_t
-            size = 0;
+          size_t
+            extent,
+            length;
 
-          switch (i)
+          ssize_t
+            stride,
+            strip_id;
+
+          tmsize_t
+            strip_size;
+
+          unsigned char
+            *p,
+            *strip_pixels;
+
+          /*
+            Convert stripped TIFF image.
+          */
+          strip_size=TIFFStripSize(tiff);
+          stride=(ssize_t) TIFFVStripSize(tiff,1);
+          length=GetQuantumExtent(image,quantum_info,quantum_type);
+          extent=(size_t) MagickMax((size_t) strip_size,rows_per_strip*
+            MagickMax((size_t) stride,length));
+          strip_pixels=(unsigned char *) AcquireQuantumMemory(extent,
+            sizeof(*strip_pixels));
+          if (strip_pixels == (unsigned char *) NULL)
+            ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
+          (void) memset(strip_pixels,0,extent*sizeof(*strip_pixels));
+          strip_id=0;
+          p=strip_pixels;
+          for (i=0; i < (ssize_t) samples_per_pixel; i++)
           {
-            case 0: break;
-            case 1: quantum_type=GreenQuantum; break;
-            case 2: quantum_type=BlueQuantum; break;
-            case 3:
+            size_t
+              rows_remaining;
+
+            tmsize_t
+              size = 0;
+
+            switch (i)
             {
-              quantum_type=AlphaQuantum;
-              if (image->colorspace == CMYKColorspace)
-                quantum_type=BlackQuantum;
+              case 0: break;
+              case 1: quantum_type=GreenQuantum; break;
+              case 2: quantum_type=BlueQuantum; break;
+              case 3:
+              {
+                quantum_type=AlphaQuantum;
+                if (image->colorspace == CMYKColorspace)
+                  quantum_type=BlackQuantum;
+                break;
+              }
+              case 4: quantum_type=AlphaQuantum; break;
+              default:
+                break;
+            }
+            rows_remaining=0;
+            for (y=0; y < (ssize_t) image->rows; y++)
+            {
+              Quantum
+                *magick_restrict q;
+
+              q=GetAuthenticPixels(image,0,y,image->columns,1,exception);
+              if (q == (Quantum *) NULL)
+                break;
+              if (rows_remaining == 0)
+                {
+                  size=TIFFReadEncodedStrip(tiff,strip_id,strip_pixels,
+                    strip_size);
+                  if (size == -1)
+                    break;
+                  rows_remaining=rows_per_strip;
+                  p=strip_pixels;
+                  strip_id++;
+                }
+              (void) ImportQuantumPixels(image,(CacheView *) NULL,
+                quantum_info,quantum_type,p,exception);
+              p+=(ptrdiff_t) stride;
+              rows_remaining--;
+              if (SyncAuthenticPixels(image,exception) == MagickFalse)
+                break;
+              if (image->previous == (Image *) NULL)
+                {
+                  status=SetImageProgress(image,LoadImageTag,(MagickOffsetType)
+                    y,image->rows);
+                  if (status == MagickFalse)
+                    break;
+                }
+            }
+            if ((size == -1) || ((samples_per_pixel > 1) &&
+                (interlace != PLANARCONFIG_SEPARATE)))
+              break;
+          }
+          strip_pixels=(unsigned char *) RelinquishMagickMemory(strip_pixels);
+          break;
+        }
+        case ReadTileMethod:
+        {
+          unsigned char
+            *p;
+
+          size_t
+            extent,
+            length;
+
+          ssize_t
+            stride;
+
+          tmsize_t
+            tile_size;
+
+          uint32
+            columns,
+            rows;
+
+          unsigned char
+            *tile_pixels;
+
+          /*
+            Convert tiled TIFF image.
+          */
+          if ((TIFFGetField(tiff,TIFFTAG_TILEWIDTH,&columns) != 1) ||
+              (TIFFGetField(tiff,TIFFTAG_TILELENGTH,&rows) != 1))
+            ThrowTIFFException(CoderError,"ImageIsNotTiled");
+          number_pixels=(MagickSizeType) columns*rows;
+          if (HeapOverflowSanityCheck(rows,sizeof(*tile_pixels)) != MagickFalse)
+            ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
+          tile_size=TIFFTileSize(tiff);
+          stride=(ssize_t) TIFFTileRowSize(tiff);
+          length=GetQuantumExtent(image,quantum_info,quantum_type);
+          extent=(size_t) MagickMax((size_t) tile_size,rows*
+            MagickMax((size_t) stride,length));
+          tile_pixels=(unsigned char *) AcquireQuantumMemory(extent,
+            sizeof(*tile_pixels));
+          if (tile_pixels == (unsigned char *) NULL)
+            ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
+          (void) memset(tile_pixels,0,extent*sizeof(*tile_pixels));
+          for (i=0; i < (ssize_t) samples_per_pixel; i++)
+          {
+            tmsize_t
+              size = 0;
+
+            switch (i)
+            {
+              case 0: break;
+              case 1: quantum_type=GreenQuantum; break;
+              case 2: quantum_type=BlueQuantum; break;
+              case 3:
+              {
+                quantum_type=AlphaQuantum;
+                if (image->colorspace == CMYKColorspace)
+                  quantum_type=BlackQuantum;
+                break;
+              }
+              case 4: quantum_type=AlphaQuantum; break;
+              default: break;
+            }
+            for (y=0; y < (ssize_t) image->rows; y+=rows)
+            {
+              ssize_t
+                x;
+
+              size_t
+                rows_remaining;
+
+              rows_remaining=image->rows-(size_t) y;
+              if ((ssize_t) (y+rows) < (ssize_t) image->rows)
+                rows_remaining=rows;
+              for (x=0; x < (ssize_t) image->columns; x+=columns)
+              {
+                size_t
+                  columns_remaining,
+                  row;
+
+                columns_remaining=image->columns-(size_t) x;
+                if ((x+(ssize_t) columns) < (ssize_t) image->columns)
+                  columns_remaining=columns;
+                size=TIFFReadTile(tiff,tile_pixels,(uint32) x,(uint32) y,
+                  0,i);
+                if (size == -1)
+                  break;
+                p=tile_pixels;
+                for (row=0; row < rows_remaining; row++)
+                {
+                  Quantum
+                    *magick_restrict q;
+
+                  q=GetAuthenticPixels(image,x,y+(ssize_t) row,columns_remaining,
+                    1,exception);
+                  if (q == (Quantum *) NULL)
+                    break;
+                  (void) ImportQuantumPixels(image,(CacheView *) NULL,
+                    quantum_info,quantum_type,p,exception);
+                  p+=(ptrdiff_t) stride;
+                  if (SyncAuthenticPixels(image,exception) == MagickFalse)
+                    break;
+                }
+              }
+              if (size == -1)
+                break;
+            }
+            if ((size == -1) || ((samples_per_pixel > 1) &&
+                (interlace != PLANARCONFIG_SEPARATE)))
+              break;
+            if (image->previous == (Image *) NULL)
+              {
+                status=SetImageProgress(image,LoadImageTag,(MagickOffsetType) i,
+                  samples_per_pixel);
+                if (status == MagickFalse)
+                  break;
+              }
+          }
+          tile_pixels=(unsigned char *) RelinquishMagickMemory(tile_pixels);
+          break;
+        }
+        case ReadGenericMethod:
+        default:
+        {
+          MemoryInfo
+            *generic_info = (MemoryInfo * ) NULL;
+
+          uint32
+            *p;
+
+          /*
+            Convert generic TIFF image.
+          */
+          if (HeapOverflowSanityCheck(image->rows,sizeof(*pixels)) != MagickFalse)
+            ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
+          number_pixels=(MagickSizeType) image->columns*image->rows;
+          generic_info=AcquireVirtualMemory(number_pixels,sizeof(uint32));
+          if (generic_info == (MemoryInfo *) NULL)
+            ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
+          p=(uint32 *) GetVirtualMemoryBlob(generic_info);
+          tiff_status=TIFFReadRGBAImage(tiff,(uint32) image->columns,(uint32)
+            image->rows,(uint32 *) p,0);
+          if (tiff_status == -1)
+            {
+              generic_info=RelinquishVirtualMemory(generic_info);
               break;
             }
-            case 4: quantum_type=AlphaQuantum; break;
-            default: break;
-          }
-          for (y=0; y < (ssize_t) image->rows; y+=rows)
+          p+=(ptrdiff_t) (image->columns*image->rows)-1;
+          for (y=0; y < (ssize_t) image->rows; y++)
           {
             ssize_t
               x;
 
-            size_t
-              rows_remaining;
+            Quantum
+              *magick_restrict q;
 
-            rows_remaining=image->rows-(size_t) y;
-            if ((ssize_t) (y+rows) < (ssize_t) image->rows)
-              rows_remaining=rows;
-            for (x=0; x < (ssize_t) image->columns; x+=columns)
+            q=QueueAuthenticPixels(image,0,y,image->columns,1,exception);
+            if (q == (Quantum *) NULL)
+              break;
+            q+=(ptrdiff_t) GetPixelChannels(image)*(image->columns-1);
+            for (x=0; x < (ssize_t) image->columns; x++)
             {
-              size_t
-                columns_remaining,
-                row;
-
-              columns_remaining=image->columns-(size_t) x;
-              if ((x+(ssize_t) columns) < (ssize_t) image->columns)
-                columns_remaining=columns;
-              size=TIFFReadTile(tiff,tile_pixels,(uint32) x,(uint32) y,
-                0,i);
-              if (size == -1)
-                break;
-              p=tile_pixels;
-              for (row=0; row < rows_remaining; row++)
+              SetPixelRed(image,ScaleCharToQuantum((unsigned char)
+                TIFFGetR(*p)),q);
+              SetPixelGreen(image,ScaleCharToQuantum((unsigned char)
+                TIFFGetG(*p)),q);
+              SetPixelBlue(image,ScaleCharToQuantum((unsigned char)
+                TIFFGetB(*p)),q);
+              if (image->alpha_trait != UndefinedPixelTrait)
+                SetPixelAlpha(image,ScaleCharToQuantum((unsigned char)
+                  TIFFGetA(*p)),q);
+              p--;
+              q-=GetPixelChannels(image);
+            }
+            if (SyncAuthenticPixels(image,exception) == MagickFalse)
+              break;
+            if (image->previous == (Image *) NULL)
               {
-                Quantum
-                  *magick_restrict q;
-
-                q=GetAuthenticPixels(image,x,y+(ssize_t) row,columns_remaining,
-                  1,exception);
-                if (q == (Quantum *) NULL)
-                  break;
-                (void) ImportQuantumPixels(image,(CacheView *) NULL,
-                  quantum_info,quantum_type,p,exception);
-                p+=stride;
-                if (SyncAuthenticPixels(image,exception) == MagickFalse)
+                status=SetImageProgress(image,LoadImageTag,(MagickOffsetType) y,
+                  image->rows);
+                if (status == MagickFalse)
                   break;
               }
-            }
-            if (size == -1)
-              break;
           }
-          if ((size == -1) || ((samples_per_pixel > 1) &&
-              (interlace != PLANARCONFIG_SEPARATE)))
-            break;
-          if (image->previous == (Image *) NULL)
-            {
-              status=SetImageProgress(image,LoadImageTag,(MagickOffsetType) i,
-                samples_per_pixel);
-              if (status == MagickFalse)
-                break;
-            }
+          generic_info=RelinquishVirtualMemory(generic_info);
+          break;
         }
-        tile_pixels=(unsigned char *) RelinquishMagickMemory(tile_pixels);
-        break;
       }
-      case ReadGenericMethod:
-      default:
-      {
-        MemoryInfo
-          *generic_info = (MemoryInfo * ) NULL;
-
-        uint32
-          *p;
-
-        /*
-          Convert generic TIFF image.
-        */
-        if (HeapOverflowSanityCheck(image->rows,sizeof(*pixels)) != MagickFalse)
-          ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-        number_pixels=(MagickSizeType) image->columns*image->rows;
-        generic_info=AcquireVirtualMemory(number_pixels,sizeof(uint32));
-        if (generic_info == (MemoryInfo *) NULL)
-          ThrowTIFFException(ResourceLimitError,"MemoryAllocationFailed");
-        p=(uint32 *) GetVirtualMemoryBlob(generic_info);
-        tiff_status=TIFFReadRGBAImage(tiff,(uint32) image->columns,(uint32)
-          image->rows,(uint32 *) p,0);
-        if (tiff_status == -1)
-          {
-            generic_info=RelinquishVirtualMemory(generic_info);
-            break;
-          }
-        p+=(image->columns*image->rows)-1;
-        for (y=0; y < (ssize_t) image->rows; y++)
-        {
-          ssize_t
-            x;
-
-          Quantum
-            *magick_restrict q;
-
-          q=QueueAuthenticPixels(image,0,y,image->columns,1,exception);
-          if (q == (Quantum *) NULL)
-            break;
-          q+=GetPixelChannels(image)*(image->columns-1);
-          for (x=0; x < (ssize_t) image->columns; x++)
-          {
-            SetPixelRed(image,ScaleCharToQuantum((unsigned char)
-              TIFFGetR(*p)),q);
-            SetPixelGreen(image,ScaleCharToQuantum((unsigned char)
-              TIFFGetG(*p)),q);
-            SetPixelBlue(image,ScaleCharToQuantum((unsigned char)
-              TIFFGetB(*p)),q);
-            if (image->alpha_trait != UndefinedPixelTrait)
-              SetPixelAlpha(image,ScaleCharToQuantum((unsigned char)
-                TIFFGetA(*p)),q);
-            p--;
-            q-=GetPixelChannels(image);
-          }
-          if (SyncAuthenticPixels(image,exception) == MagickFalse)
-            break;
-          if (image->previous == (Image *) NULL)
-            {
-              status=SetImageProgress(image,LoadImageTag,(MagickOffsetType) y,
-                image->rows);
-              if (status == MagickFalse)
-                break;
-            }
-        }
-        generic_info=RelinquishVirtualMemory(generic_info);
-        break;
-      }
-    }
     pixel_info=RelinquishVirtualMemory(pixel_info);
     SetQuantumImageType(image,quantum_type);
   next_tiff_frame:
@@ -2958,7 +2961,7 @@ static MagickBooleanType EncodeLabImage(Image *image,ExceptionInfo *exception)
         b+=1.0;
       SetPixela(image,(double) QuantumRange*a,q);
       SetPixelb(image,(double) QuantumRange*b,q);
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncCacheViewAuthenticPixels(image_view,exception) == MagickFalse)
       {

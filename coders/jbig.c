@@ -193,7 +193,7 @@ static Image *ReadJBIGImage(const ImageInfo *image_info,
         count;
 
       status=(MagickStatusType) jbg_dec_in(&jbig_info,p,(size_t) length,&count);
-      p+=count;
+      p+=(ptrdiff_t) count;
       length-=(ssize_t) count;
     }
   } while ((status == JBG_EAGAIN) || (status == JBG_EOK));
@@ -253,7 +253,7 @@ static Image *ReadJBIGImage(const ImageInfo *image_info,
         bit=0;
       SetPixelIndex(image,index,q);
       SetPixelViaPixelInfo(image,image->colormap+(ssize_t) index,q);
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncAuthenticPixels(image,exception) == MagickFalse)
       break;
@@ -492,7 +492,7 @@ static MagickBooleanType WriteJBIGImage(const ImageInfo *image_info,
             bit=0;
             byte=0;
           }
-        p+=GetPixelChannels(image);
+        p+=(ptrdiff_t) GetPixelChannels(image);
       }
       if (bit != 0)
         *q++=byte << (8-bit);

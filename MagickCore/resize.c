@@ -414,6 +414,50 @@ static double Lagrange(const double x,const ResizeFilter *resize_filter)
   return(value);
 }
 
+static double MagicKernelSharp2013(const double x,
+  const ResizeFilter *magick_unused(resize_filter))
+{
+  magick_unreferenced(resize_filter);
+
+  /*
+    Magic Kernel with Sharp 2013 filter.
+
+    See "Solving the mystery of Magic Kernel Sharp"
+    (https://johncostella.com/magic/mks.pdf)
+  */
+  if (x < 0.5)
+    return(0.625+1.75*(0.5-x)*(0.5+x));
+  if (x < 1.5)
+    return((1.0-x)*(1.75-x));
+  if (x < 2.5)
+    return(-0.125*(2.5-x)*(2.5-x));
+  return(0.0);
+}
+
+static double MagicKernelSharp2021(const double x,
+  const ResizeFilter *magick_unused(resize_filter))
+{
+  magick_unreferenced(resize_filter);
+
+  /*
+    Magic Kernel with Sharp 2021 filter.
+
+    See "Solving the mystery of Magic Kernel Sharp"
+    (https://johncostella.com/magic/mks.pdf)
+  */
+  if (x < 0.5)
+    return(577.0/576.0-239.0/144.0*x*x);
+  if (x < 1.5)
+    return(35.0/36.0*(x-1.0)*(x-239.0/140.0));
+  if (x < 2.5)
+    return(1.0/6.0*(x-2.0)*(65.0/24.0-x));
+  if (x < 3.5)
+    return(1.0/36.0*(x-3.0)*(x-3.75));
+  if (x < 4.5)
+    return(-1.0/288.0*(x-4.5)*(x-4.5));
+  return(0.0);
+}
+
 static double Quadratic(const double x,
   const ResizeFilter *magick_unused(resize_filter))
 {
@@ -600,7 +644,7 @@ static double Welch(const double x,
 %
 %  Special Purpose Filters
 %      Cubic  SincFast  LanczosSharp  Lanczos2  Lanczos2Sharp
-%      Robidoux RobidouxSharp
+%      Robidoux RobidouxSharp MagicKernelSharp2013 MagicKernelSharp2021
 %
 %  The users "-filter" selection is used to lookup the default 'expert'
 %  settings for that filter from a internal table.  However any provided
@@ -827,6 +871,8 @@ MagickPrivate ResizeFilter *AcquireResizeFilter(const Image *image,
     { SplineFilter,        BoxFilter      },  /* Spline Cubic Filter          */
     { LanczosRadiusFilter, LanczosFilter  },  /* Lanczos with integer radius  */
     { CubicSplineFilter,   BoxFilter      },  /* CubicSpline (2/3/4 lobes)    */
+    { MagicKernelSharp2013Filter, BoxFilter }, /* Magic Kernal Sharp 2013     */
+    { MagicKernelSharp2021Filter, BoxFilter }, /* Magic Kernal Sharp 2021     */
   };
   /*
     Table mapping the filter/window from the above table to an actual function.
@@ -891,6 +937,8 @@ MagickPrivate ResizeFilter *AcquireResizeFilter(const Image *image,
     { CubicBC,   2.0, 2.0, 1.0, 0.0, CubicBCWeightingFunction },  /* Cubic B-Spline (B=1,C=0)    */
     { SincFast,  3.0, 1.0, 0.0, 0.0, SincFastWeightingFunction }, /* Lanczos, Integer Radius    */
     { CubicSpline,2.0, 0.5, 0.0, 0.0, BoxWeightingFunction },  /* Spline Lobes 2-lobed */
+    { MagicKernelSharp2013, 2.5, 1.0, 0.0, 0.0, MagicKernelSharpWeightingFunction }, /* MagicKernelSharp2013 */
+    { MagicKernelSharp2021, 4.5, 1.0, 0.0, 0.0, MagicKernelSharpWeightingFunction }, /* MagicKernelSharp2021 */
   };
   /*
     The known zero crossings of the Jinc() or more accurately the Jinc(x*PI)
@@ -1798,7 +1846,7 @@ MagickExport Image *InterpolativeResizeImage(const Image *image,
         if (status == MagickFalse)
           break;
       }
-      q+=GetPixelChannels(resize_image);
+      q+=(ptrdiff_t) GetPixelChannels(resize_image);
     }
     if (SyncCacheViewAuthenticPixels(resize_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -1944,7 +1992,7 @@ MagickExport Image *LiquidRescaleImage(const Image *image,const size_t columns,
 
       for (i=0; i < (ssize_t) GetPixelChannels(image); i++)
         *q++=QuantumScale*(double) p[i];
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
   }
   image_view=DestroyCacheView(image_view);
@@ -3057,7 +3105,7 @@ MagickExport Image *MagnifyImage(const Image *image,ExceptionInfo *exception)
         for (i=0; i < (ssize_t) (channels*magnification); i++)
           q[j*(ssize_t) channels*(ssize_t) magnify_image->columns+i]=
             r[j*magnification*(ssize_t) channels+i];
-      q+=magnification*GetPixelChannels(magnify_image);
+      q+=(ptrdiff_t) magnification*GetPixelChannels(magnify_image);
     }
     if (SyncCacheViewAuthenticPixels(magnify_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -3474,7 +3522,7 @@ static MagickBooleanType HorizontalFilter(
         gamma=PerceptibleReciprocal(gamma);
         SetPixelChannel(resize_image,channel,ClampToQuantum(gamma*pixel),q);
       }
-      q+=GetPixelChannels(resize_image);
+      q+=(ptrdiff_t) GetPixelChannels(resize_image);
     }
     if (SyncCacheViewAuthenticPixels(resize_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -3686,7 +3734,7 @@ static MagickBooleanType VerticalFilter(
         gamma=PerceptibleReciprocal(gamma);
         SetPixelChannel(resize_image,channel,ClampToQuantum(gamma*pixel),q);
       }
-      q+=GetPixelChannels(resize_image);
+      q+=(ptrdiff_t) GetPixelChannels(resize_image);
     }
     if (SyncCacheViewAuthenticPixels(resize_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -3982,7 +4030,7 @@ MagickExport Image *SampleImage(const Image *image,const size_t columns,
 
       if (GetPixelWriteMask(sample_image,q) <= (QuantumRange/2))
         {
-          q+=GetPixelChannels(sample_image);
+          q+=(ptrdiff_t) GetPixelChannels(sample_image);
           continue;
         }
       for (i=0; i < (ssize_t) GetPixelChannels(sample_image); i++)
@@ -4003,7 +4051,7 @@ MagickExport Image *SampleImage(const Image *image,const size_t columns,
         SetPixelChannel(sample_image,channel,p[x_offset[x]*(ssize_t)
           GetPixelChannels(image)+i],q);
       }
-      q+=GetPixelChannels(sample_image);
+      q+=(ptrdiff_t) GetPixelChannels(sample_image);
     }
     if (SyncCacheViewAuthenticPixels(sample_view,exception) == MagickFalse)
       status=MagickFalse;
@@ -4192,7 +4240,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
         {
           if (GetPixelWriteMask(image,p) <= (QuantumRange/2))
             {
-              p+=GetPixelChannels(image);
+              p+=(ptrdiff_t) GetPixelChannels(image);
               continue;
             }
           if (image->alpha_trait != UndefinedPixelTrait)
@@ -4208,7 +4256,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
               }
             x_vector[x*(ssize_t) GetPixelChannels(image)+i]=alpha*(double) p[i];
           }
-          p+=GetPixelChannels(image);
+          p+=(ptrdiff_t) GetPixelChannels(image);
         }
       }
     else
@@ -4235,7 +4283,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
               {
                 if (GetPixelWriteMask(image,p) <= (QuantumRange/2))
                   {
-                    p+=GetPixelChannels(image);
+                    p+=(ptrdiff_t) GetPixelChannels(image);
                     continue;
                   }
                 if (image->alpha_trait != UndefinedPixelTrait)
@@ -4253,7 +4301,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
                   x_vector[x*(ssize_t) GetPixelChannels(image)+i]=alpha*
                     (double) p[i];
                 }
-                p+=GetPixelChannels(image);
+                p+=(ptrdiff_t) GetPixelChannels(image);
               }
               number_rows++;
             }
@@ -4281,7 +4329,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
             {
               if (GetPixelWriteMask(image,p) <= (QuantumRange/2))
                 {
-                  p+=GetPixelChannels(image);
+                  p+=(ptrdiff_t) GetPixelChannels(image);
                   continue;
                 }
               if (image->alpha_trait != UndefinedPixelTrait)
@@ -4299,7 +4347,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
                 x_vector[x*(ssize_t) GetPixelChannels(image)+i]=alpha*
                   (double) p[i];
               }
-              p+=GetPixelChannels(image);
+              p+=(ptrdiff_t) GetPixelChannels(image);
             }
             number_rows++;
             next_row=MagickFalse;
@@ -4331,7 +4379,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
         {
           if (GetPixelWriteMask(scale_image,q) <= (QuantumRange/2))
             {
-              q+=GetPixelChannels(scale_image);
+              q+=(ptrdiff_t) GetPixelChannels(scale_image);
               continue;
             }
           if (image->alpha_trait != UndefinedPixelTrait)
@@ -4357,7 +4405,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
             SetPixelChannel(scale_image,channel,ClampToQuantum(alpha*scanline[
               x*(ssize_t) GetPixelChannels(image)+i]),q);
           }
-          q+=GetPixelChannels(scale_image);
+          q+=(ptrdiff_t) GetPixelChannels(scale_image);
         }
       }
     else
@@ -4428,7 +4476,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
       {
         if (GetPixelWriteMask(scale_image,q) <= (QuantumRange/2))
           {
-            q+=GetPixelChannels(scale_image);
+            q+=(ptrdiff_t) GetPixelChannels(scale_image);
             continue;
           }
         if (image->alpha_trait != UndefinedPixelTrait)
@@ -4455,7 +4503,7 @@ MagickExport Image *ScaleImage(const Image *image,const size_t columns,
           SetPixelChannel(scale_image,channel,ClampToQuantum(alpha*
             scale_scanline[x*(ssize_t) GetPixelChannels(image)+i]),q);
         }
-        q+=GetPixelChannels(scale_image);
+        q+=(ptrdiff_t) GetPixelChannels(scale_image);
       }
     }
     if (SyncCacheViewAuthenticPixels(scale_view,exception) == MagickFalse)

@@ -543,7 +543,7 @@ static void TransformDoublePixels(const int id,const Image* image,
       }
     if (source_info->channels > 3)
       *p++=GetLCMSPixel(source_info,GetPixelBlack(image,q),3);
-    q+=GetPixelChannels(image);
+    q+=(ptrdiff_t) GetPixelChannels(image);
   }
   cmsDoTransform(transform[id],source_info->pixels[id],target_info->pixels[id],
     (unsigned int) image->columns);
@@ -568,7 +568,7 @@ static void TransformDoublePixels(const int id,const Image* image,
         SetPixelBlack(image,SetLCMSPixel(target_info,*p,3),q);
         p++;
       }
-    q+=GetPixelChannels(image);
+    q+=(ptrdiff_t) GetPixelChannels(image);
   }
 }
 
@@ -593,7 +593,7 @@ static void TransformQuantumPixels(const int id,const Image* image,
       }
     if (source_info->channels > 3)
       *p++=GetPixelBlack(image,q);
-    q+=GetPixelChannels(image);
+    q+=(ptrdiff_t) GetPixelChannels(image);
   }
   cmsDoTransform(transform[id],source_info->pixels[id],target_info->pixels[id],
     (unsigned int) image->columns);
@@ -612,7 +612,7 @@ static void TransformQuantumPixels(const int id,const Image* image,
       }
     if (target_info->channels > 3)
       SetPixelBlack(image,*p++,q);
-    q+=GetPixelChannels(image);
+    q+=(ptrdiff_t) GetPixelChannels(image);
   }
 }
 
@@ -1143,8 +1143,10 @@ MagickExport MagickBooleanType ProfileImage(Image *image,const char *name,
                     source_info.scale[0]=100.0;
                     source_info.scale[1]=255.0;
                     source_info.scale[2]=255.0;
+#if !defined(MAGICKCORE_HDRI_SUPPORT)
                     source_info.translate[1]=(-0.5);
                     source_info.translate[2]=(-0.5);
+#endif
                   }
 #if (MAGICKCORE_QUANTUM_DEPTH == 8)
                 else
@@ -1237,8 +1239,10 @@ MagickExport MagickBooleanType ProfileImage(Image *image,const char *name,
                     target_info.scale[0]=0.01;
                     target_info.scale[1]=1/255.0;
                     target_info.scale[2]=1/255.0;
+#if !defined(MAGICKCORE_HDRI_SUPPORT)
                     target_info.translate[1]=0.5;
                     target_info.translate[2]=0.5;
+#endif
                   }
 #if (MAGICKCORE_QUANTUM_DEPTH == 8)
                 else
@@ -1641,10 +1645,10 @@ static void WriteTo8BimProfile(Image *image,const char *name,
     q=p;
     if (LocaleNCompare((char *) p,"8BIM",4) != 0)
       break;
-    p+=4;
+    p+=(ptrdiff_t) 4;
     p=ReadResourceShort(p,&id);
     p=ReadResourceByte(p,&length_byte);
-    p+=length_byte;
+    p+=(ptrdiff_t) length_byte;
     if (((length_byte+1) & 0x01) != 0)
       p++;
     if (p > (datum+length-4))
@@ -1656,7 +1660,7 @@ static void WriteTo8BimProfile(Image *image,const char *name,
     if ((count < 0) || (p > (datum+length-count)) || (count > (ssize_t) length))
       break;
     if (id != profile_id)
-      p+=count;
+      p+=(ptrdiff_t) count;
     else
       {
         size_t
@@ -1734,10 +1738,10 @@ static void GetProfilesFromResourceBlock(Image *image,
   {
     if (LocaleNCompare((char *) p,"8BIM",4) != 0)
       break;
-    p+=4;
+    p+=(ptrdiff_t) 4;
     p=ReadResourceShort(p,&id);
     p=ReadResourceByte(p,&length_byte);
-    p+=length_byte;
+    p+=(ptrdiff_t) length_byte;
     if (((length_byte+1) & 0x01) != 0)
       p++;
     if (p > (datum+length-4))
@@ -1789,7 +1793,7 @@ static void GetProfilesFromResourceBlock(Image *image,
         if (profile != (StringInfo *) NULL)
           (void) SetImageProfileInternal(image,GetStringInfoName(profile),
             profile,MagickTrue,exception);
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
       case 0x040c:
@@ -1797,7 +1801,7 @@ static void GetProfilesFromResourceBlock(Image *image,
         /*
           Thumbnail.
         */
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
       case 0x040f:
@@ -1809,7 +1813,7 @@ static void GetProfilesFromResourceBlock(Image *image,
         if (profile != (StringInfo *) NULL)
           (void) SetImageProfileInternal(image,GetStringInfoName(profile),
             profile,MagickTrue,exception);
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
       case 0x0422:
@@ -1821,7 +1825,7 @@ static void GetProfilesFromResourceBlock(Image *image,
         if (profile != (StringInfo *) NULL)
           (void) SetImageProfileInternal(image,GetStringInfoName(profile),
             profile,MagickTrue,exception);
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
       case 0x0424:
@@ -1833,12 +1837,12 @@ static void GetProfilesFromResourceBlock(Image *image,
         if (profile != (StringInfo *) NULL)
           (void) SetImageProfileInternal(image,GetStringInfoName(profile),
             profile,MagickTrue,exception);
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
       default:
       {
-        p+=count;
+        p+=(ptrdiff_t) count;
         break;
       }
     }
@@ -1867,7 +1871,7 @@ static void PatchCorruptProfile(const char *name,StringInfo *profile)
       p=(unsigned char *) strstr((const char *) p,"<?xpacket end=\"w\"?>");
       if (p != (unsigned char *) NULL)
         {
-          p+=19;
+          p+=(ptrdiff_t) 19;
           length=(size_t) (p-GetStringInfoDatum(profile));
           if (length != GetStringInfoLength(profile))
             {
@@ -1877,7 +1881,8 @@ static void PatchCorruptProfile(const char *name,StringInfo *profile)
         }
       return;
     }
-  if (LocaleCompare(name,"exif") == 0)
+  if (((LocaleCompare(name, "exif") == 0) || (LocaleCompare(name, "app1") == 0)) &&
+      (GetStringInfoLength(profile) > 2))
     {
       /*
         Check if profile starts with byte order marker instead of Exif.
@@ -1978,18 +1983,27 @@ static MagickBooleanType SetImageProfileInternal(Image *image,const char *name,
     image->profiles=NewSplayTree(CompareSplayTreeString,RelinquishMagickMemory,
       DestroyProfile);
   (void) CopyMagickString(key,name,MagickPathExtent);
-  LocaleLower(key);
+  /*
+   * When an app1 profile starts with an exif header then store it as an exif
+   * profile instead. The PatchCorruptProfile method already ensures that the
+   * profile starts with exif instead of MM or II.
+   */
+  if ((length > 4) && (LocaleCompare(key,"app1") == 0) && 
+      (LocaleNCompare((const char *) GetStringInfoDatum(profile),"exif",4) == 0))
+    (void) CopyMagickString(key,"exif",MagickPathExtent);
+  else
+    LocaleLower(key);
   status=AddValueToSplayTree((SplayTreeInfo *) image->profiles,
     ConstantString(key),profile);
   if (status == MagickFalse)
     profile=DestroyStringInfo(profile);
   else
     {
-      if (LocaleCompare(name,"8bim") == 0)
+      if (LocaleCompare(key,"8bim") == 0)
         GetProfilesFromResourceBlock(image,profile,exception);
       else
         if (recursive == MagickFalse)
-          WriteTo8BimProfile(image,name,profile);
+          WriteTo8BimProfile(image,key,profile);
     }
   return(status);
 }
@@ -2461,7 +2475,7 @@ static void Sync8BimProfile(const Image *image,const StringInfo *profile)
     count=(ssize_t) ReadProfileByte(&p,&length);
     if ((count >= (ssize_t) length) || (count < 0))
       return;
-    p+=count;
+    p+=(ptrdiff_t) count;
     length-=(size_t) count;
     if ((*p & 0x01) == 0)
       (void) ReadProfileByte(&p,&length);
@@ -2487,7 +2501,7 @@ static void Sync8BimProfile(const Image *image,const StringInfo *profile)
       }
     if (id == 0x0422)
       SyncExifProfile(image,p,(size_t) count);
-    p+=count;
+    p+=(ptrdiff_t) count;
     length-=(size_t) count;
   }
   return;

@@ -2872,8 +2872,6 @@ dnl ===========================================================================
 #
 # Check for google libultrahdr delegate library
 #
-# Test for ultrahdr_api.h & test for uhdr_create_decoder in -luhdr
-#
 AC_ARG_WITH([uhdr],
     [AS_HELP_STRING([--with-uhdr],
                     [enable google ultrahdr support])],
@@ -2885,36 +2883,18 @@ if test "$with_uhdr" != 'yes'; then
 fi
 
 have_uhdr='no'
+UHDR_CFLAGS=""
 UHDR_LIBS=""
+UHDR_PKG=""
 if test "$with_uhdr" != 'no'; then
     AC_MSG_RESULT([-------------------------------------------------------------])
-    AC_MSG_CHECKING([for google ultrahdr])
+    PKG_CHECK_MODULES([UHDR],[libuhdr >= 1.3.0],[have_uhdr=yes],[have_uhdr=no])
     AC_MSG_RESULT([])
-    failed=0
-    passed=0
+fi
 
-    PKG_CHECK_MODULES([UHDR],[libuhdr >= 1.2.0],[have_uhdr=yes],[have_uhdr=no])
-    CFLAGS="$CFLAGS $UHDR_CFLAGS"
-    LIBS="$LIBS $UHDR_LIBS"
-    AC_CHECK_HEADER([ultrahdr_api.h],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`])
-    AC_CHECK_LIB([uhdr],[uhdr_create_decoder],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[])
-
-    AC_MSG_CHECKING([if google ultrahdr package is complete])
-
-    if test $passed -gt 0; then
-        if test $failed -gt 0; then
-            AC_MSG_RESULT([no -- some components failed test])
-            have_uhdr='no (failed tests)'
-        else
-            UHDR_LIBS='-luhdr'
-            LIBS="$UHDR_LIBS $LIBS"
-            AC_DEFINE([UHDR_DELEGATE],[1],[Define if you have google ultrahdr library])
-            AC_MSG_RESULT([yes])
-            have_uhdr='yes'
-        fi
-    else
-        AC_MSG_RESULT([no])
-    fi
+if test "$have_uhdr" = 'yes'; then
+  AC_DEFINE([UHDR_DELEGATE],[1],[Define if you have google ultrahdr library])
+  CFLAGS="$UHDR_CFLAGS $CFLAGS"
 fi
 
 AM_CONDITIONAL([UHDR_DELEGATE],[test "$have_uhdr" = 'yes'])
@@ -2924,7 +2904,7 @@ AC_SUBST([UHDR_LIBS])
 dnl ===========================================================================
 
 #
-# Set URW Base35 font directory.
+# Set URW Base35 OTF font directory.
 #
 AC_ARG_WITH([urw-base35-font-dir],
     [AS_HELP_STRING([--with-urw-base35-font-dir=DIR],
@@ -2934,6 +2914,21 @@ AC_ARG_WITH([urw-base35-font-dir],
 
 if test "$with_urw_base35_font_dir" != 'default'; then
     DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-urw-base35-font-dir=$with_urw_base35_font_dir "
+fi
+
+dnl ===========================================================================
+
+#
+# Set URW Base35 Type1 font directory.
+#
+AC_ARG_WITH([urw-base35-type1-font-dir],
+    [AS_HELP_STRING([--with-urw-base35-type1-font-dir=DIR],
+                    [URW-base35 font directory])],
+    [with_urw_base35_type1_font_dir=$withval],
+    [with_urw_base35_type1_font_dir='default'])
+
+if test "$with_urw_base35_type1_font_dir" != 'default'; then
+    DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-urw-base35-type1-font-dir=$with_urw_base35_type1_font_dir "
 fi
 
 dnl ===========================================================================
@@ -3490,13 +3485,13 @@ case "${build_os}" in
     ;;
 esac
 
-# URW-base35 fonts.
-AC_MSG_CHECKING([for URW-base35 fonts directory])
+# URW-base35 OTF fonts.
+AC_MSG_CHECKING([for URW-base35 OTF fonts directory])
 urw_base35_font_dir=''
 if test "${with_urw_base35_font_dir}" != 'default'; then
   urw_base35_font_dir="${with_urw_base35_font_dir}/"
 else
-  for font_dir in "${prefix}/share/urw-base35/fonts/" "${prefix}/share/fonts/opentype/urw-base35" '/usr/share/fonts/urw-base35/' '/usr/share/fonts/opentype/urw-base35/' '/usr/share/fonts/type1/urw-base35/'; do
+  for font_dir in "${prefix}/share/urw-base35/fonts/" "${prefix}/share/fonts/opentype/urw-base35" '/usr/share/fonts/urw-base35/' '/usr/share/fonts/opentype/urw-base35/'; do
     if test -f "${font_dir}URWGothic-Book.otf"; then
       urw_base35_font_dir="${font_dir}"
       break 1
@@ -3510,6 +3505,27 @@ else
   AC_MSG_RESULT([not found!]);
 fi
 AC_SUBST([urw_base35_font_dir])
+
+# URW-base35 Type1 fonts.
+AC_MSG_CHECKING([for URW-base35 Type1 fonts directory])
+urw_base35_type1_font_dir=''
+if test "${with_urw_base35_type1_font_dir}" != 'default'; then
+  urw_base35_type1_font_dir="${with_urw_base35_type1_font_dir}/"
+else
+  for font_dir in "${prefix}/share/urw-base35/fonts/" "${prefix}/share/fonts/type1/urw-base35" '/usr/share/fonts/urw-base35/' '/usr/share/fonts/type1/urw-base35/'; do
+    if test -f "${font_dir}URWGothic-Book.t1"; then
+      urw_base35_type1_font_dir="${font_dir}"
+      break 1
+    fi
+  done
+fi 
+if test "${urw_base35_type1_font_dir}x" != 'x'; then
+  type_include_files="${type_include_files} "'<include file="type-urw-base35-type1.xml" />'
+  AC_MSG_RESULT([$urw_base35_type1_font_dir])
+else
+  AC_MSG_RESULT([not found!]);
+fi
+AC_SUBST([urw_base35_type1_font_dir])
 
 # Windows fonts.
 AC_MSG_CHECKING([for Windows fonts directory])
@@ -4210,6 +4226,11 @@ if test "${urw_base35_font_dir}x" != 'x'; then
     result_urw_base35_font_dir=$urw_base35_font_dir
 fi
 
+result_urw_base35_type1_font_dir='none'
+if test "${urw_base35_type1_font_dir}x" != 'x'; then
+    result_urw_base35_type1_font_dir=$urw_base35_type1_font_dir
+fi
+
 result_windows_font_dir='none'
 if test "${windows_font_dir}x" != 'x'; then
     result_windows_font_dir=${windows_font_dir}
@@ -4232,6 +4253,7 @@ AC_CONFIG_FILES([\
     config/type-dejavu.xml \
     config/type-ghostscript.xml \
     config/type-urw-base35.xml \
+    config/type-urw-base35-type1.xml \
     config/type-windows.xml \
     config/type.xml \
     ImageMagick.spec \
@@ -4351,7 +4373,8 @@ Font configuration:
   Apple fonts       --with-apple-font-dir=$with_apple_font_dir	$result_apple_font_dir
   Dejavu fonts      --with-dejavu-font-dir=$with_dejavu_font_dir	$result_dejavu_font_dir
   Ghostscript fonts --with-gs-font-dir=$with_gs_font_dir		$result_ghostscript_font_dir
-  URW-base35 fonts  --with-urw-base35-font-dir=$with_urw_base35_font_dir	$result_urw_base35_font_dir
+  URW OTF fonts     --with-urw-base35-font-dir=$with_urw_base35_font_dir	$result_urw_base35_font_dir
+  URW Type1 fonts   --with-urw-base35-type1-font-dir=$with_urw_base35_type1_font_dir	$result_urw_base35_type1_font_dir
   Windows fonts     --with-windows-font-dir=$with_windows_font_dir	$result_windows_font_dir
 
 X11 configuration:

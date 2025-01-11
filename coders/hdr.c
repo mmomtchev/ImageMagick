@@ -453,7 +453,7 @@ static Image *ReadHDRImage(const ImageInfo *image_info,ExceptionInfo *exception)
                         count=ReadBlob(image,(size_t) count*sizeof(*p),p);
                         if (count < 1)
                           break;
-                        p+=count;
+                        p+=(ptrdiff_t) count;
                       }
                   }
               }
@@ -493,7 +493,7 @@ static Image *ReadHDRImage(const ImageInfo *image_info,ExceptionInfo *exception)
           SetPixelBlue(image,ClampToQuantum((double) QuantumRange*gamma*
             (double) pixel[2]),q);
         }
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncAuthenticPixels(image,exception) == MagickFalse)
       break;
@@ -623,7 +623,7 @@ static size_t HDRWriteRunlengthPixels(Image *image,unsigned char *pixels)
     previous_count=0;
     while ((runlength < MinimumRunlength) && (q < image->columns))
     {
-      q+=runlength;
+      q+=(ptrdiff_t) runlength;
       previous_count=(ssize_t) runlength;
       runlength=1;
       while ((pixels[q] == pixels[q+runlength]) &&
@@ -648,7 +648,7 @@ static size_t HDRWriteRunlengthPixels(Image *image,unsigned char *pixels)
         break;
       if (WriteBlob(image,(size_t) count*sizeof(*pixel),&pixels[p]) < 1)
         break;
-      p+=(size_t) count;
+      p+=(ptrdiff_t) count;
     }
     if (runlength >= MinimumRunlength)
       {
@@ -656,7 +656,7 @@ static size_t HDRWriteRunlengthPixels(Image *image,unsigned char *pixels)
         pixel[1]=pixels[q];
         if (WriteBlob(image,2*sizeof(*pixel),pixel) < 1)
           break;
-        p+=runlength;
+        p+=(ptrdiff_t) runlength;
       }
   }
   return(p);
@@ -816,7 +816,7 @@ static MagickBooleanType WriteHDRImage(const ImageInfo *image_info,Image *image,
           pixels[i++]=pixel[2];
           pixels[i++]=pixel[3];
         }
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
     if ((image->columns >= 8) && (image->columns <= 0x7ffff))
       {

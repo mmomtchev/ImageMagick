@@ -501,7 +501,7 @@ static unsigned char *DecodeImage(Image *blob,Image *image,
   for (y=0; y < (ssize_t) image->rows; y++)
   {
     q=pixels+y*(ssize_t) width;
-    if (bytes_per_line > 200)
+    if (bytes_per_line > 250)
       scanline_length=ReadBlobMSBShort(blob);
     else
       scanline_length=(size_t) ReadBlobByte(blob);
@@ -525,7 +525,7 @@ static unsigned char *DecodeImage(Image *blob,Image *image,
             &number_pixels);
           if ((size_t) (q-pixels+(ssize_t) number_pixels) <= *extent)
             (void) memcpy(q,p,(size_t) number_pixels);
-          q+=number_pixels;
+          q+=(ptrdiff_t) number_pixels;
           j+=(ssize_t) (length*bytes_per_pixel+1);
         }
       else
@@ -538,7 +538,7 @@ static unsigned char *DecodeImage(Image *blob,Image *image,
           {
             if ((size_t) (q-pixels+(ssize_t) number_pixels) <= *extent)
               (void) memcpy(q,p,(size_t) number_pixels);
-            q+=number_pixels;
+            q+=(ptrdiff_t) number_pixels;
           }
           j+=(ssize_t) bytes_per_pixel+1;
         }
@@ -691,7 +691,7 @@ static size_t EncodeImage(Image *image,const unsigned char *scanline,
     Write the number of and the packed length.
   */
   length=(size_t) (q-pixels);
-  if (bytes_per_line > 200)
+  if (bytes_per_line > 250)
     {
       (void) WriteBlobMSBShort(image,(unsigned short) length);
       length+=2;
@@ -1084,7 +1084,7 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
 
                 if (EOFBlob(image) != MagickFalse)
                   break;
-                if (length > 200)
+                if (length > 250)
                   scanline_length=ReadBlobMSBShort(image);
                 else
                   scanline_length=(size_t) ReadBlobByte(image);
@@ -1335,14 +1335,14 @@ static Image *ReadPICTImage(const ImageInfo *image_info,
                         }
                   }
                 p++;
-                q+=GetPixelChannels(tile_image);
+                q+=(ptrdiff_t) GetPixelChannels(tile_image);
               }
               if (SyncAuthenticPixels(tile_image,exception) == MagickFalse)
                 break;
               if ((tile_image->storage_class == DirectClass) &&
                   (pixmap.bits_per_pixel != 16))
                 {
-                  p+=(pixmap.component_count-1)*(ssize_t) tile_image->columns;
+                  p+=(ptrdiff_t) (pixmap.component_count-1)*(ssize_t) tile_image->columns;
                   if (p < pixels)
                     break;
                 }
@@ -2013,7 +2013,7 @@ static MagickBooleanType WritePICTImage(const ImageInfo *image_info,
       for (x=0; x < (ssize_t) image->columns; x++)
       {
         scanline[x]=(unsigned char) ((ssize_t) GetPixelIndex(image,p));
-        p+=GetPixelChannels(image);
+        p+=(ptrdiff_t) GetPixelChannels(image);
       }
       count+=EncodeImage(image,scanline,(size_t) (row_bytes & 0x7FFF),
         packed_scanline);
@@ -2067,7 +2067,7 @@ static MagickBooleanType WritePICTImage(const ImageInfo *image_info,
             *blue++=ScaleQuantumToChar(GetPixelBlue(image,p));
             if (image->alpha_trait != UndefinedPixelTrait)
               *opacity++=ScaleQuantumToChar((Quantum) (GetPixelAlpha(image,p)));
-            p+=GetPixelChannels(image);
+            p+=(ptrdiff_t) GetPixelChannels(image);
           }
           count+=EncodeImage(image,scanline,bytes_per_line,packed_scanline);
           if (image->previous == (Image *) NULL)

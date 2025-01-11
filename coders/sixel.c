@@ -1093,7 +1093,7 @@ static Image *ReadSIXELImage(const ImageInfo *image_info,
         continue;
       if ((*p == '}') && (*(p+1) == ';'))
         break;
-      p+=strlen(p);
+      p+=(ptrdiff_t) strlen(p);
       offset=p-sixel_buffer;
       if ((size_t) (offset+MagickPathExtent+1) < length)
         continue;
@@ -1165,7 +1165,7 @@ static Image *ReadSIXELImage(const ImageInfo *image_info,
           SetPixelRed(image,image->colormap[j].red,q);
           SetPixelGreen(image,image->colormap[j].green,q);
           SetPixelBlue(image,image->colormap[j].blue,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         if (SyncAuthenticPixels(image,exception) == MagickFalse)
           break;
@@ -1410,7 +1410,7 @@ static MagickBooleanType WriteSIXELImage(const ImageInfo *image_info,
     {
       sixel_pixels[y*(ssize_t) image->columns+x]=((ssize_t)
         GetPixelIndex(image,q));
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
   }
   status=sixel_encode_impl(sixel_pixels,image->columns,image->rows,

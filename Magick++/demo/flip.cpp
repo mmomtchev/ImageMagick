@@ -12,6 +12,7 @@
 //
 
 #include <Magick++.h>
+#include <cstdlib>
 #include <string>
 #include <iostream>
 #include <list>
@@ -25,7 +26,7 @@ int main( int /*argc*/, char ** argv)
 {
 
   // Initialize ImageMagick install location for Windows
-  InitializeMagick(*argv);
+  MagickPlusPlusGenesis genesis(*argv);
 
 
   try {

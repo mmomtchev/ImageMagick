@@ -300,7 +300,7 @@ static void JSONFormatLocaleFile(FILE *file,const char *format,
         if (((int) *p >= 0x00) && ((int) *p <= 0x1f))
           {
             (void) FormatLocaleString(q,7,"\\u%04X",(int) *p);
-            q+=6;
+            q+=(ptrdiff_t) 6;
             break;
           }
         *q++=(*p);
@@ -368,7 +368,7 @@ static ChannelStatistics *GetLocationStatistics(const Image *image,
     {
       if (GetPixelReadMask(image,p) <= (QuantumRange/2))
         {
-          p+=GetPixelChannels(image);
+          p+=(ptrdiff_t) GetPixelChannels(image);
           continue;
         }
       for (i=0; i < (ssize_t) GetPixelChannels(image); i++)
@@ -394,7 +394,7 @@ static ChannelStatistics *GetLocationStatistics(const Image *image,
           }
         }
       }
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
   }
   return(channel_statistics);
@@ -602,7 +602,7 @@ static ssize_t PrintChannelLocations(FILE *file,const Image *image,
             "        }",(double) n,(double) x,(double) y);
           n++;
         }
-      p+=GetPixelChannels(image);
+      p+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (x < (ssize_t) image->columns)
       break;
@@ -1369,7 +1369,7 @@ static MagickBooleanType EncodeImageAttributes(Image *image,FILE *file,
           {
             if (GetPixelAlpha(image,p) == (Quantum) TransparentAlpha)
               break;
-            p+=GetPixelChannels(image);
+            p+=(ptrdiff_t) GetPixelChannels(image);
           }
           if (x < (ssize_t) image->columns)
             break;

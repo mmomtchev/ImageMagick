@@ -321,8 +321,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -338,8 +338,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -347,8 +347,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -363,8 +363,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -377,8 +377,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -394,8 +394,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -412,8 +412,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -429,8 +429,8 @@ static void ImportAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -468,8 +468,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushCharPixel(p,&pixel);
         SetPixelRed(image,ScaleCharToQuantum(pixel),q);
         SetPixelAlpha(image,OpaqueAlpha,q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -488,8 +488,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,range),
               q);
             SetPixelBlue(image,ScaleAnyToQuantum((pixel >> 2) & 0x3ff,range),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -503,7 +503,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
             p=PushQuantumLongPixel(quantum_info,p,&pixel);
             SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -515,7 +515,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -549,7 +549,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
@@ -573,11 +573,11 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
-            p+=quantum_info->pad;
+            p+=(ptrdiff_t) quantum_info->pad;
           }
           for (bit=0; bit < (ssize_t) (3*number_pixels % 2); bit++)
           {
@@ -601,11 +601,11 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
-            p+=quantum_info->pad;
+            p+=(ptrdiff_t) quantum_info->pad;
           }
           if (bit != 0)
             p++;
@@ -626,7 +626,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
                 SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
                 p=PushQuantumLongPixel(quantum_info,p,&pixel);
                 SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
               }
               break;
             }
@@ -638,7 +638,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
             p=PushQuantumPixel(quantum_info,p,&pixel);
             SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -661,8 +661,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelBlue(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -674,8 +674,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelRed(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -694,8 +694,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -712,8 +712,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelRed(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -733,8 +733,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -755,8 +755,8 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -776,7 +776,7 @@ static void ImportBGRQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -812,8 +812,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -871,8 +871,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
               }
               n++;
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -889,7 +889,7 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum((unsigned short) (pixel << 6)),
           q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -914,8 +914,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -929,8 +929,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -951,8 +951,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -971,8 +971,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelRed(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -994,8 +994,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1018,8 +1018,8 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1041,7 +1041,7 @@ static void ImportBGRAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1077,8 +1077,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelOpacity(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1136,8 +1136,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
               }
               n++;
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1154,7 +1154,7 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum((unsigned short) (pixel << 6)),
           q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1179,8 +1179,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1194,8 +1194,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1216,8 +1216,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1236,8 +1236,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelRed(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
         }
       break;
@@ -1259,8 +1259,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1283,8 +1283,8 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1306,7 +1306,7 @@ static void ImportBGROQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1340,8 +1340,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelBlack(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1357,8 +1357,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelBlack(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1366,8 +1366,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelBlack(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1382,8 +1382,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1396,8 +1396,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelBlack(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1413,8 +1413,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1431,8 +1431,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1448,8 +1448,8 @@ static void ImportBlackQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelBlack(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1479,8 +1479,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelBlue(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1496,8 +1496,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelBlue(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1505,8 +1505,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1521,8 +1521,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1535,8 +1535,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelBlue(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1552,8 +1552,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1570,8 +1570,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1587,8 +1587,8 @@ static void ImportBlueQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1660,15 +1660,15 @@ static void ImportCbYCrYQuantum(const Image *image,QuantumInfo *quantum_info,
               cbcr[i]=(Quantum) (quantum);
               n++;
             }
-            p+=quantum_info->pad;
+            p+=(ptrdiff_t) quantum_info->pad;
             SetPixelRed(image,cbcr[1],q);
             SetPixelGreen(image,cbcr[0],q);
             SetPixelBlue(image,cbcr[2],q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
             SetPixelRed(image,cbcr[3],q);
             SetPixelGreen(image,cbcr[0],q);
             SetPixelBlue(image,cbcr[2],q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1683,7 +1683,7 @@ static void ImportCbYCrYQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1723,8 +1723,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelBlack(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1749,8 +1749,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelBlack(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1764,8 +1764,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelBlack(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1786,8 +1786,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1806,8 +1806,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelBlack(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1829,8 +1829,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1853,8 +1853,8 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelBlack(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1876,7 +1876,7 @@ static void ImportCMYKQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelBlack(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1918,8 +1918,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1947,8 +1947,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -1964,8 +1964,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -1988,8 +1988,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2010,8 +2010,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2035,8 +2035,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2061,8 +2061,8 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2086,7 +2086,7 @@ static void ImportCMYKAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2128,8 +2128,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelOpacity(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2157,8 +2157,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2174,8 +2174,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2198,8 +2198,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2220,8 +2220,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2245,8 +2245,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2271,8 +2271,8 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlack(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2296,7 +2296,7 @@ static void ImportCMYKOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlack(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2338,14 +2338,14 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
         for (bit=0; bit < 8; bit++)
         {
           SetPixelGray(image,((*p) & (1 << (7-bit))) == 0 ? black : white,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         p++;
       }
       for (bit=0; bit < (ssize_t) (number_pixels % 8); bit++)
       {
         SetPixelGray(image,((*p) & (0x01 << (7-bit))) == 0 ? black : white,q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       if (bit != 0)
         p++;
@@ -2361,17 +2361,17 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         pixel=(unsigned char) ((*p >> 4) & 0xf);
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
         pixel=(unsigned char) ((*p) & 0xf);
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
         p++;
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       for (bit=0; bit < (ssize_t) (number_pixels % 2); bit++)
       {
         pixel=(unsigned char) (*p++ >> 4);
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2387,8 +2387,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushCharPixel(p,&pixel);
             SetPixelGray(image,QuantumRange-ScaleCharToQuantum(pixel),q);
             SetPixelAlpha(image,OpaqueAlpha,q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2397,8 +2397,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushCharPixel(p,&pixel);
         SetPixelGray(image,ScaleCharToQuantum(pixel),q);
         SetPixelAlpha(image,OpaqueAlpha,q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2418,27 +2418,27 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
                 p=PushLongPixel(quantum_info->endian,p,&pixel);
                 SetPixelGray(image,ScaleAnyToQuantum((pixel >> 22) & 0x3ff,
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 SetPixelGray(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 SetPixelGray(image,ScaleAnyToQuantum((pixel >> 2) & 0x3ff,
                   range),q);
-                p+=quantum_info->pad;
-                q+=GetPixelChannels(image);
+                p+=(ptrdiff_t) quantum_info->pad;
+                q+=(ptrdiff_t) GetPixelChannels(image);
               }
               if (x++ < (ssize_t) (number_pixels-1))
                 {
                   p=PushLongPixel(quantum_info->endian,p,&pixel);
                   SetPixelGray(image,ScaleAnyToQuantum((pixel >> 22) & 0x3ff,
                     range),q);
-                  q+=GetPixelChannels(image);
+                  q+=(ptrdiff_t) GetPixelChannels(image);
                 }
               if (x++ < (ssize_t) number_pixels)
                 {
                   SetPixelGray(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,
                     range),q);
-                  q+=GetPixelChannels(image);
+                  q+=(ptrdiff_t) GetPixelChannels(image);
                 }
               break;
             }
@@ -2447,27 +2447,27 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ScaleAnyToQuantum((pixel >> 2) & 0x3ff,range),
               q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
             SetPixelGray(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,range),
               q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
             SetPixelGray(image,ScaleAnyToQuantum((pixel >> 22) & 0x3ff,range),
               q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           if (x++ < (ssize_t) (number_pixels-1))
             {
               p=PushLongPixel(quantum_info->endian,p,&pixel);
               SetPixelGray(image,ScaleAnyToQuantum((pixel >> 2) & 0x3ff,
                 range),q);
-              q+=GetPixelChannels(image);
+              q+=(ptrdiff_t) GetPixelChannels(image);
             }
           if (x++ < (ssize_t) number_pixels)
             {
               SetPixelGray(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,
                 range),q);
-              q+=GetPixelChannels(image);
+              q+=(ptrdiff_t) GetPixelChannels(image);
             }
           break;
         }
@@ -2475,8 +2475,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2493,20 +2493,20 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
               range),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
               range),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           for (bit=0; bit < (ssize_t) (number_pixels % 2); bit++)
           {
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
               range),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           if (bit != 0)
             p++;
@@ -2521,8 +2521,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumPixel(quantum_info,p,&pixel);
             SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2538,8 +2538,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,QuantumRange-ScaleShortToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2550,8 +2550,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2562,8 +2562,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             pixel=(unsigned short) (((unsigned int) pixel+32768) % 65536);
             SetPixelGray(image,ScaleShortToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2571,8 +2571,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelGray(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2587,8 +2587,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelGray(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2601,8 +2601,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelGray(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2618,8 +2618,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelGray(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2636,8 +2636,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelGray(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2653,8 +2653,8 @@ static void ImportGrayQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2692,7 +2692,7 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           SetPixelGray(image,(Quantum) (pixel == 0 ? 0 : QuantumRange),q);
           SetPixelAlpha(image,((*p) & (1UL << (unsigned char) (6-bit))) == 0 ?
             TransparentAlpha : OpaqueAlpha,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         p++;
       }
@@ -2703,7 +2703,7 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
           SetPixelGray(image,(Quantum) (pixel != 0 ? 0 : QuantumRange),q);
           SetPixelAlpha(image,((*p) & (1UL << (unsigned char) (6-bit))) == 0 ?
             TransparentAlpha : OpaqueAlpha,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
       if (bit != 0)
         p++;
@@ -2722,7 +2722,7 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         pixel=(unsigned char) ((*p) & 0xf);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
         p++;
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2737,8 +2737,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGray(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2754,8 +2754,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2771,8 +2771,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2791,8 +2791,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2802,8 +2802,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGray(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2820,8 +2820,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGray(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2836,8 +2836,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGray(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2855,8 +2855,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGray(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2875,8 +2875,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGray(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2894,8 +2894,8 @@ static void ImportGrayAlphaQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGray(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2925,8 +2925,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelGreen(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2942,8 +2942,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelGreen(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2951,8 +2951,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelGreen(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -2967,8 +2967,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelGreen(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2981,8 +2981,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelGreen(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -2998,8 +2998,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelGreen(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3016,8 +3016,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelGreen(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3033,8 +3033,8 @@ static void ImportGreenQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3082,7 +3082,7 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
             q);
           SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
             GetPixelIndex(image,q),q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
         p++;
       }
@@ -3095,7 +3095,7 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3110,13 +3110,13 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
         pixel=(unsigned char) ((*p) & 0xf);
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
         p++;
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       for (bit=0; bit < (ssize_t) (number_pixels % 2); bit++)
       {
@@ -3124,7 +3124,7 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3139,8 +3139,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3159,8 +3159,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
               HalfToSinglePrecision(pixel)),&range_exception),q);
             SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
               GetPixelIndex(image,q),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3170,8 +3170,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3189,8 +3189,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
               ClampToQuantum(pixel),&range_exception),q);
             SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
               GetPixelIndex(image,q),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3206,8 +3206,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
               &range_exception),q);
             SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
               GetPixelIndex(image,q),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3226,8 +3226,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
               ClampToQuantum(pixel),&range_exception),q);
             SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
               GetPixelIndex(image,q),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3247,8 +3247,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
               ClampToQuantum(pixel),&range_exception),q);
             SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
               GetPixelIndex(image,q),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3265,8 +3265,8 @@ static void ImportIndexQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelIndex(image,PushColormapIndex(image,pixel,&range_exception),q);
         SetPixelViaPixelInfo(image,image->colormap+(ssize_t)
           GetPixelIndex(image,q),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3319,7 +3319,7 @@ static void ImportIndexAlphaQuantum(const Image *image,
           SetPixelAlpha(image,((*p) & (1UL << (unsigned char) (6-bit))) == 0 ?
             TransparentAlpha : OpaqueAlpha,q);
           SetPixelIndex(image,(Quantum) (pixel == 0 ? 0 : 1),q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
       }
       if ((number_pixels % 4) != 0)
@@ -3333,7 +3333,7 @@ static void ImportIndexAlphaQuantum(const Image *image,
           SetPixelGray(image,(Quantum) (pixel == 0 ? 0 : QuantumRange),q);
           SetPixelAlpha(image,((*p) & (1UL << (unsigned char) (6-bit))) == 0 ?
             TransparentAlpha : OpaqueAlpha,q);
-          q+=GetPixelChannels(image);
+          q+=(ptrdiff_t) GetPixelChannels(image);
         }
       break;
     }
@@ -3352,7 +3352,7 @@ static void ImportIndexAlphaQuantum(const Image *image,
         pixel=(unsigned char) ((*p) & 0xf);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
         p++;
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3369,8 +3369,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
           GetPixelIndex(image,q),q);
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3392,8 +3392,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3405,8 +3405,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
           GetPixelIndex(image,q),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3426,8 +3426,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
               GetPixelIndex(image,q),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3445,8 +3445,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
               GetPixelIndex(image,q),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3467,8 +3467,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
               GetPixelIndex(image,q),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3490,8 +3490,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
               GetPixelIndex(image,q),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3511,8 +3511,8 @@ static void ImportIndexAlphaQuantum(const Image *image,
           GetPixelIndex(image,q),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3554,8 +3554,8 @@ static void ImportMultispectralQuantum(const Image *image,
           p=PushCharPixel(p,&pixel);
           q[i]=ScaleCharToQuantum(pixel);
         }
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3573,8 +3573,8 @@ static void ImportMultispectralQuantum(const Image *image,
               p=PushShortPixel(quantum_info->endian,p,&pixel);
               q[i]=ClampToQuantum((double) QuantumRange*(double)HalfToSinglePrecision(pixel));
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3585,8 +3585,8 @@ static void ImportMultispectralQuantum(const Image *image,
           p=PushShortPixel(quantum_info->endian,p,&pixel);
           q[i]=ScaleShortToQuantum(pixel);
         }
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3604,8 +3604,8 @@ static void ImportMultispectralQuantum(const Image *image,
               p=PushQuantumFloatPixel(quantum_info,p,&pixel);
               q[i]=ClampToQuantum(pixel);
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3621,8 +3621,8 @@ static void ImportMultispectralQuantum(const Image *image,
               p=PushLongPixel(quantum_info->endian,p,&pixel);
               q[i]=ScaleLongToQuantum(pixel);
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3641,8 +3641,8 @@ static void ImportMultispectralQuantum(const Image *image,
               p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
               q[i]=ClampToQuantum(pixel);
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3662,8 +3662,8 @@ static void ImportMultispectralQuantum(const Image *image,
               p=PushDoublePixel(quantum_info,p,&pixel);
               q[i]=ClampToQuantum(pixel);
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3682,7 +3682,7 @@ static void ImportMultispectralQuantum(const Image *image,
           p=PushQuantumPixel(quantum_info,p,&pixel);
           q[i]=ScaleAnyToQuantum(pixel,range);
         }
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3712,8 +3712,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelOpacity(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3729,8 +3729,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3738,8 +3738,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3754,8 +3754,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3768,8 +3768,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3785,8 +3785,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3803,8 +3803,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3820,8 +3820,8 @@ static void ImportOpacityQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3851,8 +3851,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushCharPixel(p,&pixel);
         SetPixelRed(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3868,8 +3868,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelRed(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3877,8 +3877,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelRed(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3893,8 +3893,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelRed(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3907,8 +3907,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelRed(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3924,8 +3924,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelRed(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3942,8 +3942,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
           {
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelRed(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -3959,8 +3959,8 @@ static void ImportRedQuantum(const Image *image,QuantumInfo *quantum_info,
       {
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelRed(image,ScaleAnyToQuantum(pixel,range),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -3998,8 +3998,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushCharPixel(p,&pixel);
         SetPixelBlue(image,ScaleCharToQuantum(pixel),q);
         SetPixelAlpha(image,OpaqueAlpha,q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4018,8 +4018,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum((pixel >> 12) & 0x3ff,range),
               q);
             SetPixelBlue(image,ScaleAnyToQuantum((pixel >> 2) & 0x3ff,range),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4033,7 +4033,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
             p=PushQuantumLongPixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4045,7 +4045,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4079,7 +4079,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
@@ -4103,11 +4103,11 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
-            p+=quantum_info->pad;
+            p+=(ptrdiff_t) quantum_info->pad;
           }
           for (bit=0; bit < (ssize_t) (3*number_pixels % 2); bit++)
           {
@@ -4131,11 +4131,11 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
               {
                 SetPixelBlue(image,ScaleAnyToQuantum((QuantumAny) (pixel >> 4),
                   range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
                 break;
               }
             }
-            p+=quantum_info->pad;
+            p+=(ptrdiff_t) quantum_info->pad;
           }
           if (bit != 0)
             p++;
@@ -4156,7 +4156,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
                 SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
                 p=PushQuantumLongPixel(quantum_info,p,&pixel);
                 SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
               }
               break;
             }
@@ -4168,7 +4168,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
             p=PushQuantumPixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4191,8 +4191,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelBlue(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4204,8 +4204,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4224,8 +4224,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4242,8 +4242,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelBlue(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4263,8 +4263,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4285,8 +4285,8 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelGreen(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelBlue(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4306,7 +4306,7 @@ static void ImportRGBQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelGreen(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4342,8 +4342,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelAlpha(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4401,8 +4401,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
               }
               n++;
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4419,7 +4419,7 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum((unsigned short) (pixel << 6)),
           q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4444,8 +4444,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4459,8 +4459,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelAlpha(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4481,8 +4481,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4501,8 +4501,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelAlpha(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4524,8 +4524,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4548,8 +4548,8 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelAlpha(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4571,7 +4571,7 @@ static void ImportRGBAQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelAlpha(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4607,8 +4607,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleCharToQuantum(pixel),q);
         p=PushCharPixel(p,&pixel);
         SetPixelOpacity(image,ScaleCharToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4666,8 +4666,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
               }
               n++;
             }
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4684,7 +4684,7 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum((unsigned short) (pixel << 6)),
           q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4709,8 +4709,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
             p=PushShortPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum((double) QuantumRange*(double)
               HalfToSinglePrecision(pixel)),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4724,8 +4724,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleShortToQuantum(pixel),q);
         p=PushShortPixel(quantum_info->endian,p,&pixel);
         SetPixelOpacity(image,ScaleShortToQuantum(pixel),q);
-        p+=quantum_info->pad;
-        q+=GetPixelChannels(image);
+        p+=(ptrdiff_t) quantum_info->pad;
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -4746,8 +4746,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloatPixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4766,8 +4766,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ScaleLongToQuantum(pixel),q);
             p=PushLongPixel(quantum_info->endian,p,&pixel);
             SetPixelOpacity(image,ScaleLongToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4789,8 +4789,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushQuantumFloat24Pixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4813,8 +4813,8 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
             SetPixelBlue(image,ClampToQuantum(pixel),q);
             p=PushDoublePixel(quantum_info,p,&pixel);
             SetPixelOpacity(image,ClampToQuantum(pixel),q);
-            p+=quantum_info->pad;
-            q+=GetPixelChannels(image);
+            p+=(ptrdiff_t) quantum_info->pad;
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           break;
         }
@@ -4836,7 +4836,7 @@ static void ImportRGBOQuantum(const Image *image,QuantumInfo *quantum_info,
         SetPixelBlue(image,ScaleAnyToQuantum(pixel,range),q);
         p=PushQuantumPixel(quantum_info,p,&pixel);
         SetPixelOpacity(image,ScaleAnyToQuantum(pixel,range),q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
       break;
     }
@@ -5013,7 +5013,7 @@ MagickExport size_t ImportQuantumPixels(const Image *image,
         quantum=GetPixelRed(image,q);
         SetPixelRed(image,GetPixelGreen(image,q),q);
         SetPixelGreen(image,quantum,q);
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
     }
   if (quantum_info->alpha_type == AssociatedQuantumAlpha)
@@ -5044,7 +5044,7 @@ MagickExport size_t ImportQuantumPixels(const Image *image,
             continue;
           q[i]=ClampToQuantum(gamma*(double) q[i]);
         }
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
       }
     }
   return(extent);

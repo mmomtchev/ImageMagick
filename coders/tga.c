@@ -451,7 +451,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info,ExceptionInfo *exception)
     if (q == (Quantum *) NULL)
       break;
     if (flip_x != MagickFalse)
-      q+=GetPixelChannels(image)*(image->columns-1);
+      q+=(ptrdiff_t) GetPixelChannels(image)*(image->columns-1);
     for (x=0; x < (ssize_t) image->columns; x++)
     {
       if ((tga_info.image_type == TGARLEColormap) ||
@@ -586,7 +586,7 @@ static Image *ReadTGAImage(const ImageInfo *image_info,ExceptionInfo *exception)
       if (flip_x != MagickFalse)
         q-=GetPixelChannels(image);
       else
-        q+=GetPixelChannels(image);
+        q+=(ptrdiff_t) GetPixelChannels(image);
     }
     offset+=offset_stepsize;
     if (offset >= (ssize_t) image->rows)
@@ -1066,7 +1066,7 @@ static MagickBooleanType WriteTGAImage(const ImageInfo *image_info,Image *image,
           if (i < 3)
             {
               count+=i;
-              p+=(i*(ssize_t) channels);
+              p+=(ptrdiff_t) (i*(ssize_t) channels);
             }
           if ((i >= 3) || (count == 128) ||
               ((x + i) == (ssize_t) image->columns))
@@ -1087,7 +1087,7 @@ static MagickBooleanType WriteTGAImage(const ImageInfo *image_info,Image *image,
             {
               (void) WriteBlobByte(image,(unsigned char) ((i-1) | 0x80));
               WriteTGAPixel(image,tga_info.image_type,p,range,midpoint);
-              p+=(i*(ssize_t) channels);
+              p+=(ptrdiff_t) (i*(ssize_t) channels);
             }
           x+=i;
         }
@@ -1096,7 +1096,7 @@ static MagickBooleanType WriteTGAImage(const ImageInfo *image_info,Image *image,
       for (x=0; x < (ssize_t) image->columns; x++)
       {
         WriteTGAPixel(image,tga_info.image_type,p,range,midpoint);
-        p+=channels;
+        p+=(ptrdiff_t) channels;
       }
      if (((unsigned char) (tga_info.attributes & 0xc0) >> 6) == 2)
        offset+=2;

@@ -220,14 +220,14 @@ static void PushRunlengthPacket(Image *image,const unsigned char *pixels,
           pixel->index=(MagickRealType) ConstrainColormapIndex(image,(ssize_t)
             (((size_t) *p << 24) | ((size_t) *(p+1) << 16) |
             ((size_t) *(p+2) << 8) | (size_t) *(p+3)),exception);
-          p+=4;
+          p+=(ptrdiff_t) 4;
           break;
         }
         case 16:
         {
           pixel->index=(MagickRealType) ConstrainColormapIndex(image,(ssize_t)
             (((size_t) *p << 8) | (size_t) *(p+1)),exception);
-          p+=2;
+          p+=(ptrdiff_t) 2;
           break;
         }
         case 8:
@@ -1617,7 +1617,7 @@ static Image *ReadMIFFImage(const ImageInfo *image_info,
               }
             if (image->alpha_trait != UndefinedPixelTrait)
               SetPixelAlpha(image,ClampToQuantum(pixel.alpha),q);
-            q+=GetPixelChannels(image);
+            q+=(ptrdiff_t) GetPixelChannels(image);
           }
           extent=(size_t) x;
           break;
@@ -2710,7 +2710,7 @@ static MagickBooleanType WriteMIFFImage(const ImageInfo *image_info,
         {
           length=0;
           GetPixelInfoPixel(image,p,&pixel);
-          p+=GetPixelChannels(image);
+          p+=(ptrdiff_t) GetPixelChannels(image);
           for (x=1; x < (ssize_t) image->columns; x++)
           {
             GetPixelInfoPixel(image,p,&target);
@@ -2723,7 +2723,7 @@ static MagickBooleanType WriteMIFFImage(const ImageInfo *image_info,
                 length=0;
               }
             GetPixelInfoPixel(image,p,&pixel);
-            p+=GetPixelChannels(image);
+            p+=(ptrdiff_t) GetPixelChannels(image);
           }
           q=PopRunlengthPacket(image,q,length,&pixel);
           length=(size_t) (q-pixels);

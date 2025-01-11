@@ -2993,7 +2993,7 @@ static MagickBooleanType ReadDCMPixels(Image *image,DCMInfo *info,
           SetPixelBlue(image,(Quantum) (((size_t) pixel.blue) |
             (((size_t) GetPixelBlue(image,q)) << 8)),q);
         }
-      q+=GetPixelChannels(image);
+      q+=(ptrdiff_t) GetPixelChannels(image);
     }
     if (SyncAuthenticPixels(image,exception) == MagickFalse)
       break;
@@ -3695,7 +3695,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 else
                   index=(unsigned short) (*p | (*(p+1) << 8));
                 map.red[i]=(int) index;
-                p+=2;
+                p+=(ptrdiff_t) 2;
               }
               break;
             }
@@ -3727,7 +3727,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 else
                   index=(unsigned short) (*p | (*(p+1) << 8));
                 map.green[i]=(int) index;
-                p+=2;
+                p+=(ptrdiff_t) 2;
               }
               break;
             }
@@ -3759,7 +3759,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                 else
                   index=(unsigned short) (*p | (*(p+1) << 8));
                 map.blue[i]=(int) index;
-                p+=2;
+                p+=(ptrdiff_t) 2;
               }
               break;
             }
@@ -4224,7 +4224,7 @@ static Image *ReadDCMImage(const ImageInfo *image_info,ExceptionInfo *exception)
                   default:
                     break;
                 }
-                q+=GetPixelChannels(image);
+                q+=(ptrdiff_t) GetPixelChannels(image);
               }
               if (SyncAuthenticPixels(image,exception) == MagickFalse)
                 break;
