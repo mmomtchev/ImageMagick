@@ -645,7 +645,7 @@ set(MAGICKCORE_CODERS_SRCS
 
 if(MSVC)
   # for [[fallthrough]]
-  add_compile_options(/std:clatest>)
+  add_compile_options(/std:clatest)
 endif()
 
 # Let's fill a variable with the code for the available delegates
