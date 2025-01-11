@@ -58,7 +58,7 @@ jobs:
       - name: Install all delegates
         run: |
           conan profile detect || echo ok
-          conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=17
+          conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=20
           echo 'CONAN_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake"' >> $GITHUB_ENV
         shell: bash
 
@@ -122,7 +122,7 @@ jobs:
     - name: Install all delegates (conan)
       run: |
         conan profile detect || echo ok
-        conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=17
+        conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=20
         echo 'CONAN_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake"' >> $GITHUB_ENV
       shell: bash
       if: matrix.provider == 'conan'
