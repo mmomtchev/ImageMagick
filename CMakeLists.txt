@@ -339,6 +339,9 @@ if(NOT MSVC)
 else()
   # These days, the only compiler which requires it is MSVC
   set(_FILE_OFFSET_BITS 32)
+
+  # for [[fallthrough]]
+  add_compile_options(/std:clatest)
 endif()
 
 # Disable run-time bounds-checking
