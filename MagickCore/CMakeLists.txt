@@ -643,6 +643,11 @@ set(MAGICKCORE_CODERS_SRCS
   ${CODERS_PATH}/yuv.h
 )
 
+if(MSVC)
+  # for [[fallthrough]]
+  add_compile_options(/std:clatest>)
+endif()
+
 # Let's fill a variable with the code for the available delegates
 set(MAGICKCORE_CODERS_DELEGATES_SRCS "")
 if(DPS_DELEGATE)

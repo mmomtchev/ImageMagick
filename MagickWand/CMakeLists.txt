@@ -102,6 +102,11 @@ else()
   add_library(${MAGICKWAND_BINARY_NAME} STATIC ${MAGICKWAND_SRC} ${MAGICK_RESOURCE_FILE_PATH})
 endif()
 
+if(MSVC)
+  # for [[fallthrough]]
+  add_compile_options(/std:clatest>)
+endif()
+
 set_target_properties(${MAGICKWAND_BINARY_NAME} PROPERTIES PUBLIC_HEADER "${MAGICKWAND_PUBLIC_HEADERS}")
 target_include_directories(${MAGICKWAND_BINARY_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>

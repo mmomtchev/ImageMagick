@@ -20,9 +20,6 @@ include(cmake/checks.cmake)
 find_package(PkgConfig)
 set(CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Prefer static pkgconfig settings when building a static library
 macro(get_pkgconfig_setting TARGET_LIST PKG SETTING)
   if(NOT ${BUILD_SHARED_LIBS} AND ${PKG}_STATIC_${SETTING})
@@ -339,9 +336,6 @@ if(NOT MSVC)
 else()
   # These days, the only compiler which requires it is MSVC
   set(_FILE_OFFSET_BITS 32)
-
-  # for [[fallthrough]]
-  add_compile_options(/std:clatest)
 endif()
 
 # Disable run-time bounds-checking
