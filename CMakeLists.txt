@@ -20,6 +20,9 @@ include(cmake/checks.cmake)
 find_package(PkgConfig)
 set(CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_BUILD_TYPE})
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Prefer static pkgconfig settings when building a static library
 macro(get_pkgconfig_setting TARGET_LIST PKG SETTING)
   if(NOT ${BUILD_SHARED_LIBS} AND ${PKG}_STATIC_${SETTING})
