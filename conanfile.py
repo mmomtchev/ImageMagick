@@ -132,7 +132,7 @@ class ImageMagickDelegates(ConanFile):
         self.requires('jbig/20160605', force=True)
 
       if self.options.exr:
-        self.requires('openexr/3.1.5', force=True)
+        self.requires('openexr/3.3.2', force=True)
 
       if self.options.png:
         self.requires('libpng/1.6.42', force=True)
