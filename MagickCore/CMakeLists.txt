@@ -643,11 +643,6 @@ set(MAGICKCORE_CODERS_SRCS
   ${CODERS_PATH}/yuv.h
 )
 
-if(MSVC)
-  # for [[fallthrough]]
-  add_compile_options(/std:clatest)
-endif()
-
 # Let's fill a variable with the code for the available delegates
 set(MAGICKCORE_CODERS_DELEGATES_SRCS "")
 if(DPS_DELEGATE)
@@ -742,6 +737,11 @@ if(APPLE)
   endwhile()
 else()
   target_link_options(${MAGICKCORE_BINARY_NAME} PUBLIC ${IMAGEMAGICK_DELEGATES_LDFLAGS})
+endif()
+
+if(MSVC)
+  # for [[fallthrough]]
+  target_compile_options(${MAGICKCORE_BINARY_NAME} PRIVATE /std:clatest)
 endif()
 
 set_target_properties(${MAGICKCORE_BINARY_NAME} PROPERTIES PUBLIC_HEADER "${MAGICKCORE_PUBLIC_HEADERS}")
