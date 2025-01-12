@@ -104,7 +104,7 @@ endif()
 
 if(MSVC)
   # for [[fallthrough]]
-  add_compile_options(/std:clatest)
+  target_compile_options(${MAGICKWAND_BINARY_NAME} PRIVATE /std:clatest)
 endif()
 
 set_target_properties(${MAGICKWAND_BINARY_NAME} PROPERTIES PUBLIC_HEADER "${MAGICKWAND_PUBLIC_HEADERS}")
