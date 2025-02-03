@@ -209,7 +209,8 @@ class ImageMagickDelegates(ConanFile):
         self.options['cairo'].with_fontconfig = self.settings.arch != 'wasm' and self.options.fonts
 
       if self.options.pango and self.settings.arch != 'wasm':
-        self.options['pango'].with_fontconfig = self.settings.arch != 'wasm' and self.options.fonts
+        # Pango on conan seems to be incompatible with cairo + fontconfig on Windows
+        self.options['pango'].with_fontconfig = self.settings.arch != 'wasm' and self.options.fonts and self.settings.os != 'Windows'
         self.options['pango'].with_freetype = self.settings.arch != 'wasm' and self.options.fonts
         self.options['pango'].with_cairo = self.settings.arch != 'wasm' and self.options.cairo
         self.options['pango'].with_xft = False
