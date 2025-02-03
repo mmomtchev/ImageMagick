@@ -501,7 +501,7 @@ endif()
 
 magick_find_delegate(DELEGATE PANGO_DELEGATE NAME pango DEFAULT TRUE)
 magick_find_delegate(DELEGATE PANGOCAIRO_DELEGATE NAME pango DEFAULT TRUE
-    TARGETS pango::pangocairo DISPLAYNAME pangocairo)
+    TARGETS pango::pangocairo PKGCONFIG pangocairo DISPLAYNAME pangocairo)
 
 # TODO
 # These are absent from conan
