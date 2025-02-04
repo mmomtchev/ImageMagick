@@ -514,7 +514,7 @@ magick_find_delegate(DELEGATE WMF_DELEGATE NAME WMF DEFAULT TRUE
     PKGCONFIG libwmf)
 magick_find_delegate(DELEGATE DJVU_DELEGATE NAME DJVU DEFAULT TRUE
     PKGCONFIG ddjvuapi)
-magick_find_delegate(DELEGATE LQR NAME Lqr DEFAULT TRUE
+magick_find_delegate(DELEGATE LQR_DELEGATE NAME Lqr DEFAULT TRUE
     PKGCONFIG lqr-1)
 
 # TODO
