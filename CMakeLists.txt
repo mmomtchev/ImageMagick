@@ -504,17 +504,19 @@ magick_find_delegate(DELEGATE PANGO_DELEGATE NAME pango DEFAULT TRUE)
 magick_find_delegate(DELEGATE PANGOCAIRO_DELEGATE NAME pango DEFAULT TRUE
     TARGETS pango::pangocairo PKGCONFIG pangocairo DISPLAYNAME pangocairo)
 
+# These are absent from conan
 magick_find_delegate(DELEGATE GVC_DELEGATE NAME GVC DEFAULT TRUE
     PKGCONFIG libgvc)
 magick_find_delegate(DELEGATE RAQM_DELEGATE NAME RAQM DEFAULT TRUE
     PKGCONFIG raqm)
 magick_find_delegate(DELEGATE WMF_DELEGATE NAME WMF DEFAULT TRUE
     PKGCONFIG libwmf)
+magick_find_delegate(DELEGATE DJVU_DELEGATE NAME DJVU DEFAULT TRUE
+    PKGCONFIG ddjvuapi)
 
 # TODO
-# These are absent from conan
 magick_find_delegate(DELEGATE AUTOTRACE_DELEGATE NAME AUTOTRACE DEFAULT TRUE)
-magick_find_delegate(DELEGATE DJVU_DELEGATE NAME DJVU DEFAULT TRUE)
+
 magick_find_delegate(DELEGATE DPS_DELEGATE NAME DPS DEFAULT TRUE)
 magick_find_delegate(DELEGATE FLIF_DELEGATE NAME FLIF DEFAULT TRUE)
 magick_find_delegate(DELEGATE FPX_DELEGATE NAME FlashPIX DEFAULT TRUE)
