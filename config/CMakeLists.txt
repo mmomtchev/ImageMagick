@@ -22,19 +22,11 @@ set(MAGICK_CONFIG_FILES
   MagickCore.dox
   MagickWand.dox
   Magick++.dox
-  type-dejavu.xml
-  type-ghostscript.xml
-  type-urw-base35.xml
-  type-windows.xml
   type.xml
 )
 
 set(MAGICK_INSTALLED_CONFIG_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/delegates.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-dejavu.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-ghostscript.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-urw-base35.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-windows.xml
   ${CMAKE_CURRENT_BINARY_DIR}/type.xml
   ${CMAKE_CURRENT_BINARY_DIR}/policy.xml
   colors.xml
@@ -56,11 +48,14 @@ foreach(DIR ${MAGICK_APPLE_FONT_DIR})
   endif()
 endforeach()
 
-set(MAGICK_DEJAVU_FONT_DIR "/usr/share/fonts/dejavu;/usr/share/dejavu/fonts" CACHE STRING "Deja Vu fonts directory")
+set(MAGICK_DEJAVU_FONT_DIR "/usr/share/fonts/dejavu;/usr/share/dejavu/fonts;/usr/share/fonts/truetype/dejavu/" CACHE STRING "Deja Vu fonts directory")
 foreach(DIR ${MAGICK_DEJAVU_FONT_DIR})
   if(EXISTS ${DIR}/DejaVuSerif.ttf)
     message("DejaVu fonts in ${DIR}")
-    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-dejavu.xml\"\n")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-dejavu.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-dejavu.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-dejavu.xml)
+    set(dejavu_font_dir ${DIR})
     break()
   endif()
 endforeach()
@@ -74,17 +69,36 @@ endif()
 foreach(DIR ${GHOSTSCRIPT_FONT_DIR})
   if(EXISTS ${DIR}/a010013l.pfb)
     message("Ghostscript fonts in ${DIR}")
-    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-ghostscript.xml\"\n")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-ghostscript.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-ghostscript.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-ghostscript.xml)
+    set(ghostscript_font_dir ${DIR})
     break()
   endif()
 endforeach(DIR)
 
 # URW-base35 fonts
-set(MAGICK_URW_FONT_DIR "" CACHE STRING "URW-base35 fonts directory")
+set(MAGICK_URW_FONT_DIR "/usr/share/fonts/urw-base35/" CACHE STRING "URW-base35 fonts directory")
 foreach(DIR ${MAGICK_URW_FONT_DIR})
   if(EXISTS ${DIR})
     message("URW-base35 fonts in ${DIR}")
-    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-urw-base35.xml\"\n")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-urw-base35.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-urw-base35.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-urw-base35.xml)
+    set(urw_base35_font_dir ${DIR})
+    break()
+  endif()
+endforeach()
+
+# URW-base35 Type1 fonts
+set(MAGICK_URW_TYPE1_FONT_DIR "/usr/share/fonts/type1/urw-base35/" CACHE STRING "URW-base35 Type1 fonts directory")
+foreach(DIR ${MAGICK_URW_TYPE1_FONT_DIR})
+  if(EXISTS ${DIR})
+    message("URW-base35 Type1 fonts in ${DIR}")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-urw-base35-type1.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-urw-base35-type1.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-urw-base35-type1.xml)
+    set(urw_base35_type1_font_dir ${DIR})
     break()
   endif()
 endforeach()
@@ -94,7 +108,10 @@ set(MAGICK_TT_FONT_DIR "/usr/X11R6/lib/X11/fonts/truetype/;/usr/X11R7/lib/X11/fo
 foreach(DIR ${MAGICK_TT_FONT_DIR})
   if(IS_DIRECTORY ${DIR})
     message("Truetype fonts in ${DIR}")
-    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-windows.xml\"\n")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-windows.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-windows.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-windows.xml)
+    set(twindows_font_dir ${DIR})
     break()
   endif()
 endforeach()
