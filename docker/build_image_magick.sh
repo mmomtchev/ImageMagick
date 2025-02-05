@@ -24,6 +24,6 @@ title "Build test_delegates"
 export ImageMagick_ROOT=${PREFIX}/lib/cmake
 mkdir -p ${HOME}/build_test
 cd ${HOME}/build_test
-cmake /src -DCMAKE_BUILD_TYPE=Release 
+cmake /src/tests -DCMAKE_BUILD_TYPE=Release 
 cmake --build . --config Release
 ./delegates ${EXPECTED_DELEGATES}
