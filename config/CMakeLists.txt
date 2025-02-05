@@ -15,11 +15,30 @@
 
 project(ImageMagick)
 
-set(MAGICK_APPLE_FONT_DIR "/Library/Fonts" CACHE STRING "Apple fonts directory")
-if(EXISTS ${MAGICK_APPLE_FONT_DIR}/Arial.ttf)
-  message("Apple fonts in ${MAGICK_APPLE_FONT_DIR}")
-  list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-apple.xml\"\n")
-endif()
+set(MAGICK_CONFIG_FILES
+  configure.xml
+  delegates.xml
+  ImageMagick.rdf
+  MagickCore.dox
+  MagickWand.dox
+  Magick++.dox
+  type-dejavu.xml
+  type-ghostscript.xml
+  type-urw-base35.xml
+  type-windows.xml
+  type.xml
+)
+
+set(MAGICK_APPLE_FONT_DIR "/Library/Fonts;/System/Library/Templates/Data/Library/Fonts;/System/Library/Fonts/Supplemental;/System/Library/Fonts/" CACHE STRING "Apple fonts directory")
+foreach(DIR ${MAGICK_APPLE_FONT_DIR})
+  if(EXISTS ${DIR}/Arial.ttf)
+    message("Apple fonts in ${DIR}")
+    list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-apple.xml\" />\n")
+    list(APPEND MAGICK_CONFIG_FILES type-apple.xml)
+    set(apple_font_dir ${DIR})
+    break()
+  endif()
+endforeach()
 
 set(MAGICK_DEJAVU_FONT_DIR "/usr/share/fonts/dejavu;/usr/share/dejavu/fonts" CACHE STRING "Deja Vu fonts directory")
 foreach(DIR ${MAGICK_DEJAVU_FONT_DIR})
@@ -74,20 +93,6 @@ set(QuantumDepth ${MAGICKCORE_QUANTUM_DEPTH})
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 string(REPLACE ";" "  " type_include_files "${TYPE_INCLUDE_FILES}")
 
-set(MAGICK_CONFIG_FILES
-  configure.xml
-  delegates.xml
-  ImageMagick.rdf
-  MagickCore.dox
-  MagickWand.dox
-  Magick++.dox
-  type-apple.xml
-  type-dejavu.xml
-  type-ghostscript.xml
-  type-urw-base35.xml
-  type-windows.xml
-  type.xml
-)
 foreach(CONF_FILE IN LISTS MAGICK_CONFIG_FILES)
   configure_file(${CONF_FILE}.in ${CONF_FILE} @ONLY)
 endforeach()
