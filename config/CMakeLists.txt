@@ -29,12 +29,28 @@ set(MAGICK_CONFIG_FILES
   type.xml
 )
 
+set(MAGICK_INSTALLED_CONFIG_FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/delegates.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/type-dejavu.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/type-ghostscript.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/type-urw-base35.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/type-windows.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/type.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/policy.xml
+  colors.xml
+  log.xml
+  mime.xml
+  quantization-table.xml
+  thresholds.xml
+)
+
 set(MAGICK_APPLE_FONT_DIR "/Library/Fonts;/System/Library/Templates/Data/Library/Fonts;/System/Library/Fonts/Supplemental;/System/Library/Fonts/" CACHE STRING "Apple fonts directory")
 foreach(DIR ${MAGICK_APPLE_FONT_DIR})
   if(EXISTS ${DIR}/Arial.ttf)
     message("Apple fonts in ${DIR}")
     list(APPEND TYPE_INCLUDE_FILES "<include file=\"type-apple.xml\" />\n")
     list(APPEND MAGICK_CONFIG_FILES type-apple.xml)
+    list(APPEND MAGICK_INSTALLED_CONFIG_FILES ${CMAKE_CURRENT_BINARY_DIR}/type-apple.xml)
     set(apple_font_dir ${DIR})
     break()
   endif()
@@ -102,19 +118,7 @@ set_property(CACHE MAGICK_SECURITY_POLICY PROPERTY STRINGS "open;limited;secure;
 configure_file(policy-${MAGICK_SECURITY_POLICY}.xml policy.xml @ONLY)
 
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/delegates.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-apple.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-dejavu.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-ghostscript.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-urw-base35.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type-windows.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/type.xml
-  ${CMAKE_CURRENT_BINARY_DIR}/policy.xml
-  colors.xml
-  log.xml
-  mime.xml
-  quantization-table.xml
-  thresholds.xml
+  ${MAGICK_INSTALLED_CONFIG_FILES}
   DESTINATION etc/ImageMagick-${MAGICK_MAJOR_VERSION}
 )
 
