@@ -519,8 +519,14 @@ magick_find_delegate(DELEGATE LQR_DELEGATE NAME Lqr DEFAULT TRUE
     PKGCONFIG lqr-1)
 
 # This comes from https://github.com/lbaehren/CMakeModules/blob/master/FindGhostscript.cmake
-magick_find_delegate(DELEGATE GS_DELEGATE NAME GHOSTSCRIPT DEFAULT TRUE
-    TARGETS GHOSTSCRIPT)
+# As this module does not create a proper CMake target everything is manual
+# TODO: Make a real modern CMake module out of it
+find_package(GHOSTSCRIPT)
+if(GHOSTSCRIPT_FOUND)
+  set(GS_DELEGATE ON)
+  set(IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${IMAGEMAGICK_DELEGATES_INCLUDE_DIRS} ${GHOSTSCRIPT_INCLUDES})
+  set(IMAGEMAGICK_DELEGATES_LIBRARIES ${IMAGEMAGICK_DELEGATES_LIBRARIES} ${GHOSTSCRIPT_LIBRARIES})
+endif()
 
 # TODO
 magick_find_delegate(DELEGATE AUTOTRACE_DELEGATE NAME AUTOTRACE DEFAULT TRUE)
