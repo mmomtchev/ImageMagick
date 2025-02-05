@@ -19,7 +19,7 @@ PREFIX=/build/install
 title "Generating CMake build"
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_FIND_DEBUG_MODE=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${PREFIX}
 
 title "Building ImageMagick"
 cmake --build . --config Release -j 4
