@@ -305,7 +305,7 @@ jobs:
       run: |
         mkdir -p build-test
         cd build-test
-        cmake ../tests ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=Release ${{ env.IMAGEMAGICK_ABI }}
+        cmake ../tests ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=Release ${{ env.ABI }}
         cmake --build . --config Release -j 4
       env:
         ImageMagick_ROOT: ${{ github.workspace }}/install/lib/cmake
