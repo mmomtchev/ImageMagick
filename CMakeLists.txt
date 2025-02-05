@@ -519,7 +519,8 @@ magick_find_delegate(DELEGATE LQR_DELEGATE NAME Lqr DEFAULT TRUE
     PKGCONFIG lqr-1)
 
 # This comes from https://github.com/lbaehren/CMakeModules/blob/master/FindGhostscript.cmake
-magick_find_delegate(DELEGATE GS_DELEGATE NAME GHOSTSCRIPT DEFAULT TRUE)
+magick_find_delegate(DELEGATE GS_DELEGATE NAME GHOSTSCRIPT DEFAULT TRUE
+    TARGETS GHOSTSCRIPT)
 
 # TODO
 magick_find_delegate(DELEGATE AUTOTRACE_DELEGATE NAME AUTOTRACE DEFAULT TRUE)
