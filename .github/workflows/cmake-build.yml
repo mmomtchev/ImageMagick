@@ -203,8 +203,8 @@ jobs:
       if: runner.os != 'Windows'
 
     - name: Test running the CLI from the build tree (Windows)
-      run: build\utilities\Release\Magick.exe -list Configure
-      if: runner.os == 'Windows'
+      run: build\utilities\${{ matrix.buildtype }}\Magick.exe -list Configure
+      if: runner.os == 'Windows' && matrix.libtype == 'static'
 
     - name: Install
       run: cmake --install build --config ${{ matrix.buildtype }}
