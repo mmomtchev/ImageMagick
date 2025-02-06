@@ -198,6 +198,10 @@ jobs:
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
 
+    - name: Test running the CLI from the build tree
+      shell: bash
+      run: ./utilities/Magick -list Configure
+
     - name: Install
       run: cmake --install build --config ${{ matrix.buildtype }}
 
