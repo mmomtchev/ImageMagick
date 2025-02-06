@@ -198,9 +198,13 @@ jobs:
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
 
-    - name: Test running the CLI from the build tree
-      shell: bash
+    - name: Test running the CLI from the build tree (POSIX)
       run: ./build/utilities/Magick -list Configure
+      if: runner.os != 'Windows'
+
+    - name: Test running the CLI from the build tree (Windows)
+      run: build\utilities\Release\Magick.exe -list Configure
+      if: runner.os == 'Windows'
 
     - name: Install
       run: cmake --install build --config ${{ matrix.buildtype }}
