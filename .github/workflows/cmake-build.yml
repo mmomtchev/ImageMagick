@@ -201,6 +201,9 @@ jobs:
     - name: Install
       run: cmake --install build --config ${{ matrix.buildtype }}
 
+    - name: Test the installed CLI
+      run: ${{ env.INSTALL_PREFIX }}/install/bin/Magick -list Configure
+
     - name: Build a simple program
       shell: bash
       run: |
