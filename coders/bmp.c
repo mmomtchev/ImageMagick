@@ -351,7 +351,7 @@ static MagickBooleanType DecodeImage(Image *image,const size_t compression,
   }
   (void) ReadBlobByte(image);  /* end of line */
   (void) ReadBlobByte(image);
-  return((q-pixels) < (ssize_t) number_pixels ? MagickFalse : MagickTrue);
+  return((p-pixels) < (ssize_t) number_pixels ? MagickFalse : MagickTrue);
 }
 
 /*
@@ -832,6 +832,8 @@ static Image *ReadBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
               "  Number of colors: %u",bmp_info.number_colors);
           }
+        if ((bmp_info.height < 0) && (bmp_info.compression != 0))
+          ThrowReaderException(CoderError,"CompressNotSupported");
         if ((bmp_info.size > 40) || (bmp_info.compression == BI_BITFIELDS) ||
             (bmp_info.compression == BI_ALPHABITFIELDS))
 
@@ -913,7 +915,6 @@ static Image *ReadBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
           }
         else
           (void) CopyMagickString(image->magick,"BMP3",MagickPathExtent);
-
         if (bmp_info.size > 108)
           {
             size_t
@@ -2333,20 +2334,10 @@ static MagickBooleanType WriteBMPImage(const ImageInfo *image_info,Image *image,
           q=pixels+((ssize_t) image->rows-y-1)*(ssize_t) bytes_per_line;
           for (x=0; x < (ssize_t) image->columns; x++)
           {
-            Quantum alpha=GetPixelAlpha(image,p);
-            if ((type == 3) && alpha == TransparentAlpha)
-              {
-                *q++=255;
-                *q++=255;
-                *q++=255;
-              }
-            else
-              {
-                *q++=ScaleQuantumToChar(GetPixelBlue(image,p));
-                *q++=ScaleQuantumToChar(GetPixelGreen(image,p));
-                *q++=ScaleQuantumToChar(GetPixelRed(image,p));
-              }
-            *q++=ScaleQuantumToChar(alpha);
+            *q++=ScaleQuantumToChar(GetPixelBlue(image,p));
+            *q++=ScaleQuantumToChar(GetPixelGreen(image,p));
+            *q++=ScaleQuantumToChar(GetPixelRed(image,p));
+            *q++=ScaleQuantumToChar(GetPixelAlpha(image,p));
             p+=(ptrdiff_t) GetPixelChannels(image);
           }
           if (image->previous == (Image *) NULL)

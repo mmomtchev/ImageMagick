@@ -1238,8 +1238,8 @@ MagickExport MagickBooleanType DrawAffineImage(Image *image,
   inverse_affine=InverseAffineMatrix(affine);
   if (edge.y1 < 0.0)
     edge.y1=0.0;
-  if (edge.y2 > (image->rows-1.0))
-    edge.y2=image->rows-1.0;
+  if (edge.y2 > ((double) image->rows-1.0))
+    edge.y2=(double) image->rows-1.0;
   GetPixelInfo(image,&zero);
   start=CastDoubleToLong(ceil(edge.y1-0.5));
   stop=CastDoubleToLong(floor(edge.y2+0.5));
@@ -1274,8 +1274,8 @@ MagickExport MagickBooleanType DrawAffineImage(Image *image,
       continue;
     if (inverse_edge.x1 < 0.0)
       inverse_edge.x1=0.0;
-    if (inverse_edge.x2 > image->columns-1.0)
-      inverse_edge.x2=image->columns-1.0;
+    if (inverse_edge.x2 > ((double) image->columns-1.0))
+      inverse_edge.x2=(double) image->columns-1.0;
     q=GetCacheViewAuthenticPixels(image_view,CastDoubleToLong(
       ceil(inverse_edge.x1-0.5)),y,(size_t) CastDoubleToLong(floor(
       inverse_edge.x2+0.5)-ceil(inverse_edge.x1-0.5)+1),1,exception);
@@ -2755,10 +2755,10 @@ static MagickBooleanType RenderMVGContent(Image *image,
             /*
               Identify recursion.
             */
-            for (i=0; i < n; i++)
+            for (i=0; i <= n; i++)
               if (LocaleCompare(token,graphic_context[i]->id) == 0)
                 break;
-            if (i < n)
+            if (i <= n)
               break;
             mvg_class=(const char *) GetValueFromSplayTree(macros,token);
             if ((graphic_context[n]->render != MagickFalse) &&
@@ -2773,6 +2773,7 @@ static MagickBooleanType RenderMVGContent(Image *image,
                 /*
                   Inject class elements in stream.
                 */
+                (void) CloneString(&graphic_context[n]->id,token);
                 offset=(ssize_t) (p-primitive);
                 elements=AcquireString(primitive);
                 elements[offset]='\0';
@@ -5643,8 +5644,8 @@ MagickExport MagickBooleanType DrawPrimitive(Image *image,
       else
         if (*primitive_info->text != '\0')
           {
-            const MagickInfo
-              *magick_info;
+            const char
+              *option;
 
             MagickBooleanType
               path_status;
@@ -5658,15 +5659,23 @@ MagickExport MagickBooleanType DrawPrimitive(Image *image,
             (void) CopyMagickString(clone_info->filename,primitive_info->text,
               MagickPathExtent);
             (void) SetImageInfo(clone_info,1,exception);
-            magick_info=GetMagickInfo(clone_info->magick,exception);
-            if ((magick_info != (const MagickInfo*) NULL) &&
-                (LocaleCompare(magick_info->magick_module,"SVG") == 0))
+            option=GetImageOption(clone_info,"svg:embedding");
+            if ((option == (char *) NULL) &&
+                (IsStringTrue(option) == MagickFalse))
               {
-                (void) ThrowMagickException(exception,GetMagickModule(),
-                  CorruptImageError,"ImageTypeNotSupported","`%s'",
-                  clone_info->filename);
-                clone_info=DestroyImageInfo(clone_info);
-                break;
+                const MagickInfo
+                  *magick_info;
+
+                magick_info=GetMagickInfo(clone_info->magick,exception);
+                if ((magick_info != (const MagickInfo*) NULL) &&
+                    (LocaleCompare(magick_info->magick_module,"SVG") == 0))
+                  {
+                    (void) ThrowMagickException(exception,GetMagickModule(),
+                      CorruptImageError,"ImageTypeNotSupported","`%s'",
+                      clone_info->filename);
+                    clone_info=DestroyImageInfo(clone_info);
+                    break;
+                  }
               }
             (void) CopyMagickString(clone_info->filename,primitive_info->text,
               MagickPathExtent);
@@ -5687,7 +5696,8 @@ MagickExport MagickBooleanType DrawPrimitive(Image *image,
             else
               if ((LocaleCompare(clone_info->magick,"ftp") != 0) &&
                   (LocaleCompare(clone_info->magick,"http") != 0) &&
-                  (LocaleCompare(clone_info->magick,"https") != 0))
+                  (LocaleCompare(clone_info->magick,"https") != 0) &&
+                  (LocaleCompare(clone_info->magick,"vid") != 0))
                 composite_images=ReadImage(clone_info,exception);
               else
                 (void) ThrowMagickException(exception,GetMagickModule(),

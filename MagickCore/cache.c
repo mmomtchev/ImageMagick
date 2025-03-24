@@ -203,13 +203,9 @@ MagickPrivate Cache AcquirePixelCache(const size_t number_threads)
   cache_info->number_threads=number_threads;
   if (GetOpenMPMaximumThreads() > cache_info->number_threads)
     cache_info->number_threads=GetOpenMPMaximumThreads();
-  if (GetMagickResourceLimit(ThreadResource) > cache_info->number_threads)
-    cache_info->number_threads=(size_t) GetMagickResourceLimit(ThreadResource);
   if (cache_info->number_threads == 0)
     cache_info->number_threads=1;
   cache_info->nexus_info=AcquirePixelCacheNexus(cache_info->number_threads);
-  if (cache_info->nexus_info == (NexusInfo **) NULL)
-    ThrowFatalException(ResourceLimitFatalError,"MemoryAllocationFailed");
   value=GetEnvironmentValue("MAGICK_SYNCHRONIZE");
   if (value != (const char *) NULL)
     {
@@ -2682,11 +2678,11 @@ static inline ssize_t EdgeY(const ssize_t y,const size_t rows)
   return(y);
 }
 
-static inline MagickBooleanType IsOffsetOverflow(const ssize_t x,
-  const ssize_t y)
+static inline MagickBooleanType IsOffsetOverflow(const MagickOffsetType x,
+  const MagickOffsetType y)
 {
-  if (((y > 0) && (x > (MAGICK_SSIZE_MAX-y))) ||
-      ((y < 0) && (x < (MAGICK_SSIZE_MIN-y))))
+  if (((y > 0) && (x > ((MagickOffsetType) MAGICK_SSIZE_MAX-y))) ||
+      ((y < 0) && (x < ((MagickOffsetType) MAGICK_SSIZE_MIN-y))))
     return(MagickFalse);
   return(MagickTrue);
 }
@@ -2784,7 +2780,7 @@ MagickPrivate const Quantum *GetVirtualPixelCacheNexus(const Image *image,
   if (IsValidPixelOffset(nexus_info->region.y,cache_info->columns) == MagickFalse)
     return((const Quantum *) NULL);
   offset=nexus_info->region.y*(MagickOffsetType) cache_info->columns;
-  if (IsOffsetOverflow(offset,nexus_info->region.x) == MagickFalse)
+  if (IsOffsetOverflow(offset,(MagickOffsetType) nexus_info->region.x) == MagickFalse)
     return((const Quantum *) NULL);
   offset+=nexus_info->region.x;
   length=(MagickSizeType) (nexus_info->region.height-1L)*cache_info->columns+
@@ -3681,7 +3677,7 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
 #else
           (void) ThrowMagickException(exception,GetMagickModule(),
             MissingDelegateError,"DelegateLibrarySupportNotBuiltIn",
-            "'%s' (policy requires anonymous memory mapping)",image->filename);
+            "`%s' (policy requires anonymous memory mapping)",image->filename);
 #endif
         }
       value=DestroyString(value);
@@ -3692,8 +3688,13 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
   assert(cache_info->signature == MagickCoreSignature);
   if (((MagickSizeType) image->columns > cache_info->width_limit) ||
       ((MagickSizeType) image->rows > cache_info->height_limit))
-    ThrowBinaryException(ImageError,"WidthOrHeightExceedsLimit",
-      image->filename);
+    {
+      (void) ThrowMagickException(exception,GetMagickModule(),ImageError,
+        "WidthOrHeightExceedsLimit","`%s' (%.20gx%.20g) > (%.20gx%.20g)",
+        image->filename, (double) image->columns, (double) image->rows,
+        (double) cache_info->width_limit,(double) cache_info->height_limit);
+      return(MagickFalse);
+    }
   if (GetMagickResourceLimit(ListLengthResource) != MagickResourceInfinity)
     {
       length=GetImageListLength(image);
@@ -4632,7 +4633,7 @@ static MagickBooleanType ReadPixelCachePixels(
   if (IsValidPixelOffset(nexus_info->region.y,cache_info->columns) == MagickFalse)
     return(MagickFalse);
   offset=nexus_info->region.y*(MagickOffsetType) cache_info->columns;
-  if ((offset/(MagickOffsetType) cache_info->columns) != nexus_info->region.y)
+  if ((ssize_t) (offset/cache_info->columns) != nexus_info->region.y)
     return(MagickFalse);
   offset+=nexus_info->region.x;
   number_channels=cache_info->number_channels;

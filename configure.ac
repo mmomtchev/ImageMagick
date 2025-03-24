@@ -3307,6 +3307,7 @@ LEPDelegateDefault='lepton'
 LPDelegateDefault='lp'
 LPRDelegateDefault='lpr'
 LaunchDelegateDefault='gimp'
+MKDIRDelegateDefault='mkdir'
 MrSIDDecodeDelegateDefault='mrsidgeodecode'
 MVDelegateDefault='mv'
 PCLDelegateDefault='pcl6'
@@ -3355,6 +3356,7 @@ AC_PATH_PROG([LaunchDelegate],["$LaunchDelegateDefault"],["$LaunchDelegateDefaul
 AC_PATH_PROG([MogrifyDelegate],["$MogrifyDelegateDefault"],["$MogrifyDelegateDefault"])
 AC_PATH_PROG([VIDEODecodeDelegate],["$VIDEODecodeDelegateDefault"],["$VIDEODecodeDelegateDefault"])
 AC_PATH_PROG([VIDEOEncodeDelegate],["$VIDEOEncodeDelegateDefault"],["$VIDEOEncodeDelegateDefault"])
+AC_PATH_PROG([MKDIRDelegate],["$MKDIRDelegateDefault"],["$MKDIRDelegateDefault"])
 AC_PATH_PROG([MrSIDDecodeDelegate],["$MrSIDDecodeDelegateDefault"],["$MrSIDDecodeDelegateDefault"])
 AC_PATH_PROG([MVDelegate],["$MVDelegateDefault"],["$MVDelegateDefault"])
 AC_PATH_PROG([PCLDelegate],["$PCLDelegateDefault"],["$PCLDelegateDefault"])
@@ -3829,7 +3831,7 @@ AC_SUBST([XPSVersion])
 #
 # Ghostscript related configuration.
 #
-GSAlphaDevice=pngalpha
+GSAlphaDevice=png16malpha
 GSColorDevice=png16m
 GSCMYKDevice=pamcmyk32
 GSMonoDevice=pbmraw
@@ -3862,6 +3864,8 @@ if test $have_gs = 'yes'; then
     AC_MSG_CHECKING([for gs alpha device])
     if $PSDelegate -q -dBATCH -sDEVICE=$GSAlphaDevice -sOutputFile=/dev/null < /dev/null 1>&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD; then
         :
+    elif $PSDelegate -q -dBATCH -sDEVICE=pngalpha -sOutputFile=/dev/null < /dev/null 1>&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD; then
+        GSAlphaDevice=pngalpha
     else
         GSAlphaDevice=$GSColorDevice
     fi

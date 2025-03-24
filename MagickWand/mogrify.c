@@ -212,11 +212,11 @@ static MagickBooleanType MonitorProgress(const char *text,
   if (p == (char *) NULL)
     (void) FormatLocaleFile(stderr,"%s: %ld of %lu, %02ld%% complete\r",
       locale_message,(long) offset,(unsigned long) extent,(long)
-      (100.0*offset*PerceptibleReciprocal(extent-1.0)));
+      (100.0*offset*PerceptibleReciprocal((double) extent-1.0)));
   else
     (void) FormatLocaleFile(stderr,"%s[%s]: %ld of %lu, %02ld%% complete\r",
       locale_message,p+1,(long) offset,(unsigned long) extent,(long)
-      (100.0*offset*PerceptibleReciprocal(extent-1.0)));
+      (100.0*offset*PerceptibleReciprocal((double) extent-1.0)));
   if (offset == (MagickOffsetType) (extent-1))
     (void) FormatLocaleFile(stderr,"\n");
   (void) fflush(stderr);
@@ -8330,7 +8330,6 @@ WandExport MagickBooleanType MogrifyImageList(ImageInfo *image_info,
             Image
               *fx_image;
 
-puts("list");
             (void) SyncImagesSettings(mogrify_info,*images,exception);
             fx_image=FxImage(*images,argv[i+1],exception);
             if (fx_image == (Image *) NULL)

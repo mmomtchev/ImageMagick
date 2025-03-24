@@ -108,7 +108,8 @@ static const char
     "  <delegate decode=\"browse\" stealth=\"True\" spawn=\"True\" command=\"" DELEGATE_ESC "xdg-open" DELEGATE_ESC " https://imagemagick.org/; rm " DELEGATE_ESC "%i" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"cdr\" command=\"" DELEGATE_ESC "uniconvertor" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC " " DELEGATE_ESC "%o.svg" DELEGATE_ESC "; mv " DELEGATE_ESC "%o.svg" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"cgm\" command=\"" DELEGATE_ESC "uniconvertor" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC " " DELEGATE_ESC "%o.svg" DELEGATE_ESC "; mv " DELEGATE_ESC "%o.svg" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
-    "  <delegate decode=\"https\" command=\"" DELEGATE_ESC "curl" DELEGATE_ESC " -s -k -L -o " DELEGATE_ESC "%o" DELEGATE_ESC " " DELEGATE_ESC "https:%M" DELEGATE_ESC "\"/>"
+    "  <delegate decode=\"http\" command=\"" DELEGATE_ESC "curl" DELEGATE_ESC " -s -L -o " DELEGATE_ESC "%o" DELEGATE_ESC " " DELEGATE_ESC "http:%M" DELEGATE_ESC "\"/>"
+    "  <delegate decode=\"https\" command=\"" DELEGATE_ESC "curl" DELEGATE_ESC " -s -L -o " DELEGATE_ESC "%o" DELEGATE_ESC " " DELEGATE_ESC "https:%M" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"doc\" command=\"" DELEGATE_ESC "soffice" DELEGATE_ESC " --convert-to pdf -outdir `dirname " DELEGATE_ESC "%i" DELEGATE_ESC "` " DELEGATE_ESC "%i" DELEGATE_ESC " 2&gt; " DELEGATE_ESC "%u" DELEGATE_ESC "; mv " DELEGATE_ESC "%i.pdf" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"docx\" command=\"" DELEGATE_ESC "soffice" DELEGATE_ESC " --convert-to pdf -outdir `dirname " DELEGATE_ESC "%i" DELEGATE_ESC "` " DELEGATE_ESC "%i" DELEGATE_ESC " 2&gt; " DELEGATE_ESC "%u" DELEGATE_ESC "; mv " DELEGATE_ESC "%i.pdf" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"dng:decode\" command=\"" DELEGATE_ESC "ufraw-batch" DELEGATE_ESC " --silent --create-id=also --out-type=png --out-depth=16 " DELEGATE_ESC "--output=%u.png" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC "\"/>"
@@ -425,7 +426,7 @@ MagickExport int ExternalDelegateCommand(const MagickBooleanType asynchronous,
             offset = 0;
 
           while ((offset < MagickPathExtent) &&
-                 (fgets(message+offset,MagickPathExtent-offset,file) != NULL))
+                 (fgets(message+offset,(int) (MagickPathExtent-offset),file) != NULL))
             offset+=strlen(message);
           status=pclose(file);
         }
@@ -1741,7 +1742,7 @@ MagickExport MagickBooleanType InvokeDelegate(ImageInfo *image_info,
         "NotAuthorized","`%s'",encode);
       return(MagickFalse);
     }
-  temporary=*image->filename == '\0' ? MagickTrue : MagickFalse;
+  temporary=(*image->filename == '\0') ? MagickTrue : MagickFalse;
   if ((temporary != MagickFalse) && (AcquireUniqueFilename(image->filename) ==
       MagickFalse))
     {
