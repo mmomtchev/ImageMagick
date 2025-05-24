@@ -2509,6 +2509,7 @@ fi
 
 if test "$have_jxl" = 'yes'; then
   AC_DEFINE([JXL_DELEGATE],[1],[Define if you have jpeg-xl library])
+  CFLAGS="$JXL_CFLAGS $CFLAGS"
 fi
 
 AM_CONDITIONAL([JXL_DELEGATE],[test "$have_jxl" = 'yes'])
@@ -3739,7 +3740,7 @@ AM_CONDITIONAL([ZIP_DELEGATE],[test "x$ZIP" != "x"])
 #
 # GhostPCL related configuration.
 #
-PCLColorDevice=ppmraw
+PCLColorDevice=png16malpha
 PCLCMYKDevice=pamcmyk32
 PCLMonoDevice=pbmraw
 if test -z "$PCLVersion"; then
@@ -3785,8 +3786,8 @@ AC_SUBST([PCLVersion])
 #
 # GhostXPS related configuration.
 #
-XPSColorDevice=ppmraw
-XPSCMYKDevice=bmpsep8
+XPSColorDevice=png16malpha
+XPSCMYKDevice=pamcmyk32
 XPSMonoDevice=pbmraw
 if test -z "$XPSVersion"; then
     XPSVersion='unknown'
@@ -4054,6 +4055,9 @@ if test "$have_openexr"    = 'yes' ; then
 fi
 if test "$have_pangocairo" = 'yes' ; then
    MAGICK_DELEGATES="$MAGICK_DELEGATES pangocairo"
+fi
+if test "$have_pcl"    = 'yes' ; then
+   MAGICK_DELEGATES="$MAGICK_DELEGATES pcl"
 fi
 if test "$have_png"    = 'yes' ; then
    MAGICK_DELEGATES="$MAGICK_DELEGATES png"

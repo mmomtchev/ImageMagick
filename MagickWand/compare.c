@@ -108,6 +108,7 @@ static MagickBooleanType CompareUsage(void)
     sequence_operators[] =
       "  -crop geometry       cut out a rectangular region of the image",
     settings[] =
+      "  -adjoin              join images into a single multi-image file\n"
       "  -alpha option        on, activate, off, deactivate, set, opaque, copy\n"
       "                       transparent, extract, background, or shape\n"
       "  -authenticate password\n"
@@ -370,6 +371,8 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
     {
       case 'a':
       {
+        if (LocaleCompare("adjoin",option+1) == 0)
+          break;
         if (LocaleCompare("alpha",option+1) == 0)
           {
             ssize_t
@@ -1173,6 +1176,8 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
     {
       similarity_image=SimilarityImage(image,reconstruct_image,metric,
         similarity_threshold,&offset,&similarity_metric,exception);
+      if (similarity_image == (Image *) NULL)
+        return(MagickFalse);
       if (dissimilarity_threshold == DefaultDissimilarityThreshold)
         switch (metric)
         {
@@ -1247,23 +1252,24 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
     }
   switch (metric)
   {
-    case DotProductCorrelationErrorMetric:
-    case NormalizedCrossCorrelationErrorMetric:
+    case StructuralSimilarityErrorMetric:
     case UndefinedErrorMetric:
     {
       distortion=1.0-distortion;
       similarity_metric=1.0-similarity_metric;
       break;
     }
+    case StructuralDissimilarityErrorMetric:
     case PeakSignalToNoiseRatioErrorMetric:
     {
       distortion=fabs(distortion);
-      similarity_metric+=1.0;
+      similarity_metric=fabs(similarity_metric);
       break;
     }
-    case PhaseCorrelationErrorMetric:
+    case PerceptualHashErrorMetric:
     {
-      distortion=1.0-distortion;
+      if (distortion == INFINITY)
+        distortion=1.0;
       break;
     }
     default: break;
@@ -1310,7 +1316,7 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
             case MeanErrorPerPixelErrorMetric:
             {
               (void) FormatLocaleFile(stderr,"%.*g (%.*g, %.*g)",
-                GetMagickPrecision(),distortion,
+                GetMagickPrecision(),QuantumRange*distortion,
                 GetMagickPrecision(),image->error.normalized_mean_error,
                 GetMagickPrecision(),image->error.normalized_maximum_error);
               break;
@@ -1499,6 +1505,11 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
                 difference_image->page.x,(double) difference_image->page.y);
               (void) FormatLocaleFile(stderr,"   Similarity metric: %*g\n",
                 GetMagickPrecision(),similarity_metric);
+              (void) FormatLocaleFile(stderr,"   Similarity threshold: %*g\n",
+                GetMagickPrecision(),similarity_threshold);
+              (void) FormatLocaleFile(stderr,
+                "   Dissimilarity threshold: %*g\n",GetMagickPrecision(),
+                dissimilarity_threshold);
             }
         }
       (void) ResetImagePage(difference_image,"0x0+0+0");

@@ -1578,7 +1578,7 @@ Magick_png_read_raw_profile(png_struct *ping,Image *image,
     nibbles;
 
   ssize_t
-    length;
+    length=0;
 
   StringInfo
     *profile;
@@ -1600,11 +1600,11 @@ Magick_png_read_raw_profile(png_struct *ping,Image *image,
       return(MagickFalse);
     }
   /* look for newline */
-  while ((*sp != '\n') && extent--)
+  while ((extent != 0) && (*sp != '\n') && extent--)
     sp++;
 
   /* look for length */
-  while (((*sp == '\0' || *sp == ' ' || *sp == '\n')) && extent--)
+  while ((extent != 0) && ((*sp == '\0' || *sp == ' ' || *sp == '\n')) && extent--)
      sp++;
 
   if (extent == 0)
@@ -1613,13 +1613,14 @@ Magick_png_read_raw_profile(png_struct *ping,Image *image,
       return(MagickFalse);
     }
 
-  length=StringToLong(sp);
+  if (extent >= 8)
+    length=StringToLong(sp);
 
   if (image->debug != MagickFalse)
     (void) LogMagickEvent(CoderEvent,GetMagickModule(),
          "      length: %lu",(unsigned long) length);
 
-  while ((*sp != ' ' && *sp != '\n') && extent--)
+  while ((extent != 0) && (*sp != ' ' && *sp != '\n') && extent--)
     sp++;
 
   if (extent == 0)
@@ -1647,7 +1648,7 @@ Magick_png_read_raw_profile(png_struct *ping,Image *image,
 
   for (i=0; i < (ssize_t) nibbles; i++)
   {
-    while (*sp < '0' || (*sp > '9' && *sp < 'a') || *sp > 'f')
+    while ((extent != 0) && (*sp < '0' || (*sp > '9' && *sp < 'a') || *sp > 'f'))
     {
       if (*sp == '\0')
         {
@@ -1656,13 +1657,18 @@ Magick_png_read_raw_profile(png_struct *ping,Image *image,
           return(MagickFalse);
         }
       sp++;
+      extent--;
     }
-
-    if (i%2 == 0)
-      *dp=(unsigned char) (16*unhex[(int) *sp++]);
-
-    else
-      (*dp++)+=unhex[(int) *sp++];
+    if (extent != 0)
+      {
+        if (i % 2 == 0)
+          *dp=(unsigned char) (16*unhex[(int) *sp++]);
+        else
+          (*dp++)+=unhex[(int) *sp++];
+        extent--;
+      }
+    if (extent == 0)
+      break;
   }
   /*
     We have already read "Raw profile type.
@@ -9530,27 +9536,27 @@ static MagickBooleanType WriteOnePNGImage(MngWriteInfo *mng_info,
       if (image->units == PixelsPerInchResolution)
         {
           ping_pHYs_unit_type=PNG_RESOLUTION_METER;
-          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToUnsigned((100.0*
+          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToSizeT((100.0*
             image->resolution.x)/2.54);
-          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToUnsigned((100.0*
+          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToSizeT((100.0*
             image->resolution.y+0.5)/2.54);
         }
 
       else if (image->units == PixelsPerCentimeterResolution)
         {
           ping_pHYs_unit_type=PNG_RESOLUTION_METER;
-          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToUnsigned(100.0*
+          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToSizeT(100.0*
             image->resolution.x);
-          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToUnsigned(100.0*
+          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToSizeT(100.0*
             image->resolution.y);
         }
 
       else
         {
           ping_pHYs_unit_type=PNG_RESOLUTION_UNKNOWN;
-          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToUnsigned(
+          ping_pHYs_x_resolution=(png_uint_32) CastDoubleToSizeT(
             image->resolution.x);
-          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToUnsigned(
+          ping_pHYs_y_resolution=(png_uint_32) CastDoubleToSizeT(
             image->resolution.y);
         }
 

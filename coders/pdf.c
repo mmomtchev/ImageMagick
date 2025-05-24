@@ -506,9 +506,9 @@ static Image *ReadPDFImage(const ImageInfo *image_info,ExceptionInfo *exception)
         "%gx%g%+.15g%+.15g",pdf_info.bounds.x2-pdf_info.bounds.x1,
         pdf_info.bounds.y2-pdf_info.bounds.y1,pdf_info.bounds.x1,
         pdf_info.bounds.y1);
-      page.width=(size_t) ((ssize_t) ceil((double) ((pdf_info.bounds.x2-
+      page.width=CastDoubleToSizeT(ceil((double) ((pdf_info.bounds.x2-
         pdf_info.bounds.x1)*image->resolution.x/delta.x)-0.5));
-      page.height=(size_t) ((ssize_t) ceil((double) ((pdf_info.bounds.y2-
+      page.height=CastDoubleToSizeT(ceil((double) ((pdf_info.bounds.y2-
         pdf_info.bounds.y1)*image->resolution.y/delta.y)-0.5));
     }
   fitPage=MagickFalse;
@@ -1867,9 +1867,9 @@ static MagickBooleanType WritePDFImage(const ImageInfo *image_info,Image *image,
     (void) ParseMetaGeometry(temp,&geometry.x,&geometry.y,
       &geometry.width,&geometry.height);
     scale.x=(double) (geometry.width*delta.x)/resolution.x;
-    geometry.width=CastDoubleToUnsigned(scale.x+0.5);
+    geometry.width=CastDoubleToSizeT(scale.x+0.5);
     scale.y=(double) (geometry.height*delta.y)/resolution.y;
-    geometry.height=CastDoubleToUnsigned(scale.y+0.5);
+    geometry.height=CastDoubleToSizeT(scale.y+0.5);
     (void) ParseAbsoluteGeometry(temp,&media_info);
     (void) ParseGravityGeometry(image,temp,&page_info,exception);
     if (image->gravity != UndefinedGravity)

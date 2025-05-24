@@ -352,7 +352,7 @@ MagickExport MagickStatusType GetGeometry(const char *geometry,ssize_t *x,
               if (LocaleNCompare(p,"0x",2) == 0)
                 *width=(size_t) strtol(p,&p,10);
               else
-                *width=CastDoubleToUnsigned(StringToDouble(p,&p)+0.5);
+                *width=CastDoubleToSizeT(StringToDouble(p,&p)+0.5);
             }
           if (p != q)
             flags|=WidthValue;
@@ -371,7 +371,7 @@ MagickExport MagickStatusType GetGeometry(const char *geometry,ssize_t *x,
               */
               q=p;
               if (height != (size_t *) NULL)
-                *height=CastDoubleToUnsigned(StringToDouble(p,&p)+0.5);
+                *height=CastDoubleToSizeT(StringToDouble(p,&p)+0.5);
               if (p != q)
                 flags|=HeightValue;
             }
@@ -390,12 +390,12 @@ MagickExport MagickStatusType GetGeometry(const char *geometry,ssize_t *x,
       }
       q=p;
       if (x != (ssize_t *) NULL)
-        *x=CastDoubleToLong(StringToDouble(p,&p));
+        *x=CastDoubleToSsizeT(StringToDouble(p,&p));
       if (p != q)
         {
           flags|=XValue;
           if (((flags & XNegative) != 0) && (x != (ssize_t *) NULL))
-            *x=CastDoubleToLong(-1.0**x);
+            *x=CastDoubleToSsizeT(-1.0**x);
         }
     }
   if ((*p == '+') || (*p == '-'))
@@ -411,12 +411,12 @@ MagickExport MagickStatusType GetGeometry(const char *geometry,ssize_t *x,
       }
       q=p;
       if (y != (ssize_t *) NULL)
-        *y=CastDoubleToLong(StringToDouble(p,&p));
+        *y=CastDoubleToSsizeT(StringToDouble(p,&p));
       if (p != q)
         {
           flags|=YValue;
           if (((flags & YNegative) != 0) && (y != (ssize_t *) NULL))
-            *y=CastDoubleToLong(-1.0**y);
+            *y=CastDoubleToSsizeT(-1.0**y);
         }
     }
   if ((flags & PercentValue) != 0)
@@ -557,14 +557,14 @@ MagickExport void GravityAdjustGeometry(const size_t width,
     case EastGravity:
     case SouthEastGravity:
     {
-      region->x=CastDoubleToLong((double) width-region->width-region->x);
+      region->x=CastDoubleToSsizeT((double) width-region->width-region->x);
       break;
     }
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
     {
-      region->x=CastDoubleToLong((double) width/2.0-region->width/2.0+
+      region->x=CastDoubleToSsizeT((double) width/2.0-region->width/2.0+
         region->x);
       break;
     }
@@ -581,14 +581,14 @@ MagickExport void GravityAdjustGeometry(const size_t width,
     case SouthGravity:
     case SouthEastGravity:
     {
-      region->y=CastDoubleToLong((double) height-region->height-region->y);
+      region->y=CastDoubleToSsizeT((double) height-region->height-region->y);
       break;
     }
     case EastGravity:
     case WestGravity:
     case CenterGravity:
     {
-      region->y=CastDoubleToLong((double) height/2.0-region->height/2.0+
+      region->y=CastDoubleToSsizeT((double) height/2.0-region->height/2.0+
         region->y);
       break;
     }
@@ -1359,8 +1359,8 @@ MagickExport MagickStatusType ParseGravityGeometry(const Image *image,
       scale.y=geometry_info.sigma;
       if ((status & SigmaValue) == 0)
         scale.y=scale.x;
-      region_info->width=CastDoubleToUnsigned(scale.x*image->columns/100.0+0.5);
-      region_info->height=CastDoubleToUnsigned(scale.y*image->rows/100.0+0.5);
+      region_info->width=CastDoubleToSizeT(scale.x*image->columns/100.0+0.5);
+      region_info->height=CastDoubleToSizeT(scale.y*image->rows/100.0+0.5);
     }
   if ((flags & AspectRatioValue) != 0)
     {
@@ -1384,18 +1384,18 @@ MagickExport MagickStatusType ParseGravityGeometry(const Image *image,
       if ((flags & MaximumValue) != 0)
         {
           if (geometry_ratio < image_ratio)
-            region_info->height=CastDoubleToUnsigned((double) image->rows*
+            region_info->height=CastDoubleToSizeT((double) image->rows*
               image_ratio/geometry_ratio+0.5);
           else
-            region_info->width=CastDoubleToUnsigned((double) image->columns*
+            region_info->width=CastDoubleToSizeT((double) image->columns*
               geometry_ratio/image_ratio+0.5);
         }
       else
         if (geometry_ratio >= image_ratio)
-          region_info->height=CastDoubleToUnsigned((double) image->rows*
+          region_info->height=CastDoubleToSizeT((double) image->rows*
             image_ratio/geometry_ratio+0.5);
         else
-          region_info->width=CastDoubleToUnsigned((double) image->columns*
+          region_info->width=CastDoubleToSizeT((double) image->columns*
             geometry_ratio/image_ratio+0.5);
     }
   /*
@@ -1519,8 +1519,8 @@ MagickExport MagickStatusType ParseMetaGeometry(const char *geometry,ssize_t *x,
       scale.y=geometry_info.sigma;
       if ((percent_flags & SigmaValue) == 0)
         scale.y=scale.x;
-      *width=CastDoubleToUnsigned(scale.x*stasis_width/100.0+0.5);
-      *height=CastDoubleToUnsigned(scale.y*stasis_height/100.0+0.5);
+      *width=CastDoubleToSizeT(scale.x*stasis_width/100.0+0.5);
+      *height=CastDoubleToSizeT(scale.y*stasis_height/100.0+0.5);
       stasis_width=(*width);
       stasis_height=(*height);
     }
@@ -1540,12 +1540,12 @@ MagickExport MagickStatusType ParseMetaGeometry(const char *geometry,ssize_t *x,
       if (geometry_ratio >= image_ratio)
         {
           *width=stasis_width;
-          *height=CastDoubleToUnsigned((double) (PerceptibleReciprocal(
+          *height=CastDoubleToSizeT((double) (PerceptibleReciprocal(
             geometry_ratio)*stasis_height*image_ratio)+0.5);
         }
       else
         {
-          *width=CastDoubleToUnsigned(PerceptibleReciprocal(image_ratio)*
+          *width=CastDoubleToSizeT(PerceptibleReciprocal(image_ratio)*
             stasis_width*geometry_ratio+0.5);
           *height=stasis_height;
         }
@@ -1598,10 +1598,8 @@ MagickExport MagickStatusType ParseMetaGeometry(const char *geometry,ssize_t *x,
                   (scale_factor < ((double) *height/(double) stasis_width)))
                 scale_factor=(double) *height/(double) stasis_width;
             }
-      *width=CastDoubleToUnsigned(MagickMax(floor(scale_factor*stasis_width+
-        0.5),1.0));
-      *height=CastDoubleToUnsigned(MagickMax(floor(scale_factor*stasis_height+
-        0.5),1.0));
+      *width=CastDoubleToSizeT(MagickMax(floor(scale_factor*stasis_width+0.5),1.0));
+      *height=CastDoubleToSizeT(MagickMax(floor(scale_factor*stasis_height+0.5),1.0));
     }
   if ((flags & GreaterValue) != 0)
     {
@@ -1638,9 +1636,9 @@ MagickExport MagickStatusType ParseMetaGeometry(const char *geometry,ssize_t *x,
         PerceptibleReciprocal(sqrt(area)));
       if ((scale.x < (double) *width) || (scale.y < (double) *height))
         {
-          *width=CastDoubleToUnsigned((double) stasis_width*PerceptibleReciprocal(
+          *width=CastDoubleToSizeT((double) stasis_width*PerceptibleReciprocal(
             distance*PerceptibleReciprocal(sqrt(area)))+0.5);
-          *height=CastDoubleToUnsigned((double) stasis_height*PerceptibleReciprocal(
+          *height=CastDoubleToSizeT((double) stasis_height*PerceptibleReciprocal(
             distance*PerceptibleReciprocal(sqrt(area)))+0.5);
         }
     }

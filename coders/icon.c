@@ -851,6 +851,13 @@ ModuleExport size_t RegisterICONImage(void)
   entry->flags|=CoderDecoderSeekableStreamFlag;
   entry->flags|=CoderEncoderSeekableStreamFlag;
   (void) RegisterMagickInfo(entry);
+  entry=AcquireMagickInfo("ICON","ICN","Microsoft icon");
+  entry->decoder=(DecodeImageHandler *) ReadICONImage;
+  entry->encoder=(EncodeImageHandler *) WriteICONImage;
+  entry->flags ^= CoderAdjoinFlag;
+  entry->flags|=CoderDecoderSeekableStreamFlag;
+  entry->flags|=CoderEncoderSeekableStreamFlag;
+  (void) RegisterMagickInfo(entry);
   entry=AcquireMagickInfo("ICON","ICON","Microsoft icon");
   entry->decoder=(DecodeImageHandler *) ReadICONImage;
   entry->encoder=(EncodeImageHandler *) WriteICONImage;
@@ -924,7 +931,7 @@ ModuleExport void UnregisterICONImage(void)
 static Image *AutoResizeImage(const Image *image,const char *option,
   MagickOffsetType *count,ExceptionInfo *exception)
 {
-#define MAX_SIZES 11
+#define MAX_SIZES 16
 
   char
     *q;
@@ -937,7 +944,7 @@ static Image *AutoResizeImage(const Image *image,const char *option,
     *resized;
 
   size_t
-    sizes[MAX_SIZES] = { 512, 256, 192, 128, 96, 64, 48, 40, 32, 24, 16 };
+    sizes[MAX_SIZES] = { 256, 192, 128, 96, 64, 48, 40, 32, 24, 16 };
 
   ssize_t
     i;
@@ -962,7 +969,7 @@ static Image *AutoResizeImage(const Image *image,const char *option,
       p++;
   }
   if (i == 0)
-    i=MAX_SIZES;
+    i=10; /* the number of sizes when they are not specified by the user */
   *count=i;
   for (i=0; i < *count; i++)
   {

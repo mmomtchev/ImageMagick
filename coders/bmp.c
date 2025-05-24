@@ -832,7 +832,7 @@ static Image *ReadBMPImage(const ImageInfo *image_info,ExceptionInfo *exception)
             (void) LogMagickEvent(CoderEvent,GetMagickModule(),
               "  Number of colors: %u",bmp_info.number_colors);
           }
-        if ((bmp_info.height < 0) && (bmp_info.compression != 0))
+        if ((bmp_info.height < 0) && (bmp_info.compression != BI_RGB))
           ThrowReaderException(CoderError,"CompressNotSupported");
         if ((bmp_info.size > 40) || (bmp_info.compression == BI_BITFIELDS) ||
             (bmp_info.compression == BI_ALPHABITFIELDS))
@@ -2073,14 +2073,14 @@ static MagickBooleanType WriteBMPImage(const ImageInfo *image_info,Image *image,
       case UndefinedResolution:
       case PixelsPerInchResolution:
       {
-        bmp_info.x_pixels=(unsigned int) (100.0*image->resolution.x/2.54);
-        bmp_info.y_pixels=(unsigned int) (100.0*image->resolution.y/2.54);
+        bmp_info.x_pixels=CastDoubleToUInt(100.0*image->resolution.x/2.54);
+        bmp_info.y_pixels=CastDoubleToUInt(100.0*image->resolution.y/2.54);
         break;
       }
       case PixelsPerCentimeterResolution:
       {
-        bmp_info.x_pixels=(unsigned int) (100.0*image->resolution.x);
-        bmp_info.y_pixels=(unsigned int) (100.0*image->resolution.y);
+        bmp_info.x_pixels=CastDoubleToUInt(100.0*image->resolution.x);
+        bmp_info.y_pixels=CastDoubleToUInt(100.0*image->resolution.y);
         break;
       }
     }
