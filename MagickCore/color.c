@@ -1167,42 +1167,42 @@ MagickExport void ConcatenateColorComponent(const PixelInfo *pixel,
   char
     component[MagickPathExtent];
 
-  float
+  double
     color,
     scale;
 
-  color=0.0f;
+  color=0.0;
   scale=QuantumRange;
   if ((compliance != NoCompliance) || (pixel->depth <= 8))
-    scale=255.0f;
+    scale=255.0;
   if ((compliance != NoCompliance) &&
       (IssRGBCompatibleColorspace(pixel->colorspace) != MagickFalse) &&
       (IsSVGCompliant(pixel) == MagickFalse))
-    scale=100.0f;
+    scale=100.0;
   switch (channel)
   {
     case RedPixelChannel:
     {
       color=pixel->red;
       if (IsHueCompatibleColorspace(pixel->colorspace) != MagickFalse)
-        scale=360.0f;
+        scale=360.0;
       if ((compliance != NoCompliance) &&
           (IsLabCompatibleColorspace(pixel->colorspace) != MagickFalse))
-        scale=100.0f;
+        scale=100.0;
       if (pixel->colorspace == XYZColorspace)
-        color/=2.55f;
+        color/=2.55;
       break;
     }
     case GreenPixelChannel:
     {
       color=pixel->green;
       if (IsHueCompatibleColorspace(pixel->colorspace) != MagickFalse)
-        scale=100.0f;
+        scale=100.0;
       if ((compliance != NoCompliance) &&
           (IsLabCompatibleColorspace(pixel->colorspace) != MagickFalse))
-        color-=QuantumRange/2.0f;
+        color-=QuantumRange/2.0;
       if (pixel->colorspace == XYZColorspace)
-        color/=2.55f;
+        color/=2.55;
       break;
     }
     case BluePixelChannel:
@@ -1211,20 +1211,20 @@ MagickExport void ConcatenateColorComponent(const PixelInfo *pixel,
       if (IsHueCompatibleColorspace(pixel->colorspace) != MagickFalse)
         scale=100.0f;
       if (pixel->colorspace == LabColorspace)
-        color-=QuantumRange/2.0f;
+        color-=QuantumRange/2.0;
       if ((pixel->colorspace == LCHColorspace) ||
           (pixel->colorspace == LCHabColorspace) ||
           (pixel->colorspace == LCHuvColorspace))
-        color*=360.0f/255.0f;
+        color*=360.0/255.0;
       if (pixel->colorspace == XYZColorspace)
-        color/=2.55f;
+        color/=2.55;
       break;
     }
     case AlphaPixelChannel:
     {
       color=pixel->alpha;
       if (compliance != NoCompliance)
-        scale=1.0f;
+        scale=1.0;
       break;
     }
     case BlackPixelChannel:
@@ -1240,13 +1240,13 @@ MagickExport void ConcatenateColorComponent(const PixelInfo *pixel,
     default:
       break;
   }
-  if ((scale != 100.0f) ||
+  if ((scale != 100.0) ||
       (IsLabCompatibleColorspace(pixel->colorspace) != MagickFalse))
     (void) FormatLocaleString(component,MagickPathExtent,"%.*g",
-      GetMagickPrecision(),(double) scale*QuantumScale*(double) color);
+      GetMagickPrecision(),scale*QuantumScale*color);
   else
     (void) FormatLocaleString(component,MagickPathExtent,"%.*g%%",
-      GetMagickPrecision(),(double) scale*QuantumScale*(double) color);
+      GetMagickPrecision(),scale*QuantumScale*color);
   (void) ConcatenateMagickString(tuple,component,MagickPathExtent);
 }
 
@@ -1679,18 +1679,13 @@ MagickPrivate MagickBooleanType IsEquivalentAlpha(const Image *image,
     fuzz,
     pixel;
 
-  double
-    distance;
-
   if ((image->alpha_trait & BlendPixelTrait) == 0)
     return(MagickTrue);
   if (p->alpha == q->alpha)
     return(MagickTrue);
-  fuzz=MagickMax(image->fuzz,MagickSQ1_2);
-  fuzz*=fuzz;
+  fuzz=p->fuzz*p->fuzz+q->fuzz*q->fuzz;
   pixel=(double) p->alpha-(double) q->alpha;
-  distance=pixel*pixel;
-  if (distance > fuzz)
+  if ((pixel*pixel) > fuzz)
     return(MagickFalse);
   return(MagickTrue);
 }
@@ -1856,16 +1851,11 @@ MagickPrivate MagickBooleanType IsEquivalentIntensity(const Image *image,
     fuzz,
     pixel;
 
-  double
-    distance;
-
   if (GetPixelInfoIntensity(image,p) == GetPixelInfoIntensity(image,q))
     return(MagickTrue);
-  fuzz=MagickMax(image->fuzz,MagickSQ1_2);
-  fuzz*=fuzz;
+  fuzz=p->fuzz*p->fuzz+q->fuzz*q->fuzz;
   pixel=GetPixelInfoIntensity(image,p)-GetPixelInfoIntensity(image,q);
-  distance=pixel*pixel;
-  if (distance > fuzz)
+  if ((pixel*pixel) > fuzz)
     return(MagickFalse);
   return(MagickTrue);
 }
@@ -2235,7 +2225,7 @@ static MagickStatusType ParseCSSColor(const char *magick_restrict color,
       intensity;
 
     p=q;
-    intensity=(float) StringToDouble(p,&q);
+    intensity=StringToFloat(p,&q);
     if (p == q)
       break;
     if (*q == '%')

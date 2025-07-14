@@ -22,6 +22,7 @@
 #include "MagickCore/cache.h"
 #include "MagickCore/image-private.h"
 #include "MagickCore/pixel-accessor.h"
+#include "MagickCore/statistic-private.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -316,10 +317,10 @@ static inline Quantum ScaleAnyToQuantum(const QuantumAny quantum,
     return(QuantumRange);
 #if !defined(MAGICKCORE_HDRI_SUPPORT)
   return((Quantum) ((double) QuantumRange*(quantum*
-    PerceptibleReciprocal((double) range))+0.5));
+    MagickSafeReciprocal((double) range))+0.5));
 #else
   return((Quantum) ((double) QuantumRange*(quantum*
-    PerceptibleReciprocal((double) range))));
+    MagickSafeReciprocal((double) range))));
 #endif
 }
 
@@ -697,7 +698,7 @@ static inline Quantum ScaleShortToQuantum(const unsigned short value)
 }
 #endif
 
-static inline unsigned short SinglePrecisionToHalf(const float value)
+static inline unsigned short SinglePrecisionToHalf(const double value)
 {
   typedef union _SinglePrecision
   {
@@ -728,7 +729,7 @@ static inline unsigned short SinglePrecisionToHalf(const float value)
       Exponent width: 5 bits
       Significand precision: 11 (10 explicitly stored)
   */
-  map.single_precision=value;
+  map.single_precision=(float) value;
   sign_bit=(map.fixed_point >> 16) & 0x00008000;
   exponent=(int) ((map.fixed_point >> ExponentShift) & 0x000000ff)-ExponentBias;
   significand=map.fixed_point & 0x007fffff;

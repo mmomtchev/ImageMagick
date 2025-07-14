@@ -813,7 +813,8 @@ static MagickBooleanType BlendRMSEResidual(const Image *alpha_image,
     *beta_view;
 
   double
-    area = 0.0;
+    area = 0.0,
+    channel_residual = 0.0;
 
   MagickBooleanType
     status = MagickTrue;
@@ -825,11 +826,11 @@ static MagickBooleanType BlendRMSEResidual(const Image *alpha_image,
   ssize_t
     y;
 
-  *residual=0.0;
   alpha_view=AcquireVirtualCacheView(alpha_image,exception);
   beta_view=AcquireVirtualCacheView(beta_image,exception);
 #if defined(MAGICKCORE_OPENMP_SUPPORT)
   #pragma omp parallel for schedule(static) shared(status) \
+    reduction(+:area) reduction(+:channel_residual) \
     magick_number_threads(alpha_image,alpha_image,rows,1)
 #endif
   for (y=0; y < (ssize_t) rows; y++)
@@ -837,12 +838,6 @@ static MagickBooleanType BlendRMSEResidual(const Image *alpha_image,
     const Quantum
       *magick_restrict p,
       *magick_restrict q;
-
-    double
-      channel_residual;
-
-    size_t
-      local_area = 0;
 
     ssize_t
       x;
@@ -895,22 +890,15 @@ static MagickBooleanType BlendRMSEResidual(const Image *alpha_image,
             beta_image,channel,q));
         channel_residual+=distance*distance;
       }
-      local_area++;
+      area++;
       p+=(ptrdiff_t) GetPixelChannels(alpha_image);
       q+=(ptrdiff_t) GetPixelChannels(beta_image);
     }
-#if defined(MAGICKCORE_OPENMP_SUPPORT)
-    #pragma omp critical (MagickCore_BlendRMSEResidual)
-#endif
-    {
-      area+=local_area;
-      *residual+=channel_residual;
-    }
   }
-  area=PerceptibleReciprocal(area);
   beta_view=DestroyCacheView(beta_view);
   alpha_view=DestroyCacheView(alpha_view);
-  *residual=sqrt(*residual*area/(double) GetImageChannels(alpha_image));
+  area=MagickSafeReciprocal(area);
+  *residual=sqrt(area*channel_residual/(double) GetImageChannels(alpha_image));
   return(status);
 }
 
@@ -1127,7 +1115,7 @@ static MagickBooleanType CompositeOverImage(Image *image,
         */
         Sca=QuantumScale*Sa*Sc;
         Dca=QuantumScale*Da*Dc;
-        gamma=PerceptibleReciprocal(alpha);
+        gamma=MagickSafeReciprocal(alpha);
         pixel=(double) QuantumRange*gamma*(Sca+Dca*(1.0-Sa));
         q[i]=clamp != MagickFalse ? ClampPixel(pixel) : ClampToQuantum(pixel);
       }
@@ -2354,7 +2342,6 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
               case ClearCompositeOp:
               case CopyCompositeOp:
               case ReplaceCompositeOp:
-              case SrcCompositeOp:
               {
                 if (channel == AlphaPixelChannel)
                   pixel=(MagickRealType) TransparentAlpha;
@@ -2641,7 +2628,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
               case FreezeCompositeOp:
               {
                 pixel=(double) QuantumRange*(1.0-(1.0-Sa)*(1.0-Sa)*
-                  PerceptibleReciprocal(Da));
+                  MagickSafeReciprocal(Da));
                 if (pixel < 0.0)
                   pixel=0.0;
                 break;
@@ -2685,7 +2672,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
               case ReflectCompositeOp:
               {
                 pixel=(double) QuantumRange*(Sa*Sa*
-                  PerceptibleReciprocal(1.0-Da));
+                  MagickSafeReciprocal(1.0-Da));
                 if (pixel > (double) QuantumRange)
                   pixel=(double) QuantumRange;
                 break;
@@ -2733,20 +2720,20 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
         */
         Sca=QuantumScale*Sa*Sc;
         Dca=QuantumScale*Da*Dc;
-        SaSca=Sa*PerceptibleReciprocal(Sca);
-        DcaDa=Dca*PerceptibleReciprocal(Da);
+        SaSca=Sa*MagickSafeReciprocal(Sca);
+        DcaDa=Dca*MagickSafeReciprocal(Da);
         switch (compose)
         {
           case DarkenCompositeOp:
           case LightenCompositeOp:
           case ModulusSubtractCompositeOp:
           {
-            gamma=PerceptibleReciprocal(1.0-alpha);
+            gamma=MagickSafeReciprocal(1.0-alpha);
             break;
           }
           default:
           {
-            gamma=PerceptibleReciprocal(alpha);
+            gamma=MagickSafeReciprocal(alpha);
             break;
           }
         }
@@ -2771,7 +2758,6 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           }
           case CopyCompositeOp:
           case ReplaceCompositeOp:
-          case SrcCompositeOp:
           {
             pixel=(double) QuantumRange*Sca;
             break;
@@ -2779,6 +2765,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           case BlurCompositeOp:
           case DisplaceCompositeOp:
           case DistortCompositeOp:
+          case SrcCompositeOp:
           {
             pixel=Sc;
             break;
@@ -2826,7 +2813,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
                 (1.0-Sa));
             else
               pixel=(double) QuantumRange*gamma*(Dca*Sa*Sa*
-                PerceptibleReciprocal(Sa-Sca)+Sca*(1.0-Da)+Dca*(1.0-Sa));
+                MagickSafeReciprocal(Sa-Sca)+Sca*(1.0-Da)+Dca*(1.0-Sa));
             break;
           }
           case ColorizeCompositeOp:
@@ -2859,6 +2846,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
             break;
           }
           case CopyAlphaCompositeOp:
+          case DstCompositeOp:
           {
             pixel=Dc;
             break;
@@ -2941,7 +2929,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           {
             if (compose_sync == MagickFalse)
               {
-                pixel=(double) QuantumRange*(Sc/PerceptibleReciprocal(Dc));
+                pixel=(double) QuantumRange*(Sc/MagickSafeReciprocal(Dc));
                 break;
               }
             if ((fabs((double) Sca) < MagickEpsilon) &&
@@ -2964,7 +2952,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           {
             if (compose_sync == MagickFalse)
               {
-                pixel=(double) QuantumRange*(Dc/PerceptibleReciprocal(Sc));
+                pixel=(double) QuantumRange*(Dc/MagickSafeReciprocal(Sc));
                 break;
               }
             if ((fabs((double) Dca) < MagickEpsilon) &&
@@ -2986,12 +2974,6 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           case DstAtopCompositeOp:
           {
             pixel=(double) QuantumRange*(Dca*Sa+Sca*(1.0-Da));
-            break;
-          }
-          case DstCompositeOp:
-          case NoCompositeOp:
-          {
-            pixel=(double) QuantumRange*Dca;
             break;
           }
           case DstInCompositeOp:
@@ -3018,7 +3000,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           case FreezeCompositeOp:
           {
             pixel=(double) QuantumRange*gamma*(1.0-(1.0-Sca)*(1.0-Sca)*
-              PerceptibleReciprocal(Dca));
+              MagickSafeReciprocal(Dca));
             if (pixel < 0.0)
               pixel=0.0;
             break;
@@ -3302,6 +3284,11 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
             pixel=(double) QuantumRange*(1.0-fabs(1.0-Sca-Dca));
             break;
           }
+          case NoCompositeOp:
+          {
+            pixel=(double) QuantumRange*Dca;
+            break;
+          }
           case OutCompositeOp:
           case SrcOutCompositeOp:
           {
@@ -3380,7 +3367,7 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           case ReflectCompositeOp:
           {
             pixel=(double) QuantumRange*gamma*(Sca*Sca*
-              PerceptibleReciprocal(1.0-Dca));
+              MagickSafeReciprocal(1.0-Dca));
             if (pixel > (double) QuantumRange)
               pixel=(double) QuantumRange;
             break;
@@ -3464,20 +3451,20 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
           {
             if ((Sca+Dca) < 1.0)
               pixel=(double) QuantumRange*gamma*(0.5*Dca*
-                PerceptibleReciprocal(1.0-Sca));
+                MagickSafeReciprocal(1.0-Sca));
             else
               pixel=(double) QuantumRange*gamma*(1.0-0.5*(1.0-Sca)*
-                PerceptibleReciprocal(Dca));
+                MagickSafeReciprocal(Dca));
             break;
           }
           case SoftDodgeCompositeOp:
           {
             if ((Sca+Dca) < 1.0)
               pixel=(double) QuantumRange*gamma*(0.5*Sca*
-                PerceptibleReciprocal(1.0-Dca));
+                MagickSafeReciprocal(1.0-Dca));
             else
               pixel=(double) QuantumRange*gamma*(1.0-0.5*(1.0-Dca)*
-                PerceptibleReciprocal(Sca));
+                MagickSafeReciprocal(Sca));
             break;
           }
           case SoftLightCompositeOp:
@@ -3542,11 +3529,11 @@ MagickExport MagickBooleanType CompositeImage(Image *image,
             if ((2.0*Sca) <= Sa)
               {
                 pixel=(double) QuantumRange*gamma*(Sa*(Da+Sa*(Dca-Da)*
-                  PerceptibleReciprocal(2.0*Sca))+Sca*(1.0-Da)+Dca*(1.0-Sa));
+                  MagickSafeReciprocal(2.0*Sca))+Sca*(1.0-Da)+Dca*(1.0-Sa));
                 break;
               }
             pixel=(double) QuantumRange*gamma*(Dca*Sa*Sa*
-              PerceptibleReciprocal(2.0*(Sa-Sca))+Sca*(1.0-Da)+Dca*(1.0-Sa));
+              MagickSafeReciprocal(2.0*(Sa-Sca))+Sca*(1.0-Da)+Dca*(1.0-Sa));
             break;
           }
           case XorCompositeOp:

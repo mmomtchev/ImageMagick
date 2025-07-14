@@ -48,7 +48,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
 
       - name: Restart from scratch every Sunday
         run: rm -rf ~/.conan2
@@ -59,6 +60,7 @@ jobs:
         run: |
           conan profile detect || echo ok
           conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=20
+          conan cache clean
           echo 'CONAN_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake"' >> $GITHUB_ENV
         shell: bash
 
@@ -116,13 +118,15 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ~/.conan2
-        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}-${{ github.run_id }}
+        restore-keys: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.libtype }}-${{ matrix.buildtype }}
       if: matrix.provider == 'conan' || matrix.provider == 'pkgconf'
 
     - name: Install all delegates (conan)
       run: |
         conan profile detect || echo ok
         conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=20
+        conan cache clean
         echo 'CONAN_TOOLCHAIN=-DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/build/conan_toolchain.cmake"' >> $GITHUB_ENV
       shell: bash
       if: matrix.provider == 'conan'
@@ -133,6 +137,7 @@ jobs:
       run: |
         conan profile detect || echo ok
         conan install . -of build --build=missing -o libtype=${{ matrix.libtype }} --settings=build_type=${{ matrix.buildtype }} --settings compiler.cppstd=20
+        conan cache clean
         echo "PKG_CONFIG_PATH=${{ github.workspace }}/build" >> $GITHUB_ENV
       shell: bash
       env:
@@ -261,13 +266,15 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.conan2
-        key: wasm-emscripten
+        key: wasm-emscripten-${{ github.run_id }}
+        restore-keys: wasm-emscripten
 
     - name: Install all delegates
       shell: bash
       run: |
         conan profile detect || echo ok
         conan install . -of build -pr:b=default -pr:h=./emscripten.profile --build=missing --settings compiler.cppstd=20
+        conan cache clean
 
     - name: Generate CMake build (conan)
       run: |

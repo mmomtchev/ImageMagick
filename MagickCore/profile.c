@@ -2115,12 +2115,12 @@ static inline signed short ReadProfileShort(const EndianType endian,
       value=(unsigned short) buffer[1] << 8;
       value|=(unsigned short) buffer[0];
       quantum.unsigned_value=value & 0xffff;
-      return(quantum.signed_value);
+      return((signed short) quantum.signed_value);
     }
   value=(unsigned short) buffer[0] << 8;
   value|=(unsigned short) buffer[1];
   quantum.unsigned_value=value & 0xffff;
-  return(quantum.signed_value);
+  return((signed short) quantum.signed_value);
 }
 
 static inline signed int ReadProfileLong(const EndianType endian,
@@ -2571,6 +2571,18 @@ static void GetXmpNumeratorAndDenominator(double value,
   *denominator=1;
   if (value <= MagickEpsilon)
     return;
+  if (value > (double) MAGICK_ULONG_MAX)
+    {
+      *numerator = MAGICK_ULONG_MAX;
+      *denominator = 1;
+      return;
+    }
+  if (floor(value) == value)
+    {
+      *numerator = (unsigned long) value;
+      *denominator = 1;
+      return;
+    }
   *numerator=1;
   df=1.0;
   while(fabs(df - value) > MagickEpsilon)

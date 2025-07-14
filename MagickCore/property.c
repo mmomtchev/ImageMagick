@@ -446,7 +446,7 @@ static void GetIPTCProperty(const Image *image,const char *key,
     profile=GetImageProfile(image,"8bim");
   if (profile == (StringInfo *) NULL)
     return;
-  count=sscanf(key,"IPTC:%ld:%ld",&dataset,&record);
+  count=MagickSscanf(key,"IPTC:%ld:%ld",&dataset,&record);
   if (count != 2)
     return;
   attribute=(char *) NULL;
@@ -613,8 +613,8 @@ static void Get8BIMProperty(const Image *image,const char *key,
   profile=GetImageProfile(image,"8bim");
   if (profile == (StringInfo *) NULL)
     return;
-  count=(ssize_t) sscanf(key,"8BIM:%ld,%ld:%1024[^\n]\n%1024[^\n]",&start,&stop,
-    name,format);
+  count=(ssize_t) MagickSscanf(key,"8BIM:%ld,%ld:%1024[^\n]\n%1024[^\n]",
+    &start,&stop,name,format);
   if ((count != 2) && (count != 3) && (count != 4))
     return;
   if (count < 4)
@@ -3371,7 +3371,7 @@ MagickExport const char *GetMagickProperty(ImageInfo *image_info,
         {
           WarnNoImageReturn("\"%%[%s]\"",property);
           (void) FormatLocaleString(value,MagickPathExtent,"%.*g",
-            GetMagickPrecision(),(double) PerceptibleReciprocal(
+            GetMagickPrecision(),(double) MagickSafeReciprocal(
               image->resolution.x)*image->columns);
           break;
         }
@@ -3379,7 +3379,7 @@ MagickExport const char *GetMagickProperty(ImageInfo *image_info,
         {
           WarnNoImageReturn("\"%%[%s]\"",property);
           (void) FormatLocaleString(value,MagickPathExtent,"%.*g",
-            GetMagickPrecision(),(double) PerceptibleReciprocal(
+            GetMagickPrecision(),(double) MagickSafeReciprocal(
               image->resolution.y)*image->rows);
           break;
         }

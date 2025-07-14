@@ -70,6 +70,7 @@
 #include "MagickCore/quantum-private.h"
 #include "MagickCore/static.h"
 #include "MagickCore/string_.h"
+#include "MagickCore/string-private.h"
 #include "MagickCore/module.h"
 #include "MagickCore/token.h"
 #include "MagickCore/transform.h"
@@ -276,10 +277,10 @@ static Image *ReadPCLImage(const ImageInfo *image_info,ExceptionInfo *exception)
         /*
           Note region defined by crop box.
         */
-        count=(ssize_t) sscanf(command,"CropBox [%lf %lf %lf %lf",
+        count=(ssize_t) MagickSscanf(command,"CropBox [%lf %lf %lf %lf",
           &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
         if (count != 4)
-          count=(ssize_t) sscanf(command,"CropBox[%lf %lf %lf %lf",
+          count=(ssize_t) MagickSscanf(command,"CropBox[%lf %lf %lf %lf",
             &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
       }
     if (LocaleNCompare(MediaBox,command,strlen(MediaBox)) == 0)
@@ -287,10 +288,10 @@ static Image *ReadPCLImage(const ImageInfo *image_info,ExceptionInfo *exception)
         /*
           Note region defined by media box.
         */
-        count=(ssize_t) sscanf(command,"MediaBox [%lf %lf %lf %lf",
+        count=(ssize_t) MagickSscanf(command,"MediaBox [%lf %lf %lf %lf",
           &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
         if (count != 4)
-          count=(ssize_t) sscanf(command,"MediaBox[%lf %lf %lf %lf",
+          count=(ssize_t) MagickSscanf(command,"MediaBox[%lf %lf %lf %lf",
             &bounds.x1,&bounds.y1,&bounds.x2,&bounds.y2);
       }
     if (count != 4)
@@ -397,10 +398,10 @@ static Image *ReadPCLImage(const ImageInfo *image_info,ExceptionInfo *exception)
     image->page=page;
     if (image_info->ping != MagickFalse)
       {
-        image->magick_columns*=image->resolution.x/2.0;
-        image->magick_rows*=image->resolution.y/2.0;
-        image->columns*=image->resolution.x/2.0;
-        image->rows*=image->resolution.y/2.0;
+        image->magick_columns*=(size_t) (image->resolution.x/2.0);
+        image->magick_rows*=(size_t) (image->resolution.y/2.0);
+        image->columns*=(size_t) (image->resolution.x/2.0);
+        image->rows*=(size_t) (image->resolution.y/2.0);
       }
     next_image=SyncNextImageInList(image);
     if (next_image != (Image *) NULL)
@@ -542,7 +543,7 @@ static size_t PCLDeltaCompressImage(const size_t length,
       break;
     replacement=j >= 31 ? 31 : j;
     j-=replacement;
-    delta=i >= 8 ? 8 : i;
+    delta=i >= 8 ? 8 : (int) i;
     *q++=(unsigned char) (((delta-1) << 5) | replacement);
     if (replacement == 31)
       {
@@ -562,7 +563,7 @@ static size_t PCLDeltaCompressImage(const size_t length,
         *q++=(*pixels++);
       if (i == 0)
         break;
-      delta=i;
+      delta=(int) i;
       if (i >= 8)
         delta=8;
       *q++=(unsigned char) ((delta-1) << 5);
@@ -793,9 +794,9 @@ static MagickBooleanType WritePCLImage(const ImageInfo *image_info,Image *image,
           {
             (void) FormatLocaleString(buffer,MagickPathExtent,
               "\033*v%da%db%dc%.20gI",
-              ScaleQuantumToChar(image->colormap[i].red),
-              ScaleQuantumToChar(image->colormap[i].green),
-              ScaleQuantumToChar(image->colormap[i].blue),(double) i);
+              ScaleQuantumToChar((Quantum) image->colormap[i].red),
+              ScaleQuantumToChar((Quantum) image->colormap[i].green),
+              ScaleQuantumToChar((Quantum) image->colormap[i].blue),(double) i);
             (void) WriteBlobString(image,buffer);
           }
           for (one=1; i < (ssize_t) (one << bits_per_pixel); i++)

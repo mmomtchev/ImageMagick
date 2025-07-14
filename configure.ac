@@ -2470,7 +2470,9 @@ if test "$with_jpeg" != 'no'; then
             AC_MSG_RESULT([no -- some components failed test])
             have_jpeg='no (failed tests)'
         else
-            JPEG_LIBS='-ljpeg'
+            if test -z "$JPEG_LIBS"; then
+              JPEG_LIBS='-ljpeg'
+            fi
             LIBS="$JPEG_LIBS $LIBS"
             AC_DEFINE([JPEG_DELEGATE],[1],[Define if you have JPEG library])
             AC_MSG_RESULT([yes])
@@ -3461,7 +3463,7 @@ else
       ghostscript_font_dir=`echo "${PSDelegate}" | sed -e 's:/gs/.*:/gs:;s:^/::;s/./&:/;s:/:\\\\:g'`"\\fonts\\"
     fi
   else
-    # Linux / Mac OS X / Unix Build
+    # Linux / macOS / Unix Build
     for font_dir in "${prefix}/share/ghostscript/fonts/" '/usr/share/fonts/default/Type1/' '/usr/share/ghostscript/fonts/' '/usr/share/fonts/ghostscript/' '/usr/share/fonts/type1/gsfonts/' '/opt/local/share/ghostscript/fonts/' '/sw/share/ghostscript/fonts/' '/System/Library/Frameworks/Ghostscript.framework/Resources/fonts/'; do
       if test -f "${font_dir}a010013l.pfb"; then
         ghostscript_font_dir="${font_dir}"

@@ -103,7 +103,7 @@ static const char
   *DelegateMap = (const char *)
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
     "<delegatemap>"
-    "  <delegate decode=\"bpg\" command=\"" DELEGATE_ESC "bpgdec" DELEGATE_ESC " -b 16 -o " DELEGATE_ESC "%o.png" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC "; mv " DELEGATE_ESC "%o.png" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
+    "  <delegate decode=\"bpg\" command=\"" DELEGATE_ESC "bpgdec" DELEGATE_ESC " -b 16 -o " DELEGATE_ESC "%o" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"png\" encode=\"bpg\" command=\"" DELEGATE_ESC "bpgenc" DELEGATE_ESC " -b 12 -q %~ -o " DELEGATE_ESC "%o" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"browse\" stealth=\"True\" spawn=\"True\" command=\"" DELEGATE_ESC "xdg-open" DELEGATE_ESC " https://imagemagick.org/; rm " DELEGATE_ESC "%i" DELEGATE_ESC "\"/>"
     "  <delegate decode=\"cdr\" command=\"" DELEGATE_ESC "uniconvertor" DELEGATE_ESC " " DELEGATE_ESC "%i" DELEGATE_ESC " " DELEGATE_ESC "%o.svg" DELEGATE_ESC "; mv " DELEGATE_ESC "%o.svg" DELEGATE_ESC " " DELEGATE_ESC "%o" DELEGATE_ESC "\"/>"
@@ -1664,7 +1664,7 @@ static MagickBooleanType CopyDelegateFile(const char *source,
   source_file=open_utf8(source,O_RDONLY | O_BINARY,0);
   if (source_file == -1)
     {
-      (void) close(destination_file);
+      (void) close_utf8(destination_file);
       return(MagickFalse);
     }
   quantum=(size_t) MagickMaxBufferExtent;
@@ -1673,8 +1673,8 @@ static MagickBooleanType CopyDelegateFile(const char *source,
   buffer=(unsigned char *) AcquireQuantumMemory(quantum,sizeof(*buffer));
   if (buffer == (unsigned char *) NULL)
     {
-      (void) close(source_file);
-      (void) close(destination_file);
+      (void) close_utf8(source_file);
+      (void) close_utf8(destination_file);
       return(MagickFalse);
     }
   length=0;
@@ -1688,8 +1688,8 @@ static MagickBooleanType CopyDelegateFile(const char *source,
     if ((size_t) count != length)
       break;
   }
-  (void) close(destination_file);
-  (void) close(source_file);
+  (void) close_utf8(destination_file);
+  (void) close_utf8(source_file);
   buffer=(unsigned char *) RelinquishMagickMemory(buffer);
   return(i != 0 ? MagickTrue : MagickFalse);
 }
