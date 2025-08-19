@@ -155,7 +155,9 @@ jobs:
       run: dotnet tool install --global sign --prerelease
 
     - name: Sign executables and libraries
-      if: github.event_name != 'pull_request'
+      env:
+        secrets_available: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      if: env.secrets_available
       run: sign code trusted-signing `
         --trusted-signing-account ImageMagick `
         --trusted-signing-certificate-profile ImageMagick `
