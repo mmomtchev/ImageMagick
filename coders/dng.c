@@ -353,7 +353,7 @@ static void LibRawDataError(void *data,const char *magick_unused(file),
       */
       exception=(ExceptionInfo *) data;
       (void) ThrowMagickException(exception,GetMagickModule(),
-        CorruptImageWarning,"Data corrupted at","`%d'",offset);
+        CorruptImageWarning,"Data corrupted at","`%d'",(int) offset);
   }
 }
 

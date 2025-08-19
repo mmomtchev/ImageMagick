@@ -94,7 +94,7 @@ jobs:
 
   build_windows:
     name: Build ${{ matrix.quantum }}${{matrix.hdri_flag}} (${{matrix.architecture}})
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
@@ -146,7 +146,7 @@ jobs:
 
   version:
     name: Set release and version
-    runs-on: windows-latest
+    runs-on: windows-2022
     outputs:
       release: ${{ steps.version.outputs.release }}
       version: ${{ steps.version.outputs.version }}
@@ -167,7 +167,7 @@ jobs:
 
   create_msix:
     name: Create Msix ${{matrix.quantum}}${{matrix.hdri_flag}}
-    runs-on: windows-latest
+    runs-on: windows-2022
     environment: release
     needs:
       - version
@@ -197,13 +197,13 @@ jobs:
         path: ImageMagick-Windows
 
     - name: Download x64 artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: Windows-${{matrix.quantum}}${{matrix.hdri_flag}}-x64
         path: ImageMagick-Windows\Installer\Msix\x64
 
     - name: Download arm64 artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: Windows-${{matrix.quantum}}${{matrix.hdri_flag}}-arm64
         path: ImageMagick-Windows\Installer\Msix\arm64
@@ -244,7 +244,7 @@ jobs:
 
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         path: artifacts
 
@@ -265,7 +265,7 @@ jobs:
     needs:
       - version
       - create_release
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
