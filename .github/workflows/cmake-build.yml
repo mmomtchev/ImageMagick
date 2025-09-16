@@ -56,6 +56,12 @@ jobs:
         shell: bash
         if: github.event_name == 'schedule'
 
+      - run: ls -al
+        shell: bash
+
+      - run: ls ./conan.profile
+        shell: bash
+
       - name: Install all delegates
         run: |
           conan profile detect --exist-ok
