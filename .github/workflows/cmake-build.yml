@@ -33,7 +33,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: conanfile.py
+          sparse-checkout: |
+            conanfile.py
+            conan.profile
           sparse-checkout-cone-mode: false
 
       - uses: actions/setup-python@v5
@@ -55,12 +57,6 @@ jobs:
         run: rm -rf ~/.conan2
         shell: bash
         if: github.event_name == 'schedule'
-
-      - run: ls -al
-        shell: bash
-
-      - run: ls ./conan.profile
-        shell: bash
 
       - name: Install all delegates
         run: |
