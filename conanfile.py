@@ -125,7 +125,7 @@ class ImageMagickDelegates(ConanFile):
         self.requires('libaom-av1/3.6.0', force=True)
 
       if self.options.h265:
-        self.requires('libde265/1.0.12', force=True)
+        self.requires('libde265/1.0.15', force=True)
 
       if self.options.heif:
         self.requires('libheif/1.19.5', force=True)
