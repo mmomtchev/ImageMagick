@@ -110,7 +110,7 @@ class ImageMagickDelegates(ConanFile):
         self.requires('xz_utils/5.4.5', force=True)
 
       if self.options.gzip:
-        self.requires('zlib/1.2.13', force=True)
+        self.requires('zlib/1.3.1', force=True)
 
       if self.options.fftw:
         self.requires('fftw/3.3.10', force=True)
