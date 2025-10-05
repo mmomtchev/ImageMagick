@@ -164,6 +164,9 @@ class ImageMagickDelegates(ConanFile):
       if self.options.pango and self.settings.arch != 'wasm':
         self.requires('pango/1.54.0', force=True)
 
+      if self.options.cairo or self.options.pango and self.settings.arch != 'wasm':
+        self.requires('lzo/2.10', force=True)
+
       if (self.options.openmp and self.settings.arch != 'wasm' and self.settings.os != 'Windows' and
           self.settings.os != 'Macos' and self.settings.arch != 'armv8' and self.settings.get_safe("build_type", default="Release") != 'Debug') :
         self.requires('llvm-openmp/17.0.6', force=True)
