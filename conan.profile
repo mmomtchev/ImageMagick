@@ -1,4 +1,4 @@
 include(default)
 
-[replace_tool_requires]
-cmake/*: cmake/3.31.9
+[conf]
+tools.cmake.cmaketoolchain:extra_variables={{ {"CMAKE_POLICY_VERSION_MINIMUM=": "3.5"} }}
