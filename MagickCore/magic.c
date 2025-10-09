@@ -472,7 +472,7 @@ static int MagicInfoCompare(const void *x,const void *y)
 #endif
 
 MagickExport const MagicInfo **GetMagicInfoList(const char *pattern,
-  size_t *number_aliases,ExceptionInfo *magick_unused(exception))
+  size_t *number_aliases,ExceptionInfo *exception)
 {
   const MagicInfo
     **aliases;
@@ -489,7 +489,7 @@ MagickExport const MagicInfo **GetMagicInfoList(const char *pattern,
   if (IsEventLogging() != MagickFalse)
     (void) LogMagickEvent(TraceEvent,GetMagickModule(),"%s",pattern);
   *number_aliases=0;
-  if (IsMagicCacheInstantiated() == MagickFalse)
+  if (IsMagicListInstantiated(exception) == MagickFalse)
     return((const MagicInfo **) NULL);
   aliases=(const MagicInfo **) AcquireQuantumMemory((size_t)
     GetNumberOfElementsInLinkedList(magic_list)+1UL,sizeof(*aliases));
@@ -569,7 +569,7 @@ static int MagicCompare(const void *x,const void *y)
 #endif
 
 MagickExport char **GetMagicList(const char *pattern,size_t *number_aliases,
-  ExceptionInfo *magick_unused(exception))
+  ExceptionInfo *exception)
 {
   char
     **aliases;
@@ -586,7 +586,7 @@ MagickExport char **GetMagicList(const char *pattern,size_t *number_aliases,
   if (IsEventLogging() != MagickFalse)
     (void) LogMagickEvent(TraceEvent,GetMagickModule(),"%s",pattern);
   *number_aliases=0;
-  if (IsMagicCacheInstantiated() == MagickFalse)
+  if (IsMagicListInstantiated(exception) == MagickFalse)
     return((char **) NULL);
   aliases=(char **) AcquireQuantumMemory((size_t)
     GetNumberOfElementsInLinkedList(magic_list)+1UL,sizeof(*aliases));

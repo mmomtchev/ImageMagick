@@ -232,7 +232,7 @@ static Image *ReadVIDEOImage(const ImageInfo *image_info,
       if (option != (const char *) NULL)
         {
           FormatSanitizedDelegateOption(command,MagickPathExtent,
-            " -vsync \"%s\""," -vsync '%s'",option);
+            " -fps_mode \"%s\""," -fps_mode '%s'",option);
           (void) ConcatenateMagickString(options,command,MagickPathExtent);
         }
       option=GetImageOption(image_info,"video:pixel-format");
@@ -248,7 +248,7 @@ static Image *ReadVIDEOImage(const ImageInfo *image_info,
             MagickPathExtent);
       intermediate_format=GetIntermediateFormat(image_info);
       (void) FormatLocaleString(command,MagickPathExtent,
-        " -vcodec %s -lossless 1",intermediate_format);
+        " -vcodec %s",intermediate_format);
       (void) ConcatenateMagickString(options,command,MagickPathExtent);
       AcquireUniqueFilename(read_info->unique);
       (void) AcquireUniqueSymbolicLink(image_info->filename,
