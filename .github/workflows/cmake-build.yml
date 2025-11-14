@@ -199,7 +199,7 @@ jobs:
         cd build
         cmake .. ${{ env.CONAN_TOOLCHAIN }} -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ${{ env.LIBTYPE }}     \
           -DCMAKE_INSTALL_PREFIX="${{ env.INSTALL_PREFIX }}" ${{ env.ZERO_CONF }} ${{ env.CUSTOM_DELEGATES }} \
-          -DCMAKE_VERBOSE_MAKEFILE=ON
+          -DCMAKE_VERBOSE_MAKEFILE=ON -DMAGICK_DELEGATES_VERBOSE=ON
 
     - name: Build
       run: cmake --build build --config ${{ matrix.buildtype }}
