@@ -31,7 +31,7 @@ The build process will automatically identify available dependencies. It will lo
 
 This is implemented in `magick_find_delegate()` in the main `CMakeLists.txt`.
 
-If you suspect that a dependency is being imported incorrectly, the `-DCMAKE_VERBOSE_MAKEFILE=ON=ON` `CMake` option can be used to troubleshoot it.
+If you suspect that a dependency is being imported incorrectly, the `-DCMAKE_VERBOSE_MAKEFILE=ON` `CMake` option can be used to troubleshoot it.
 
 ## `conan`
 
