@@ -18,6 +18,7 @@ project(ImageMagick)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cmake/checks.cmake)
+include(CMakePrintHelpers)
 find_package(PkgConfig)
 set(CMAKE_TRY_COMPILE_CONFIGURATION ${CMAKE_BUILD_TYPE})
 
@@ -52,17 +53,10 @@ macro(handle_cmake_dep)
       set(${MAGICK_FIND_DELEGATE} TRUE)
 
       if(MAGICK_DELEGATES_VERBOSE)
-        if(TARGET_INCLUDES)
-          message("---- Include paths: ${TARGET_INCLUDES}")
-        endif()
-        get_target_property(TARGET_LIBRARIES ${MAGICK_FIND_SEARCH_TARGET} INTERFACE_LINK_LIBRARIES)
-        if(TARGET_LIBRARIES)
-          message("---- Libraries: ${TARGET_LIBRARIES}")
-        endif()
-        get_target_property(TARGET_LIBRARY_DIRS ${MAGICK_FIND_SEARCH_TARGET} INTERFACE_LINK_DIRECTORIES)
-        if(TARGET_LIBRARY_DIRS)
-          message("---- Libraries paths: ${TARGET_LIBRARY_DIRS}")
-        endif()
+        cmake_print_properties(
+          TARGETS ${MAGICK_FIND_SEARCH_TARGET}
+          PROPERTIES LOCATION INTERFACE_INCLUDE_DIRECTORIES
+        )
       endif()
 
     else()
@@ -83,29 +77,36 @@ macro(try_handle_pkgconfig_dep)
   pkg_check_modules(${MAGICK_FIND_NAME} QUIET ${MAGICK_FIND_SEARCH_TARGET})
   if(${${MAGICK_FIND_NAME}_FOUND})
     message(${ARGV0})
-    get_pkgconfig_setting(CMAKE_REQUIRED_INCLUDES ${MAGICK_FIND_NAME} INCLUDE_DIRS)
-    get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${MAGICK_FIND_NAME} INCLUDE_DIRS)
-    get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARIES ${MAGICK_FIND_NAME} LIBRARIES)
-    get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LIBRARY_DIRS ${MAGICK_FIND_NAME} LIBRARY_DIRS)
-    get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_CFLAGS ${MAGICK_FIND_NAME} CFLAGS)
-    get_pkgconfig_setting(IMAGEMAGICK_DELEGATES_LDFLAGS ${MAGICK_FIND_NAME} LDFLAGS_OTHER)
+
+    unset(PKG_INCLUDE_DIRS)
+    unset(PKG_CFLAGS)
+    unset(PKG_LIBRARIES)
+    unset(PKG_LIBRARY_DIRS)
+    unset(PKG_LDFLAGS_OTHER)
+
+    get_pkgconfig_setting(PKG_INCLUDE_DIRS ${MAGICK_FIND_NAME} INCLUDE_DIRS)
+    get_pkgconfig_setting(PKG_LIBRARIES ${MAGICK_FIND_NAME} LIBRARIES)
+    get_pkgconfig_setting(PKG_LIBRARY_DIRS ${MAGICK_FIND_NAME} LIBRARY_DIRS)
+    get_pkgconfig_setting(PKG_CFLAGS ${MAGICK_FIND_NAME} CFLAGS)
+    get_pkgconfig_setting(PKG_LDFLAGS_OTHER ${MAGICK_FIND_NAME} LDFLAGS_OTHER)
+
+    list(APPEND CMAKE_REQUIRED_INCLUDES ${PKG_INCLUDE_DIRS})
+    list(APPEND IMAGEMAGICK_DELEGATES_INCLUDE_DIRS ${PKG_INCLUDE_DIRS})
+    list(APPEND IMAGEMAGICK_DELEGATES_LIBRARIES ${PKG_LIBRARIES})
+    list(APPEND IMAGEMAGICK_DELEGATES_LIBRARY_DIRS ${PKG_LIBRARY_DIRS})
+    list(APPEND IMAGEMAGICK_DELEGATES_CFLAGS ${PKG_CFLAGS})
+    list(APPEND IMAGEMAGICK_DELEGATES_LDFLAGS ${PKG_LDFLAGS_OTHER})
+
     set(${MAGICK_FIND_DELEGATE} TRUE)
+
     if(MAGICK_DELEGATES_VERBOSE)
-      if(INCLUDE_DIRS)
-        message("---- Include paths: ${INCLUDE_DIRS}")
-      endif()
-      if(CFLAGS)
-        message("---- Compilation flags: ${CFLAGS}")
-      endif()
-      if(LIBRARIES)
-        message("---- Libraries: ${LIBRARIES}")
-      endif()
-      if(LIBRARY_DIRS)
-        message("---- Libraries paths: ${LIBRARY_DIRS}")
-      endif()
-      if(LDFLAGS_OTHER)
-        message("---- Link flags: ${LDFLAGS_OTHER}")
-      endif()
+      cmake_print_variables(
+        PKG_INCLUDE_DIRS
+        PKG_CFLAGS
+        PKG_LIBRARIES
+        PKG_LIBRARY_DIRS
+        PKG_LDFLAGS_OTHER
+      )
     endif()
   endif()
 endmacro()
