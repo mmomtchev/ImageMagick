@@ -192,6 +192,13 @@ jobs:
         echo "EXPECTED_DELEGATES=${EXPECTED_DELEGATES}" | sed s/jxl// >> $GITHUB_ENV
       if: matrix.provider == 'conan' && runner.os == 'Linux' && matrix.libtype == 'shared'
 
+    - name: Workaround for https://github.com/actions/runner-images/issues/13308
+      shell: bash
+      run: |
+        echo "CUSTOM_DELEGATES=-DCAIRO_DELEGATE=OFF" >> $GITHUB_ENV
+        echo "EXPECTED_DELEGATES=${EXPECTED_DELEGATES}" | sed s/cairo// >> $GITHUB_ENV
+      if: matrix.provider == 'system' && runner.os == 'macOS' && matrix.libtype == 'static'
+
     - name: Generate CMake build
       shell: bash
       run: |
