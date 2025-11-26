@@ -198,6 +198,7 @@ jobs:
         brew install gettext
         echo "CXXFLAGS=${CXXFLAGS} -I/opt/homebrew/include" >> $GITHUB_ENV
         echo "CFLAGS=${CFLAGS} -I/opt/homebrew/include" >> $GITHUB_ENV
+        echo "LDFLAGS=${LDFLAGS} -L/opt/homebrew/lib" >> $GITHUB_ENV
       if: matrix.provider == 'system' && runner.os == 'macOS'
 
     - name: Generate CMake build
