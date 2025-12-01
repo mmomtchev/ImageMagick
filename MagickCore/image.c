@@ -1036,7 +1036,7 @@ MagickExport ImageInfo *CloneImageInfo(const ImageInfo *image_info)
 %
 %      MagickBooleanType CopyImagePixels(Image *image,const Image *source_image,
 %        const RectangleInfo *geometry,const OffsetInfo *offset,
-%        ExceptionInfo *exception);
+%        ExceptionInfo *exception)
 %
 %  A description of each parameter follows:
 %
@@ -2965,6 +2965,8 @@ MagickExport MagickBooleanType SetImageInfo(ImageInfo *image_info,
           image_info->affirm=MagickTrue;
           (void) CopyMagickString(image_info->magick,magic,MagickPathExtent);
           GetPathComponent(image_info->filename,CanonicalPath,component);
+          if (IsStringTrue(GetImageOption(image_info,"filename:literal")) != MagickFalse)
+            GetPathComponent(image_info->filename,SubcanonicalPath,component);
           (void) CopyMagickString(image_info->filename,component,
             MagickPathExtent);
         }

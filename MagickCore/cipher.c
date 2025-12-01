@@ -536,7 +536,7 @@ static inline void IncrementCipherNonce(const size_t length,
     if (nonce[i] != 0)
       return;
   }
-  ThrowFatalException(ResourceLimitFatalError,"Sequence wrap error `%s'");
+  ThrowFatalException(ResourceLimitFatalError,"Sequence wrap error");
 }
 
 MagickExport MagickBooleanType DecipherImage(Image *image,
@@ -951,7 +951,7 @@ MagickExport MagickBooleanType PasskeyEncipherImage(Image *image,
 %
 %  The format of the SetAESKey method is:
 %
-%      SetAESKey(AESInfo *aes_info,const StringInfo *key)
+%      void SetAESKey(AESInfo *aes_info,const StringInfo *key)
 %
 %  A description of each parameter follows:
 %
