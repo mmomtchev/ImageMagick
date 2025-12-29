@@ -79,7 +79,7 @@ jobs:
           mv ChangeLog.md Artifacts/ChangeLog.md
 
       - name: Upload ChangeLog.md
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ChangeLog
           path: Artifacts
@@ -151,7 +151,7 @@ jobs:
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-${{matrix.buildType}}-openMP.zip
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ChangeLog
           path: ImageMagick
@@ -202,7 +202,7 @@ jobs:
           subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
           directory: Configure\Installer\Inno\Artifacts
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.typeName}}-${{matrix.architecture}}.exe
           path: Configure\Installer\Inno\Artifacts
@@ -228,7 +228,7 @@ jobs:
           clone-repositories-im7.cmd
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ChangeLog
           path: ImageMagick
@@ -244,7 +244,7 @@ jobs:
           move ImageMagick source
           7z a ImageMagick-%VERSION%-Windows.7z .\source\*
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-Windows.7z
           path: ImageMagick-${{needs.version.outputs.version}}-Windows.7z
@@ -291,7 +291,7 @@ jobs:
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-static-openMP-linked-runtime.zip
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ChangeLog
           path: ImageMagick
@@ -331,7 +331,7 @@ jobs:
           Copy-Item "ImageMagick\LICENSE" "portable\LICENSE.txt"
           7z a "ImageMagick-$env:VERSION-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z" .\portable\*
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z
           path: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z
@@ -370,13 +370,13 @@ jobs:
           persist-credentials: false
 
       - name: Download x64 artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-x64.7z
           path: ImageMagick-Windows\Installer\Msix\x64
 
       - name: Download arm64 artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-arm64.7z
           path: ImageMagick-Windows\Installer\Msix\arm64
@@ -407,7 +407,7 @@ jobs:
           aip-commands: |
               SetVersion ${{needs.version.outputs.semantic_version}}
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.msixbundle
           path: ImageMagick-Windows\Installer\Msix\Artifacts\ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.msixbundle
@@ -488,7 +488,7 @@ jobs:
           find /appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 
       - name: Upload ImageMagick AppImage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: AppImage-${{matrix.compiler}}
           path: artifacts
@@ -516,7 +516,7 @@ jobs:
           persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           merge-multiple: true
