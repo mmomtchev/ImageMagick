@@ -23,7 +23,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -278,7 +278,7 @@ static MagickBooleanType JP2ComponentHasAlpha(const ImageInfo* image_info,
 
   if (comp.alpha != 0)
     return(MagickTrue);
-  option=GetImageOption(image_info, "jp2:assume-alpha");
+  option=GetImageOption(image_info,"jp2:assume-alpha");
   return(IsStringTrue(option));
 }
 

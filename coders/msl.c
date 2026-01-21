@@ -25,7 +25,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -7041,9 +7041,19 @@ static void MSLStartElement(void *context,const xmlChar *tag,
 
           /* process */
           {
-            *msl_info->image_info[n]->magick='\0';
-            (void) WriteImage(msl_info->image_info[n], msl_info->image[n],
-              msl_info->exception);
+            (void) CopyMagickString(msl_info->image_info[n]->filename,
+              msl_info->image[n]->filename,MagickPathExtent);
+            (void) SetImageInfo(msl_info->image_info[n],1,exception);
+            if (LocaleCompare(msl_info->image_info[n]->magick,"msl") != 0)
+              {
+                *msl_info->image_info[n]->magick='\0';
+                (void) WriteImage(msl_info->image_info[n],msl_info->image[n],
+                  msl_info->exception);
+              }
+            else
+              (void) ThrowMagickException(msl_info->exception,GetMagickModule(),
+                FileOpenError,"UnableToWriteFile","`%s'",
+                msl_info->image[n]->filename);
             break;
           }
         }
@@ -7088,6 +7098,12 @@ static void MSLEndElement(void *context,const xmlChar *tag)
     {
       if (LocaleCompare((const char *) tag,"comment") == 0 )
         {
+          if (msl_info->image[n] == (Image *) NULL)
+            {
+              ThrowMSLException(OptionError,"NoImagesDefined",
+                (const char *) tag);
+              break;
+            }
           (void) DeleteImageProperty(msl_info->image[n],"comment");
           if (msl_info->content == (char *) NULL)
             break;
@@ -7137,6 +7153,12 @@ static void MSLEndElement(void *context,const xmlChar *tag)
     {
       if (LocaleCompare((const char *) tag,"label") == 0 )
         {
+          if (msl_info->image[n] == (Image *) NULL)
+            {
+              ThrowMSLException(OptionError,"NoImagesDefined",
+                (const char *) tag);
+              break;
+            }
           (void) DeleteImageProperty(msl_info->image[n],"label");
           if (msl_info->content == (char *) NULL)
             break;

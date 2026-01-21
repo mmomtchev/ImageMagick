@@ -23,7 +23,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -336,7 +336,7 @@ static void SetLibRawParams(const ImageInfo *image_info,Image *image,
 }
 
 static void LibRawDataError(void *data,const char *magick_unused(file),
-#if defined(MAGICK_LIBRAW_VERSION_TAIL) && MAGICK_LIBRAW_VERSION_TAIL == 202502
+#if LIBRAW_COMPILE_CHECK_VERSION(0,22)
   const INT64 offset)
 #else
   const int offset)

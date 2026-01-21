@@ -23,7 +23,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -326,7 +326,7 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
   if (status == MagickFalse)
     ThrowCompareException(ResourceLimitError,"MemoryAllocationFailed",
       GetExceptionMessage(errno));
-  for (i=1; i < (ssize_t) (argc-1); i++)
+  for (i=1; i < ((ssize_t) argc-1); i++)
   {
     option=argv[i];
     if (LocaleCompare(option,"(") == 0)
@@ -356,7 +356,7 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
         */
         FireImageStack(MagickFalse,MagickFalse,pend);
         filename=argv[i];
-        if ((LocaleCompare(filename,"--") == 0) && (i < (ssize_t) (argc-1)))
+        if ((LocaleCompare(filename,"--") == 0) && (i < ((ssize_t) argc-1)))
           filename=argv[++i];
         images=ReadImages(image_info,filename,exception);
         status&=(MagickStatusType) ((images != (Image *) NULL) &&
@@ -1161,7 +1161,7 @@ WandExport MagickBooleanType CompareImagesCommand(ImageInfo *image_info,
   }
   if (k != 0)
     ThrowCompareException(OptionError,"UnbalancedParenthesis",argv[i]);
-  if (i-- != (ssize_t) (argc-1))
+  if (i-- != ((ssize_t) argc-1))
     ThrowCompareException(OptionError,"MissingAnImageFilename",argv[i]);
   if ((image == (Image *) NULL) || (GetImageListLength(image) < 2))
     ThrowCompareException(OptionError,"MissingAnImageFilename",argv[i]);

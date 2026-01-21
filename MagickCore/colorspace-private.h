@@ -5,7 +5,7 @@
   You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://imagemagick.org/script/license.php
+    https://imagemagick.org/license/
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -753,7 +753,7 @@ static inline void ConvertXYZToCAT02LMS(const double X,const double Y,
 {
   *L=0.7328*X+0.4296*Y-0.1624*Z;
   *M=(-0.7036)*X+1.6975*Y+0.0061*Z;
-  *S=0.0030*X+0.0136*Y+0.9834*Z; 
+  *S=0.0030*X+0.0136*Y+0.9834*Z;
 }
 
 static inline void ConvertRGBToXYZ(const double red,const double green,

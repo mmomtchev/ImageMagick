@@ -23,7 +23,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -911,10 +911,7 @@ MagickExport Image *ReadImage(const ImageInfo *image_info,
           {
             if (((flags & XValue) != 0) || ((flags & YValue) != 0))
               {
-                Image
-                  *crop_image;
-
-                crop_image=CropImage(next,&geometry,exception);
+                Image *crop_image = CropImage(next,&geometry,exception);
                 if (crop_image != (Image *) NULL)
                   ReplaceImageInList(&next,crop_image);
               }

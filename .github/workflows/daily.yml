@@ -9,9 +9,10 @@ on:
     branches:
     - cmake-portable-build
 
-name: Daily
 permissions:
   contents: read
+
+name: Daily
 jobs:
   change_log:
     name: 'Create ChangeLog.md'

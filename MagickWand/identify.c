@@ -23,7 +23,7 @@
 %  You may not use this file except in compliance with the License.  You may  %
 %  obtain a copy of the License at                                            %
 %                                                                             %
-%    https://imagemagick.org/script/license.php                               %
+%    https://imagemagick.org/license/                                         %
 %                                                                             %
 %  Unless required by applicable law or agreed to in writing, software        %
 %  distributed under the License is distributed on an "AS IS" BASIS,          %
@@ -303,7 +303,7 @@ WandExport MagickBooleanType IdentifyImageCommand(ImageInfo *image_info,
         identify_info=CloneImageInfo(image_info);
         identify_info->verbose=MagickFalse;
         filename=argv[i];
-        if ((LocaleCompare(filename,"--") == 0) && (i < (ssize_t) (argc-1)))
+        if ((LocaleCompare(filename,"--") == 0) && (i < ((ssize_t) argc-1)))
           filename=argv[++i];
         if (identify_info->ping != MagickFalse)
           images=PingImages(identify_info,filename,exception);
