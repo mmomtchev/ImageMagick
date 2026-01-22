@@ -12,4 +12,4 @@ compiler.version=17
 [options]
 
 [tool_requires]
-emsdk/3.1.50
+emsdk/3.1.73
