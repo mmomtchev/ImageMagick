@@ -16,8 +16,14 @@ cmake_minimum_required(VERSION 3.21)
 
 project(ImageMagick)
 
-cmake_policy(SET CMP0156 NEW)
-cmake_policy(SET CMP0159 NEW)
+if(POLICY CMP0156)
+  # Dedupe static libraries if the linker supports it
+  cmake_policy(SET CMP0156 NEW)
+endif()
+if(POLICY CMP0159)
+  # Capture groups for regex matching
+  cmake_policy(SET CMP0159 NEW)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(cmake/checks.cmake)
