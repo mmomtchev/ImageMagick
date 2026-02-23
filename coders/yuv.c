@@ -165,8 +165,8 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
       vertical_factor=horizontal_factor;
       if ((flags & SigmaValue) != 0)
         vertical_factor=(ssize_t) geometry_info.sigma;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowReaderException(CorruptImageError,"UnexpectedSamplingFactor");
     }
   if ((interlace == UndefinedInterlace) ||
@@ -261,7 +261,7 @@ static Image *ReadYUVImage(const ImageInfo *image_info,ExceptionInfo *exception)
             chroma_image->columns,1,exception);
           if (chroma_pixels == (Quantum *) NULL)
             break;
-          for (x=0; x < (ssize_t) image->columns; x+=2)
+          for (x=0; x < (ssize_t) (image->columns-1); x+=2)
           {
             SetPixelRed(chroma_image,0,chroma_pixels);
             if (quantum == 1)
@@ -670,8 +670,8 @@ static MagickBooleanType WriteYUVImage(const ImageInfo *image_info,Image *image,
       vertical_factor=horizontal_factor;
       if ((flags & SigmaValue) != 0)
         vertical_factor=(ssize_t) geometry_info.sigma;
-      if ((horizontal_factor != 1) && (horizontal_factor != 2) &&
-          (vertical_factor != 1) && (vertical_factor != 2))
+      if (((horizontal_factor != 1) && (horizontal_factor != 2)) ||
+          ((vertical_factor != 1) && (vertical_factor != 2)))
         ThrowWriterException(CorruptImageError,"UnexpectedSamplingFactor");
     }
   if ((interlace == UndefinedInterlace) ||
@@ -740,7 +740,7 @@ static MagickBooleanType WriteYUVImage(const ImageInfo *image_info,Image *image,
             exception);
           if (s == (const Quantum *) NULL)
             break;
-          for (x=0; x < (ssize_t) yuv_image->columns; x+=2)
+          for (x=0; x < (ssize_t) (yuv_image->columns-1); x+=2)
           {
             if (quantum == 1)
               {
@@ -767,7 +767,7 @@ static MagickBooleanType WriteYUVImage(const ImageInfo *image_info,Image *image,
                   GetPixelRed(yuv_image,p)));
               }
             p+=(ptrdiff_t) GetPixelChannels(yuv_image);
-            s++;
+            s+=(ptrdiff_t) GetPixelChannels(chroma_image);
           }
           if (image->previous == (Image *) NULL)
             {

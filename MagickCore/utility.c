@@ -745,6 +745,23 @@ MagickPrivate void ExpandFilename(char *path)
 %      line arguments.
 %
 */
+static inline void getcwd_utf8(char *path,size_t extent)
+{
+#if !defined(MAGICKCORE_WINDOWS_SUPPORT) || defined(__CYGWIN__)
+  char
+    *directory;
+
+   directory=getcwd(path,extent);
+   (void) directory;
+#else
+  wchar_t
+    wide_path[MagickPathExtent];
+
+  (void) _wgetcwd(wide_path,MagickPathExtent-1);
+  (void) WideCharToMultiByte(CP_UTF8,0,wide_path,-1,path,(int) extent,NULL,NULL);
+#endif
+}
+
 MagickExport MagickBooleanType ExpandFilenames(int *number_arguments,
   char ***arguments)
 {
@@ -1042,16 +1059,23 @@ MagickPrivate MagickBooleanType GetExecutionPath(char *path,const size_t extent)
 #if defined(MAGICKCORE_HAVE__NSGETEXECUTABLEPATH)
   {
     char
-      executable_path[PATH_MAX << 1],
-      execution_path[PATH_MAX+1];
+      executable_path[PATH_MAX << 1];
 
     uint32_t
       length;
 
     length=sizeof(executable_path);
-    if ((_NSGetExecutablePath(executable_path,&length) == 0) &&
-        (realpath(executable_path,execution_path) != (char *) NULL))
-      (void) CopyMagickString(path,execution_path,extent);
+    if (_NSGetExecutablePath(executable_path,&length) == 0)
+      {
+        char
+          *real_path = realpath_utf8(executable_path);
+
+        if (real_path != (char *) NULL)
+          {
+            (void) CopyMagickString(path,real_path,extent);
+            real_path=DestroyString(real_path);
+          }
+      }
   }
 #endif
 #if defined(MAGICKCORE_HAVE_GETEXECNAME)
@@ -1097,10 +1121,13 @@ MagickPrivate MagickBooleanType GetExecutionPath(char *path,const size_t extent)
     if (count != -1)
       {
         char
-          execution_path[PATH_MAX+1];
+          *real_path = realpath_utf8(program_name);
 
-        if (realpath(program_name,execution_path) != (char *) NULL)
-          (void) CopyMagickString(path,execution_path,extent);
+        if (real_path != (char *) NULL)
+          {
+            (void) CopyMagickString(path,real_path,extent);
+            real_path=DestroyString(real_path);
+          }
       }
     if (program_name != program_invocation_name)
       program_name=(char *) RelinquishMagickMemory(program_name);
@@ -1882,7 +1909,7 @@ MagickPrivate MagickBooleanType ShredFile(const char *path)
     {
       char
         *property;
-          
+
       passes=0;
       property=GetEnvironmentValue("MAGICK_SHRED_PASSES");
       if (property != (char *) NULL)

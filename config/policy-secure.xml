@@ -90,12 +90,15 @@
   <policy domain="filter" rights="none" pattern="*"/>
   <!-- Don't read/write from/to stdin/stdout. -->
   <policy domain="path" rights="none" pattern="-"/>
-  <!-- don't read sensitive paths. -->
+  <policy domain="path" rights="none" pattern="fd:*"/>
+  <!-- Sensitive paths are not permitted. -->
   <policy domain="path" rights="none" pattern="/etc/*"/>
-  <!-- Indirect reads are not permitted. -->
+  <!-- Relative paths are not permitted. -->
+  <policy domain="path" rights="none" pattern="*../*"/>
+  <!-- Indirect reading is not permitted. -->
   <policy domain="path" rights="none" pattern="@*"/>
   <!-- These image types are security risks on read, but write is fine -->
-  <policy domain="module" rights="write" pattern="{MSL,MVG,PS,SVG,URL,XPS}"/>
+  <policy domain="module" rights="write" pattern="{MSL,MVG,PS,SVG,TEXT,URL,XPS}"/>
   <!-- This policy sets the number of times to replace content of certain
        memory buffers and temporary files before they are freed or deleted. -->
   <policy domain="system" name="shred" value="1"/>

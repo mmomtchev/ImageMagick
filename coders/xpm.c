@@ -442,10 +442,12 @@ static Image *ReadXPMImage(const ImageInfo *image_info,ExceptionInfo *exception)
         (void) CopyXPMColor(target,q,MagickMin((size_t) (next-q),
           MagickPathExtent-1));
         q=ParseXPMColor(target,MagickFalse);
-        (void) CopyXPMColor(symbolic,q,MagickMin((size_t) (next-q),
-          MagickPathExtent-1));
         if (q != (char *) NULL)
-          *q='\0';
+          {
+            (void) CopyXPMColor(symbolic,q,MagickMin((size_t) (next-q),
+              MagickPathExtent-1));
+            *q='\0';
+          }
       }
     (void) StripMagickString(target);
     if (*symbolic != '\0')
@@ -1132,10 +1134,14 @@ static MagickBooleanType WriteXPMImage(const ImageInfo *image_info,Image *image,
     for (x=0; x < (ssize_t) image->columns; x++)
     {
       k=((ssize_t) GetPixelIndex(image,p) % MaxCixels);
+      if (k < 0)
+        k=0;
       symbol[0]=Cixel[k];
       for (j=1; j < (ssize_t) characters_per_pixel; j++)
       {
         k=(((int) GetPixelIndex(image,p)-k)/MaxCixels) % MaxCixels;
+        if (k < 0)
+          k=0;
         symbol[j]=Cixel[k];
       }
       symbol[j]='\0';

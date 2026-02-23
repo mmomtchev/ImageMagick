@@ -1334,6 +1334,7 @@ static MagickBooleanType ReadPSDChannelZip(Image *image,
       ThrowBinaryException(ResourceLimitError,"MemoryAllocationFailed",
         image->filename);
     }
+  memset(pixels,0,count*sizeof(*pixels));
   if (ReadBlob(image,compact_size,compact_pixels) != (ssize_t) compact_size)
     {
       pixels=(unsigned char *) RelinquishMagickMemory(pixels);
@@ -2327,7 +2328,13 @@ static MagickBooleanType ReadPSDMergedImage(const ImageInfo *image_info,
   sizes=(MagickOffsetType *) NULL;
   if (compression == RLE)
     {
-      sizes=ReadPSDRLESizes(image,psd_info,image->rows*psd_info->channels);
+      size_t
+        extent;
+
+      if (HeapOverflowSanityCheckGetSize(image->rows,psd_info->channels,&extent) != MagickFalse)
+        ThrowBinaryException(ResourceLimitError,"MemoryAllocationFailed",
+          image->filename);
+      sizes=ReadPSDRLESizes(image,psd_info,extent);
       if (sizes == (MagickOffsetType *) NULL)
         ThrowBinaryException(ResourceLimitError,"MemoryAllocationFailed",
           image->filename);
@@ -2638,19 +2645,23 @@ static Image *ReadPSDImage(const ImageInfo *image_info,ExceptionInfo *exception)
       */
       (void) SeekBlob(image,offset+(MagickOffsetType) length,SEEK_SET);
     }
-  /*
-    If we are only "pinging" the image, then we're done - so return.
-  */
   if (EOFBlob(image) != MagickFalse)
     {
       if (profile != (StringInfo *) NULL)
         profile=DestroyStringInfo(profile);
       ThrowReaderException(CorruptImageError,"UnexpectedEndOfFile");
     }
+  /*
+    If we are only "pinging" the image, then we're done - so return.
+  */
   if (image_info->ping != MagickFalse)
     {
       if (profile != (StringInfo *) NULL)
-        profile=DestroyStringInfo(profile);
+        {
+          (void) SetImageProfile(image,GetStringInfoName(profile),profile,
+            exception);
+          profile=DestroyStringInfo(profile);
+        }
       (void) CloseBlob(image);
       return(GetFirstImageInList(image));
     }

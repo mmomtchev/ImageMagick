@@ -85,6 +85,30 @@ static inline MagickThreadType GetMagickThreadId(void)
 #endif
 }
 
+static inline void GetMagickThreadFilename(const char *filename,
+  char *thread_filename)
+{
+  MagickThreadType
+    id;
+
+  char
+    thread_id[2*sizeof(id)+1];
+
+  ssize_t
+    i;
+
+  unsigned char
+    bytes[sizeof(id)];
+
+  id=GetMagickThreadId();
+  (void) memcpy(bytes,&id,sizeof(id));
+  for (i=0; i < (ssize_t) sizeof(bytes); i++)
+    (void) FormatLocaleString(thread_id+2*i,MagickPathExtent,"%02x",bytes[i]);
+  thread_id[sizeof(thread_id)-1]='\0';
+  (void) FormatLocaleString(thread_filename,MagickPathExtent,"%s|%s",thread_id,
+    filename);
+}
+
 static inline size_t GetMagickThreadSignature(void)
 {
 #if defined(MAGICKCORE_THREAD_SUPPORT)

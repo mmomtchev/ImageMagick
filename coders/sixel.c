@@ -214,8 +214,15 @@ static unsigned char *get_params(unsigned char *p, int *param, int *len)
       {
         for (n = 0; isdigit((int) ((unsigned char) *p)); p++)
         {
-          if (n <= (INT_MAX/10))
-            n=(int) ((ssize_t) n*10+(*p-'0'));
+          int digit = *p-'0';
+          ssize_t tmp = (ssize_t) n*10+digit;
+
+          if (tmp > INT_MAX)
+            {
+              n=INT_MAX;
+              break;
+            }
+          n=(int) tmp;
         }
         if (*len < 10)
           param[(*len)++]=n;
@@ -250,12 +257,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
     background_color_index,
     c,
     color_index,
-    dmsx,
-    dmsy,
     g,
-    i,
-    imsx,
-    imsy,
     n,
     max_color_index,
     max_x,
@@ -266,17 +268,24 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
     r,
     repeat_count,
     sixel_palet[SIXEL_PALETTE_MAX],
-    sixel_vertical_mask,
-    x,
-    y;
+    sixel_vertical_mask;
 
   sixel_pixel_t
     *dmbuf,
     *imbuf;
 
   size_t
-    extent,
-    offset;
+    extent;
+
+  ssize_t
+    dmsx,
+    dmsy,
+    i,
+    imsx,
+    imsy,
+    offset,
+    x,
+    y;
 
   extent=strlen((char *) p);
   position_x=position_y=0;
@@ -293,7 +302,8 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
   imsy=2048;
   if (SetImageExtent(image,(size_t) imsx,(size_t) imsy,exception) == MagickFalse)
     return(MagickFalse);
-  imbuf=(sixel_pixel_t *) AcquireQuantumMemory((size_t) imsx,(size_t) imsy*sizeof(sixel_pixel_t));
+  imbuf=(sixel_pixel_t *) AcquireQuantumMemory((size_t) imsx,
+    (size_t) imsy*sizeof(sixel_pixel_t));
   if (imbuf == (sixel_pixel_t *) NULL)
     return(MagickFalse);
   for (n = 0; n < 16; n++)
@@ -314,7 +324,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
     sixel_palet[n++]=SIXEL_RGB(i*11,i*11,i*11);
   for (; n < SIXEL_PALETTE_MAX; n++)
     sixel_palet[n]=SIXEL_RGB(255,255,255);
-  for (i = 0; i < imsx * imsy; i++)
+  for (i = 0; i < (imsx*imsy); i++)
     imbuf[i]=(sixel_pixel_t) background_color_index;
   while (*p != '\0')
   {
@@ -398,7 +408,10 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
             dmsx=imsx > attributed_ph ? imsx : attributed_ph;
             dmsy=imsy > attributed_pv ? imsy : attributed_pv;
             if (SetImageExtent(image,(size_t) dmsx,(size_t) dmsy,exception) == MagickFalse)
-              break;
+              {
+                imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
+                return(MagickFalse);
+              }
             dmbuf=(sixel_pixel_t *) AcquireQuantumMemory((size_t) dmsx,(size_t)
               dmsy*sizeof(sixel_pixel_t));
             if (dmbuf == (sixel_pixel_t *) NULL)
@@ -408,7 +421,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
               }
             (void) memset(dmbuf,background_color_index,(size_t) dmsx*(size_t)
               dmsy*sizeof(sixel_pixel_t));
-            for (y = 0; y < imsy; ++y)
+            for (y=0; y < imsy; ++y)
               (void) memcpy(dmbuf+dmsx*y,imbuf+imsx*y,(size_t) imsx*
                 sizeof(sixel_pixel_t));
             imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
@@ -485,16 +498,17 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
       }
     else if ((*p >= '?') && (*p <= '\177'))
       {
-        if ((imsx < (position_x + repeat_count)) || (imsy < (position_y + 6)))
+        if ((imsx < ((ssize_t) position_x+repeat_count)) ||
+            (imsy < ((ssize_t) position_y+6)))
           {
-            int
+            ssize_t
               nx,
               ny;
 
             nx=imsx*2;
             ny=imsy*2;
 
-            while ((nx < (position_x + repeat_count)) || (ny < (position_y + 6)))
+            while ((nx < ((ssize_t) position_x+repeat_count)) || (ny < ((ssize_t) position_y+6)))
             {
               nx *= 2;
               ny *= 2;
@@ -503,7 +517,10 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
             dmsx=nx;
             dmsy=ny;
             if (SetImageExtent(image,(size_t) dmsx,(size_t) dmsy,exception) == MagickFalse)
-              break;
+              {
+                imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
+                return(MagickFalse);
+              }
             dmbuf=(sixel_pixel_t *) AcquireQuantumMemory((size_t) dmsx,(size_t)
               dmsy*sizeof(sixel_pixel_t));
             if (dmbuf == (sixel_pixel_t *) NULL)
@@ -534,9 +551,9 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                 {
                   if ((b & sixel_vertical_mask) != 0)
                     {
-                      offset=(size_t) (imsx*((ssize_t) position_y+i)+
+                      offset=(ssize_t) (imsx*((ssize_t) position_y+i)+
                         (ssize_t) position_x);
-                      if (offset >= (size_t) (imsx*imsy))
+                      if (offset >= (imsx*imsy))
                         {
                           imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
                           return(MagickFalse);
@@ -545,7 +562,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                       if (max_x < position_x)
                           max_x = position_x;
                       if (max_y < (position_y + i))
-                          max_y = position_y + i;
+                          max_y = (int) (position_y + i);
                     }
                   sixel_vertical_mask <<= 1;
                 }
@@ -566,10 +583,11 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                       }
                       for (y = position_y + i; y < position_y + i + n; ++y)
                       {
-                        offset=(size_t) ((ssize_t) imsx*y+(ssize_t) position_x);
-                        if ((offset+(size_t) repeat_count) >= (size_t) (imsx*imsy))
+                        offset=(imsx*y+position_x);
+                        if ((offset+repeat_count) >= (imsx*imsy))
                           {
-                            imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
+                            imbuf=(sixel_pixel_t *)
+                              RelinquishMagickMemory(imbuf);
                             return(MagickFalse);
                           }
                         for (x = 0; x < repeat_count; x++)
@@ -578,7 +596,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                       if (max_x < (position_x+repeat_count-1))
                         max_x = position_x+repeat_count-1;
                       if (max_y < (position_y+i+n-1))
-                        max_y = position_y+i+n-1;
+                        max_y = (int) (position_y+i+n-1);
                       i+=(n-1);
                       sixel_vertical_mask <<= (n-1);
                     }

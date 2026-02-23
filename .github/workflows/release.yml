@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -60,13 +60,13 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Install dependencies
-        run: npm install -g auto-changelog
+        run: npm install -g git+https://github.com/CookPete/auto-changelog.git#5ba380ad0044dd5be1b2bf4067f64d87202c98bd #v2.5.0
 
       - name: Create ChangeLog.md
         env:
@@ -80,7 +80,7 @@ jobs:
           mv ChangeLog.md Artifacts/ChangeLog.md
 
       - name: Upload ChangeLog.md
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ChangeLog
           path: Artifacts
@@ -136,7 +136,7 @@ jobs:
           innosetup-6.2.0.exe /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-
 
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           path: ImageMagick
           persist-credentials: false
@@ -152,7 +152,7 @@ jobs:
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-${{matrix.buildType}}-openMP.zip
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ChangeLog
           path: ImageMagick
@@ -182,12 +182,12 @@ jobs:
           nmake release
 
       - name: Sign executables and libraries
-        uses: ImageMagick/.github/actions/code-signing@757a0d61ad4171546b1056ac46263630037a4fc7
+        uses: ImageMagick/.github/actions/code-signing@e535c88db29bcffe05a25dcf3cc92b68ed171f05
         with:
-          client-id: ${{secrets.AZURE_CLIENT_ID}}
-          tenant-id: ${{secrets.AZURE_TENANT_ID}}
-          subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
-          directory: Artifacts\bin
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          directory: ${{ github.workspace }}\Artifacts\bin
 
       - name: Create installer
         shell: cmd
@@ -196,14 +196,14 @@ jobs:
           "C:\Program Files (x86)\Inno Setup 6\iscc.exe" Configure\Installer\Inno\ImageMagick.iss
 
       - name: Sign installer
-        uses: ImageMagick/.github/actions/code-signing@757a0d61ad4171546b1056ac46263630037a4fc7
+        uses: ImageMagick/.github/actions/code-signing@e535c88db29bcffe05a25dcf3cc92b68ed171f05
         with:
-          client-id: ${{secrets.AZURE_CLIENT_ID}}
-          tenant-id: ${{secrets.AZURE_TENANT_ID}}
-          subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
-          directory: Configure\Installer\Inno\Artifacts
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          directory: ${{ github.workspace }}\Configure\Installer\Inno\Artifacts
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.typeName}}-${{matrix.architecture}}.exe
           path: Configure\Installer\Inno\Artifacts
@@ -217,7 +217,7 @@ jobs:
 
     steps:
       - name: Clone ImageMagick/Windows
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           repository: ImageMagick/Windows
           ref: refs/heads/main
@@ -229,7 +229,7 @@ jobs:
           clone-repositories-im7.cmd
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ChangeLog
           path: ImageMagick
@@ -245,7 +245,7 @@ jobs:
           move ImageMagick source
           7z a ImageMagick-%VERSION%-Windows.7z .\source\*
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-Windows.7z
           path: ImageMagick-${{needs.version.outputs.version}}-Windows.7z
@@ -276,7 +276,7 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           path: ImageMagick
           persist-credentials: false
@@ -292,7 +292,7 @@ jobs:
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-static-openMP-linked-runtime.zip
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ChangeLog
           path: ImageMagick
@@ -310,12 +310,12 @@ jobs:
           msbuild /m /t:Rebuild /p:Configuration=Release,Platform=${{matrix.architecture}}
 
       - name: Sign executables and libraries
-        uses: ImageMagick/.github/actions/code-signing@757a0d61ad4171546b1056ac46263630037a4fc7
+        uses: ImageMagick/.github/actions/code-signing@e535c88db29bcffe05a25dcf3cc92b68ed171f05
         with:
-          client-id: ${{secrets.AZURE_CLIENT_ID}}
-          tenant-id: ${{secrets.AZURE_TENANT_ID}}
-          subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
-          directory: Artifacts\bin
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          directory: ${{ github.workspace }}\Artifacts\bin
 
       - name: Copy Files
         shell: pwsh
@@ -332,7 +332,7 @@ jobs:
           Copy-Item "ImageMagick\LICENSE" "portable\LICENSE.txt"
           7z a "ImageMagick-$env:VERSION-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z" .\portable\*
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z
           path: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-${{matrix.architecture}}.7z
@@ -363,31 +363,35 @@ jobs:
             hdri_flag: -HDRI
 
     steps:
-      - name: Clone ImageMagick-Windows
-        uses: actions/checkout@v6
+      - name: Clone ImageMagick
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
-          repository: ImageMagick/ImageMagick-Windows
-          path: ImageMagick-Windows
+          path: ImageMagick
           persist-credentials: false
 
+      - name: Download configure
+        shell: cmd
+        run: |
+          ImageMagick\.github\build\windows\download-configure.cmd
+
       - name: Download x64 artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-x64.7z
-          path: ImageMagick-Windows\Installer\Msix\x64
+          path: Configure\Installer\Msix\x64
 
       - name: Download arm64 artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ImageMagick-${{needs.version.outputs.version}}-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-arm64.7z
-          path: ImageMagick-Windows\Installer\Msix\arm64
+          path: Configure\Installer\Msix\arm64
 
       - name: Unzip artifacts
         shell: pwsh
         env:
           VERSION: ${{needs.version.outputs.version}}
         run: |
-          cd ImageMagick-Windows\Installer\Msix\x64
+          cd Configure\Installer\Msix\x64
           7z x "ImageMagick-$env:VERSION-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-x64.7z"
           cd ../arm64
           7z x "ImageMagick-$env:VERSION-portable-${{matrix.quantum}}${{matrix.hdri_flag}}-arm64.7z"
@@ -399,33 +403,19 @@ jobs:
           tenant-id: ${{secrets.AZURE_TENANT_ID}}
           subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
 
-      - name: Install TrustedSigningClientTools
-        run: |
-          $DownloadUrl = "https://download.microsoft.com/download/6d9cb638-4d5f-438d-9f21-23f0f4405944/TrustedSigningClientTools.msi"
-          $DownloadPath = "$env:TEMP\TrustedSigningClientTools.msi"         
-          Invoke-WebRequest -Uri $DownloadUrl -OutFile $DownloadPath -UseBasicParsing
-
-          $InstallDir = "$env:ProgramData\Caphyon\Advanced Installer\TrustedSigningClientTools\1.0.0"
-          New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-
-          $process = Start-Process -FilePath "msiexec.exe" -ArgumentList @("/a", "`"$DownloadPath`"", "/qr", "TARGETDIR=`"$InstallDir`"") -Wait -PassThru -NoNewWindow
-          if ($process.ExitCode -ne 0) {
-            throw "Install failed with exit code: $($process.ExitCode)"
-          }
-
       - name: Create msixbundle with Advanced Installer
         uses: caphyon/advinst-github-action@f7e45a75aba48b695fafc344f61adf634d41fe4e # v2.0
         with:
           advinst-license: ${{secrets.ADVINST_LICENSE_KEY}}
-          aip-path: ImageMagick-Windows\Installer\Msix\ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.aip
+          aip-path: Configure\Installer\Msix\ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.aip
           aip-build-name: Build_MSIX
           aip-commands: |
               SetVersion ${{needs.version.outputs.semantic_version}}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.msixbundle
-          path: ImageMagick-Windows\Installer\Msix\Artifacts\ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.msixbundle
+          path: Configure\Installer\Msix\Artifacts\ImageMagick.${{matrix.quantum}}${{matrix.hdri_flag}}.msixbundle
 
   linux_app_image:
     name: Linux AppImage
@@ -453,7 +443,7 @@ jobs:
           apt-get install -y autoconf curl file fuse git kmod squashfs-tools libbz2-dev libdjvulibre-dev libfontconfig-dev libfreetype6-dev libfribidi-dev libharfbuzz-dev libheif-dev liblcms-dev libopenexr-dev libopenjp2-7-dev libturbojpeg0-dev liblqr-dev libraqm-dev libtiff-dev libwebp-dev libx11-dev libxml2-dev liblzma-dev make software-properties-common wget ${{matrix.packages}}
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           persist-credentials: false
 
@@ -503,7 +493,7 @@ jobs:
           find /appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
 
       - name: Upload ImageMagick AppImage
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: AppImage-${{matrix.compiler}}
           path: artifacts
@@ -526,12 +516,12 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           path: artifacts
           merge-multiple: true

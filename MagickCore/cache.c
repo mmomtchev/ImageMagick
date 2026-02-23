@@ -3264,8 +3264,7 @@ MagickExport const Quantum *GetVirtualPixelQueue(const Image *image)
   assert(image->cache != (Cache) NULL);
   cache_info=(CacheInfo *) image->cache;
   assert(cache_info->signature == MagickCoreSignature);
-  if (cache_info->methods.get_virtual_pixels_handler !=
-       (GetVirtualPixelsHandler) NULL)
+  if (cache_info->methods.get_virtual_pixels_handler != (GetVirtualPixelsHandler) NULL)
     return(cache_info->methods.get_virtual_pixels_handler(image));
   assert(id < (int) cache_info->number_threads);
   return(GetVirtualPixelsNexus(cache_info,cache_info->nexus_info[id]));
@@ -3561,6 +3560,25 @@ static MagickBooleanType MaskPixelCacheNexus(Image *image,NexusInfo *nexus_info,
 %
 */
 
+static inline MagickBooleanType CacheOverflowSanityCheckGetSize(
+  const MagickSizeType count,const size_t quantum,MagickSizeType *const extent)
+{
+  MagickSizeType
+    length;
+
+  if ((count == 0) || (quantum == 0))
+    return(MagickTrue);
+  length=count*quantum;
+  if (quantum != (length/count))
+    {
+      errno=ENOMEM;
+      return(MagickTrue);
+    }
+  if (extent != NULL)
+    *extent=length;
+  return(MagickFalse);
+}
+
 static MagickBooleanType OpenPixelCacheOnDisk(CacheInfo *cache_info,
   const MapMode mode)
 {
@@ -3711,7 +3729,7 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
     status;
 
   MagickSizeType
-    length,
+    length = 0,
     number_pixels;
 
   size_t
@@ -3789,12 +3807,22 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
   packet_size=MagickMax(cache_info->number_channels,1)*sizeof(Quantum);
   if (image->metacontent_extent != 0)
     packet_size+=cache_info->metacontent_extent;
-  length=number_pixels*packet_size;
+  if (CacheOverflowSanityCheckGetSize(number_pixels,packet_size,&length) != MagickFalse)
+    {
+      cache_info->storage_class=UndefinedClass;
+      cache_info->length=0;
+      ThrowBinaryException(ResourceLimitError,"PixelCacheAllocationFailed",
+        image->filename);
+    }
   columns=(size_t) (length/cache_info->rows/packet_size);
   if ((cache_info->columns != columns) || ((ssize_t) cache_info->columns < 0) ||
       ((ssize_t) cache_info->rows < 0))
-    ThrowBinaryException(ResourceLimitError,"PixelCacheAllocationFailed",
-      image->filename);
+    {
+      cache_info->storage_class=UndefinedClass;
+      cache_info->length=0;
+      ThrowBinaryException(ResourceLimitError,"PixelCacheAllocationFailed",
+        image->filename);
+    }
   cache_info->length=length;
   if (image->ping != MagickFalse)
     {
@@ -3949,6 +3977,8 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
       if ((source_info.storage_class != UndefinedClass) && (mode != ReadMode))
         RelinquishPixelCachePixels(&source_info);
       cache_info->type=UndefinedCache;
+      (void) memset(image->channel_map,0,MaxPixelChannels*
+        sizeof(*image->channel_map));
       (void) ThrowMagickException(exception,GetMagickModule(),CacheError,
         "CacheResourcesExhausted","`%s'",image->filename);
       return(MagickFalse);
@@ -3961,6 +3991,8 @@ static MagickBooleanType OpenPixelCache(Image *image,const MapMode mode,
       if ((source_info.storage_class != UndefinedClass) && (mode != ReadMode))
         RelinquishPixelCachePixels(&source_info);
       cache_info->type=UndefinedCache;
+      (void) memset(image->channel_map,0,MaxPixelChannels*
+        sizeof(*image->channel_map));
       (void) ThrowMagickException(exception,GetMagickModule(),CacheError,
         "CacheResourcesExhausted","`%s'",image->filename);
       return(MagickFalse);
@@ -4168,6 +4200,9 @@ MagickExport MagickBooleanType PersistPixelCache(Image *image,
   status=AcquireMagickResource(DiskResource,cache_info->length);
   if (status == MagickFalse)
     {
+      cache_info->type=UndefinedCache;
+      (void) memset(image->channel_map,0,MaxPixelChannels*
+        sizeof(*image->channel_map));
       (void) ThrowMagickException(exception,GetMagickModule(),CacheError,
         "CacheResourcesExhausted","`%s'",image->filename);
       return(MagickFalse);

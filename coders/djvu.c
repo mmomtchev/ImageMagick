@@ -329,8 +329,7 @@ get_page_image(LoadContext *lc, ddjvu_page_t *page, int x, int y, int w, int h, 
   Image
     *image;
 
-  int
-    ret,
+  size_t
     stride;
 
   unsigned char
@@ -349,7 +348,7 @@ get_page_image(LoadContext *lc, ddjvu_page_t *page, int x, int y, int w, int h, 
         stride = (type == DDJVU_PAGETYPE_BITONAL)?
                 (image->columns + 7)/8 : image->columns *3;
 
-        q = (unsigned char *) AcquireQuantumMemory(image->rows,(size_t) stride);
+        q = (unsigned char *) AcquireQuantumMemory(image->rows,stride);
         if (q == (unsigned char *) NULL)
           return;
 
@@ -372,14 +371,13 @@ get_page_image(LoadContext *lc, ddjvu_page_t *page, int x, int y, int w, int h, 
         ddjvu_format_set_row_order(format, 1);
         ddjvu_format_set_y_direction(format, 1);
 
-        ret = ddjvu_page_render(page,
+        (void) ddjvu_page_render(page,
                                     DDJVU_RENDER_COLOR, /* ddjvu_render_mode_t */
                                     &rect,
                                     &rect,     /* mmc: ?? */
                                     format,
                                     (size_t) stride, /* ?? */
                                     (char*)q);
-        (void) ret;
         ddjvu_format_release(format);
 
 

@@ -2273,18 +2273,14 @@ MagickExport XMLTreeInfo *NewXMLTreeTag(const char *tag)
   XMLTreeRoot
     *root;
 
-  root=(XMLTreeRoot *) AcquireMagickMemory(sizeof(*root));
-  if (root == (XMLTreeRoot *) NULL)
-    return((XMLTreeInfo *) NULL);
+  root=(XMLTreeRoot *) AcquireCriticalMemory(sizeof(*root));
   (void) memset(root,0,sizeof(*root));
   root->root.tag=(char *) NULL;
   if (tag != (char *) NULL)
     root->root.tag=ConstantString(tag);
   root->node=(&root->root);
   root->root.content=ConstantString("");
-  root->entities=(char **) AcquireMagickMemory(sizeof(predefined_entities));
-  if (root->entities == (char **) NULL)
-    return((XMLTreeInfo *) NULL);
+  root->entities=(char **) AcquireCriticalMemory(sizeof(predefined_entities));
   (void) memcpy(root->entities,predefined_entities,sizeof(predefined_entities));
   root->root.attributes=sentinel;
   root->attributes=(char ***) root->root.attributes;

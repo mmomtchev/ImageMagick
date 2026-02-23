@@ -20,13 +20,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Install dependencies
-        run: npm install -g auto-changelog
+        run: npm install -g git+https://github.com/CookPete/auto-changelog.git#5ba380ad0044dd5be1b2bf4067f64d87202c98bd #v2.5.0
 
       - name: Create ChangeLog.md
         run: |
@@ -37,7 +37,7 @@ jobs:
           mv ChangeLog.md artifacts/ChangeLog.md
 
       - name: Upload ChangeLog.md
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f #v6.0.0
         with:
           name: ChangeLog
           path: artifacts
@@ -81,7 +81,7 @@ jobs:
           apt-get install -y autoconf libfontconfig1-dev libfreetype6-dev libltdl-dev make pkg-config ${{ matrix.packages }}
 
       - name: Clone msttcorefonts
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           repository: ImageMagick/msttcorefonts
           persist-credentials: false
@@ -91,7 +91,7 @@ jobs:
           set -e
           ./install.sh
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           persist-credentials: false
 
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           path: ImageMagick
           persist-credentials: false
@@ -159,7 +159,7 @@ jobs:
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-${{matrix.buildType}}-openMP.zip
 
       - name: Download ChangeLog.md
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7.0.0
         with:
           name: ChangeLog
           path: ImageMagick
@@ -187,7 +187,7 @@ jobs:
 
     steps:
       - name: Clone ImageMagick
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           path: ImageMagick
           persist-credentials: false
@@ -231,7 +231,7 @@ jobs:
       - name: Prepare git
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
         with:
           persist-credentials: false
 

@@ -20,6 +20,7 @@
 #include "MagickCore/colorspace-private.h"
 #include "MagickCore/property.h"
 #include "MagickCore/string_.h"
+#include "MagickCore/thread-private.h"
 
 #define MagickCoderHeader(coder,offset,magic) \
   { coder, offset, (const unsigned char *) (magic), sizeof(magic)-1, MagickFalse },
