@@ -1464,17 +1464,34 @@ MagickExport void *FileToBlob(const char *filename,const size_t extent,
   file=fileno(stdin);
   if (LocaleCompare(filename,"-") != 0)
     {
+      int
+        flags = O_RDONLY | O_BINARY;
+
       status=GetPathAttributes(filename,&attributes);
       if ((status == MagickFalse) || (S_ISDIR(attributes.st_mode) != 0))
         {
           ThrowFileException(exception,BlobError,"UnableToReadBlob",filename);
           return(NULL);
         }
-      file=open_utf8(filename,O_RDONLY | O_BINARY,0);
+#if defined(O_NOFOLLOW)
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow");
+      if (status == MagickFalse)
+        flags|=O_NOFOLLOW;
+#endif
+      file=open_utf8(filename,flags,0);
     }
   if (file == -1)
     {
       ThrowFileException(exception,BlobError,"UnableToOpenFile",filename);
+      return(NULL);
+    }
+  status=IsRightsAuthorized(PathPolicyDomain,ReadPolicyRights,filename);
+  if (status == MagickFalse)
+    {
+      file=close_utf8(file)-1;
+      errno=EPERM;
+      (void) ThrowMagickException(exception,GetMagickModule(),PolicyError,
+        "NotAuthorized","`%s'",filename);
       return(NULL);
     }
   offset=(MagickOffsetType) lseek(file,0,SEEK_END);
@@ -1609,6 +1626,7 @@ MagickExport void *FileToBlob(const char *filename,const size_t extent,
 %    o filename: the filename.
 %
 */
+
 static inline ssize_t WriteBlobStream(Image *image,const size_t length,
   const void *magick_restrict data)
 {
@@ -1627,6 +1645,11 @@ static inline ssize_t WriteBlobStream(Image *image,const size_t length,
   blob_info=image->blob;
   if (blob_info->type != BlobStream)
     return(WriteBlob(image,length,(const unsigned char *) data));
+  if (blob_info->offset > (MagickOffsetType) (MAGICK_SSIZE_MAX-length))
+    {
+      errno=EOVERFLOW;
+      return(0);
+    }
   extent=(MagickSizeType) (blob_info->offset+(MagickOffsetType) length);
   if (extent >= blob_info->extent)
     {
@@ -1670,7 +1693,7 @@ MagickExport MagickBooleanType FileToImage(Image *image,const char *filename,
   assert(filename != (const char *) NULL);
   if (IsEventLogging() != MagickFalse)
     (void) LogMagickEvent(TraceEvent,GetMagickModule(),"%s",filename);
-  status=IsRightsAuthorized(PathPolicyDomain,WritePolicyRights,filename);
+  status=IsRightsAuthorized(PathPolicyDomain,ReadPolicyRights,filename);
   if (status == MagickFalse)
     {
       errno=EPERM;
@@ -1680,10 +1703,29 @@ MagickExport MagickBooleanType FileToImage(Image *image,const char *filename,
     }
   file=fileno(stdin);
   if (LocaleCompare(filename,"-") != 0)
-    file=open_utf8(filename,O_RDONLY | O_BINARY,0);
+    {
+      int
+        flags = O_RDONLY | O_BINARY;
+
+#if defined(O_NOFOLLOW)
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow");
+      if (status == MagickFalse)
+        flags|=O_NOFOLLOW;
+#endif
+      file=open_utf8(filename,flags,0);
+    }
   if (file == -1)
     {
       ThrowFileException(exception,BlobError,"UnableToOpenBlob",filename);
+      return(MagickFalse);
+    }
+  status=IsRightsAuthorized(PathPolicyDomain,ReadPolicyRights,filename);
+  if (status == MagickFalse)
+    {
+      file=close_utf8(file);
+      errno=EPERM;
+      (void) ThrowMagickException(exception,GetMagickModule(),PolicyError,
+        "NotAuthorized","`%s'",filename);
       return(MagickFalse);
     }
   quantum=(size_t) MagickMaxBufferExtent;
@@ -2280,8 +2322,8 @@ MagickExport void ImageToCustomStream(const ImageInfo *image_info,Image *image,
           ssize_t
             count;
 
-          (void) FormatLocaleString(image->filename,MagickPathExtent,
-            "%s:%s",image->magick,unique);
+          (void) FormatLocaleString(image->filename,MagickPathExtent,"%s:%s",
+            image->magick,unique);
           status=WriteImage(clone_info,image,exception);
           if (status != MagickFalse)
             {
@@ -3277,6 +3319,9 @@ MagickExport MagickBooleanType OpenBlob(const ImageInfo *image_info,
   const char
     *type;
 
+  int
+    flags = O_RDONLY;
+
   MagickBooleanType
     status;
 
@@ -3309,14 +3354,64 @@ MagickExport MagickBooleanType OpenBlob(const ImageInfo *image_info,
   blob_info->mode=mode;
   switch (mode)
   {
-    default: type="r"; break;
-    case ReadBlobMode: type="r"; break;
-    case ReadBinaryBlobMode: type="rb"; break;
-    case WriteBlobMode: type="w"; break;
-    case WriteBinaryBlobMode: type="w+b"; break;
-    case AppendBlobMode: type="a"; break;
-    case AppendBinaryBlobMode: type="a+b"; break;
+    case ReadBlobMode:
+    {
+      flags=O_RDONLY;
+      type="r";
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow");
+      break;
+    }
+    case ReadBinaryBlobMode:
+    {
+      flags=O_RDONLY | O_BINARY;
+      type="rb";
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow");
+      break;
+    }
+    case WriteBlobMode:
+    {
+      flags=O_WRONLY | O_CREAT | O_TRUNC;
+      type="w";
+      status=IsRightsAuthorized(SystemPolicyDomain,WritePolicyRights,"follow");
+      break;
+    }
+    case WriteBinaryBlobMode:
+    {
+      flags=O_RDWR | O_CREAT | O_TRUNC | O_BINARY;
+      type="w+b";
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow") &&
+        IsRightsAuthorized(SystemPolicyDomain,WritePolicyRights,"follow") ?
+        MagickTrue : MagickFalse;
+      break;
+    }
+    case AppendBlobMode:
+    {
+      flags=O_WRONLY | O_CREAT | O_APPEND;
+      type="a";
+      status=IsRightsAuthorized(SystemPolicyDomain,WritePolicyRights,"follow");
+      break;
+    }
+    case AppendBinaryBlobMode:
+    {
+      flags=O_RDWR | O_CREAT | O_APPEND | O_BINARY;
+      type="a+b";
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow") &&
+        IsRightsAuthorized(SystemPolicyDomain,WritePolicyRights,"follow") ?
+        MagickTrue : MagickFalse;
+      break;
+    }
+    default:
+    {
+      flags=O_RDONLY;
+      type="r";
+      status=IsRightsAuthorized(SystemPolicyDomain,ReadPolicyRights,"follow");
+      break;
+    }
   }
+#if defined(O_NOFOLLOW)
+  if (status == MagickFalse)
+    flags|=O_NOFOLLOW;
+#endif
   if (*type != 'r')
     blob_info->synchronize=image_info->synchronize;
   if (image_info->stream != (StreamHandler) NULL)
@@ -3460,7 +3555,13 @@ MagickExport MagickBooleanType OpenBlob(const ImageInfo *image_info,
   else
     if (*type == 'r')
       {
-        blob_info->file_info.file=(FILE *) fopen_utf8(filename,type);
+        int
+          file;
+
+        blob_info->file_info.file=(FILE *) NULL;
+        file=open_utf8(filename,flags,0);
+        if (file >= 0)
+          blob_info->file_info.file=fdopen(file,type);
         if (blob_info->file_info.file != (FILE *) NULL)
           {
             size_t
@@ -3580,13 +3681,26 @@ MagickExport MagickBooleanType OpenBlob(const ImageInfo *image_info,
         else
 #endif
           {
-            blob_info->file_info.file=(FILE *) fopen_utf8(filename,type);
+            int
+              file;
+
+            blob_info->file_info.file=(FILE *) NULL;
+            file=open_utf8(filename,flags,S_MODE);
+            if (file >= 0)
+              blob_info->file_info.file=fdopen(file,type);
             if (blob_info->file_info.file != (FILE *) NULL)
               {
                 blob_info->type=FileStream;
                 (void) SetStreamBuffering(image_info,blob_info);
               }
           }
+  if (IsRightsAuthorized(PathPolicyDomain,rights,filename) == MagickFalse)
+    {
+      errno=EPERM;
+      (void) ThrowMagickException(exception,GetMagickModule(),PolicyError,
+        "NotAuthorized","`%s'",filename);
+      return(MagickFalse);
+    }
   blob_info->status=0;
   blob_info->error_number=0;
   if (blob_info->type != UndefinedStream)
@@ -5915,6 +6029,11 @@ MagickExport ssize_t WriteBlob(Image *image,const size_t length,
       MagickSizeType
         extent;
 
+      if (blob_info->offset > (MagickOffsetType) (MAGICK_SSIZE_MAX-length))
+        {
+          errno=EOVERFLOW;
+          return(0);
+        }
       extent=(MagickSizeType) (blob_info->offset+(MagickOffsetType) length);
       if (extent >= blob_info->extent)
         {

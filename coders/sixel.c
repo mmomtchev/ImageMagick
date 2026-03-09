@@ -553,7 +553,7 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                     {
                       offset=(ssize_t) (imsx*((ssize_t) position_y+i)+
                         (ssize_t) position_x);
-                      if (offset >= (imsx*imsy))
+                      if ((offset < 0) || (offset >= (imsx*imsy)))
                         {
                           imbuf=(sixel_pixel_t *) RelinquishMagickMemory(imbuf);
                           return(MagickFalse);
@@ -584,14 +584,14 @@ static MagickBooleanType sixel_decode(Image *image,unsigned char *p,
                       for (y = position_y + i; y < position_y + i + n; ++y)
                       {
                         offset=(imsx*y+position_x);
-                        if ((offset+repeat_count) >= (imsx*imsy))
+                        if ((offset < 0) || ((offset+repeat_count) >= (imsx*imsy)))
                           {
                             imbuf=(sixel_pixel_t *)
                               RelinquishMagickMemory(imbuf);
                             return(MagickFalse);
                           }
                         for (x = 0; x < repeat_count; x++)
-                          imbuf[(int) offset+x]=(sixel_pixel_t) color_index;
+                          imbuf[(size_t) offset+x]=(sixel_pixel_t) color_index;
                       }
                       if (max_x < (position_x+repeat_count-1))
                         max_x = position_x+repeat_count-1;
@@ -815,7 +815,8 @@ static MagickBooleanType sixel_encode_impl(sixel_pixel_t *pixels,size_t width,
   context->pos = 0;
   if (ncolors < 1)
     return(MagickFalse);
-  len=ncolors*width;
+  if (HeapOverflowSanityCheckGetSize(ncolors,width,&len) != MagickFalse)
+    return(MagickFalse);
   context->active_palette=(-1);
   map=(sixel_pixel_t *) AcquireQuantumMemory(len,sizeof(sixel_pixel_t));
   if (map == (sixel_pixel_t *) NULL)
@@ -1398,6 +1399,8 @@ static MagickBooleanType WriteSIXELImage(const ImageInfo *image_info,
           image->colormap[opacity].blue=image->transparent_color.blue;
         }
     }
+  if (image->colors > SIXEL_PALETTE_MAX)
+    return(MagickFalse);
   /*
     SIXEL header.
   */

@@ -666,40 +666,46 @@ static MagickBooleanType WriteUHDRImage(const ImageInfo *image_info,
     aligned_height = image->rows + (image->rows & 1);
     if (HeapOverflowSanityCheckGetSize(aligned_width,aligned_height,&picSize) != MagickFalse)
       {
-        (void) ThrowMagickException(exception,GetMagickModule(),CorruptImageError,
-          "ImproperImageHeader","%s",image->filename);
+        (void) ThrowMagickException(exception,GetMagickModule(),
+          CorruptImageError,"ImproperImageHeader","%s",image->filename);
         goto next_image;
       }
     if (HeapOverflowSanityCheckGetSize(picSize,bpp,&picSize) != MagickFalse)
       {
-        (void) ThrowMagickException(exception,GetMagickModule(),CorruptImageError,
-          "ImproperImageHeader","%s",image->filename);
+        (void) ThrowMagickException(exception,GetMagickModule(),
+          CorruptImageError,"ImproperImageHeader","%s",image->filename);
         goto next_image;
       }
-    if ((bpp < 4) && (HeapOverflowSanityCheckGetSize(picSize,1.5,&picSize) != MagickFalse))
+    if (bpp < 4)
       {
-        (void) ThrowMagickException(exception,GetMagickModule(),CorruptImageError,
-          "ImproperImageHeader","%s",image->filename);
-        goto next_image;
+        if (HeapOverflowSanityCheckGetSize(picSize,3,&picSize) != MagickFalse)
+          {
+            (void) ThrowMagickException(exception,GetMagickModule(),
+              CorruptImageError,"ImproperImageHeader","%s",image->filename);
+            goto next_image;
+          }
+        picSize/=2;
       }
 
-    if (image->depth < hdrIntentMinDepth && image->depth != 8)
+    if ((image->depth < hdrIntentMinDepth) && (image->depth != 8))
     {
       (void) ThrowMagickException(exception, GetMagickModule(), ConfigureWarning,
         "Received image with unexpected bit depth","%s","ignoring ...");
       goto next_image;
     }
 
-    if (image->depth >= hdrIntentMinDepth && hdrImgDescriptor.planes[UHDR_PLANE_Y] != NULL)
+    if ((image->depth >= hdrIntentMinDepth) &&
+        (hdrImgDescriptor.planes[UHDR_PLANE_Y] != NULL))
     {
       (void) ThrowMagickException(exception, GetMagickModule(), ConfigureWarning,
         "Received multiple hdr intent resources, ","%s","overwriting ...");
       RelinquishMagickMemory(hdrImgDescriptor.planes[UHDR_PLANE_Y]);
       hdrImgDescriptor.planes[UHDR_PLANE_Y] = NULL;
     }
-    else if (image->depth == 8 && sdrImgDescriptor.planes[UHDR_PLANE_Y] != NULL)
+    else if ((image->depth == 8) &&
+             (sdrImgDescriptor.planes[UHDR_PLANE_Y] != NULL))
     {
-      (void) ThrowMagickException(exception, GetMagickModule(), ConfigureWarning,
+      (void) ThrowMagickException(exception,GetMagickModule(),ConfigureWarning,
         "Received multiple sdr intent resources, ","%s","overwriting ...");
       RelinquishMagickMemory(sdrImgDescriptor.planes[UHDR_PLANE_Y]);
       sdrImgDescriptor.planes[UHDR_PLANE_Y] = NULL;

@@ -6501,6 +6501,10 @@ static Image *ReadOneMNGImage(MngReadInfo* mng_info,
                 large_image->columns=magnified_width;
                 large_image->rows=magnified_height;
 
+                status=SetImageExtent(image,image->columns,image->rows,exception);
+                if (status == MagickFalse)
+                  return(DestroyImageList(image));
+
                 magn_methx=mng_info->magn_methx;
                 magn_methy=mng_info->magn_methy;
 
@@ -7668,11 +7672,10 @@ ModuleExport void UnregisterPNGImage(void)
 %    transparent region at the top and/or left.
 */
 
-static void
-Magick_png_write_raw_profile(const ImageInfo *image_info,png_struct *ping,
-  png_info *ping_info, unsigned char *profile_type, unsigned char
-  *profile_description, unsigned char *profile_data, png_uint_32 length,
-  ExceptionInfo *exception)
+static void Magick_png_write_raw_profile(const ImageInfo *image_info,
+  png_struct *ping,png_info *ping_info,unsigned char *profile_type,
+  unsigned char *profile_description,unsigned char *profile_data,
+  png_uint_32 length,ExceptionInfo *exception)
 {
    png_charp
      dp;
@@ -7705,7 +7708,7 @@ Magick_png_write_raw_profile(const ImageInfo *image_info,png_struct *ping,
    description_length=(png_uint_32) strlen((const char *) profile_description);
    allocated_length=(png_uint_32) (2*length+(length >> 5)+description_length+
      20);
-   if (allocated_length < length)
+   if ((allocated_length < length) || (length >= (PNG_UINT_31_MAX / 2)))
      {
        (void) ThrowMagickException(exception,GetMagickModule(),CoderError,
          "maximum profile length exceeded","`%s'",image_info->filename);
@@ -12356,6 +12359,13 @@ static MagickBooleanType WriteOneJNGImage(MngWriteInfo *mng_info,
           blob=(unsigned char *) ImageToBlob(jpeg_image_info,jpeg_image,
             &length,exception);
 
+          if (blob == (unsigned char *) NULL)
+            {
+              jpeg_image=DestroyImage(jpeg_image);
+              jpeg_image_info=DestroyImageInfo(jpeg_image_info);
+              return(MagickFalse);
+            }
+
           /* Retrieve sample depth used */
           value=GetImageProperty(jpeg_image,"png:bit-depth-written",exception);
           if (value != (char *) NULL)
@@ -12725,6 +12735,15 @@ static MagickBooleanType WriteOneJNGImage(MngWriteInfo *mng_info,
   blob=(unsigned char *) ImageToBlob(jpeg_image_info,jpeg_image,&length,
     exception);
 
+  if (blob == (unsigned char *) NULL)
+    {
+      if (jpeg_image != (Image *)NULL)
+        jpeg_image=DestroyImage(jpeg_image);
+      if (jpeg_image_info != (ImageInfo *)NULL)
+        jpeg_image_info=DestroyImageInfo(jpeg_image_info);
+      return(MagickFalse);
+    }
+
   if (logging != MagickFalse)
     {
       (void) LogMagickEvent(CoderEvent,GetMagickModule(),
@@ -12900,7 +12919,9 @@ static MagickBooleanType WriteMNGImage(const ImageInfo *image_info,Image *image,
   mng_info->image=image;
   write_mng=LocaleCompare(image_info->magick,"MNG") == 0 ?
     MagickTrue : MagickFalse;
-
+  if ((write_mng != MagickFalse) && (image->storage_class == PseudoClass) &&
+      (image->colors > 256))
+    (void) SetImageStorageClass(image,DirectClass,exception);
   /*
    * See if user has requested a specific PNG subformat to be used
    * for all of the PNGs in the MNG being written, e.g.,
