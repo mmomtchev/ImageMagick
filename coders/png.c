@@ -5589,7 +5589,7 @@ static Image *ReadOneMNGImage(MngReadInfo* mng_info,
                     change_clipping=(*p++);
                     p++; /* change_sync */
 
-                    if (change_delay && ((p-chunk) < (ssize_t) (length-4)))
+                    if (change_delay && ((p-chunk)+4 <= (ssize_t) length))
                       {
                         frame_delay=(size_t) image->ticks_per_second*
                           (size_t) mng_get_long(p);
@@ -5610,7 +5610,7 @@ static Image *ReadOneMNGImage(MngReadInfo* mng_info,
                             "    Framing_delay=%.20g",(double) frame_delay);
                       }
 
-                    if (change_timeout && ((p-chunk) < (ssize_t) (length-4)))
+                    if (change_timeout && ((p-chunk)+4 <= (ssize_t) length))
                       {
                         frame_timeout=(size_t) image->ticks_per_second*
                           (size_t) mng_get_long(p);
@@ -6327,6 +6327,11 @@ static Image *ReadOneMNGImage(MngReadInfo* mng_info,
 
         else
           image->delay=0;
+
+        if (mng_info->framing_mode == 3)
+          image->dispose=BackgroundDispose;
+        else
+          image->dispose=NoneDispose;
 
         image->page.width=mng_info->mng_width;
         image->page.height=mng_info->mng_height;
@@ -13583,7 +13588,7 @@ static MagickBooleanType WriteMNGImage(const ImageInfo *image_info,Image *image,
 
    mng_info->write_mng=write_mng;
 
-   if ((int) image->dispose >= 3)
+   if ((int) image->dispose >= BackgroundDispose)
      mng_info->framing_mode=3;
 
    if (mng_info->need_fram != MagickFalse && mng_info->adjoin != MagickFalse &&

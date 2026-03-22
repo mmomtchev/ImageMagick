@@ -3393,24 +3393,24 @@ static MagickBooleanType ExecuteRPN (FxInfo * pfx, fxRtT * pfxrt, fxFltType *res
           regA = -regA;
           break;
         case oLshift:
-          if ((size_t) (regB+0.5) >= (8*sizeof(size_t)))
+          if (CastDoubleToSizeT((double) regB+0.5) >= (8*sizeof(size_t)))
             {
               (void) ThrowMagickException ( pfx->exception, GetMagickModule(),
                 OptionError, "undefined shift", "%g", (double) regB);
               regA = (fxFltType) 0.0;
               break;
             }
-          regA = (fxFltType) ((size_t)(regA+0.5) << (size_t)(regB+0.5));
+          regA = (fxFltType) (CastDoubleToSizeT((double) regA+0.5) << CastDoubleToSizeT((double) regB+0.5));
           break;
         case oRshift:
-          if ((size_t) (regB+0.5) >= (8*sizeof(size_t)))
+          if (CastDoubleToSizeT((double) regB+0.5) >= (8*sizeof(size_t)))
             {
               (void) ThrowMagickException ( pfx->exception, GetMagickModule(),
                 OptionError, "undefined shift", "%g", (double) regB);
               regA = (fxFltType) 0.0;
               break;
             }
-          regA = (fxFltType) ((size_t)(regA+0.5) >> (size_t)(regB+0.5));
+          regA = (fxFltType) (CastDoubleToSizeT((double) regA+0.5) >> CastDoubleToSizeT((double) regB+0.5));
           break;
         case oEq:
           regA = fabs((double) (regA-regB)) < MagickEpsilon ? 1.0 : 0.0;
@@ -3440,10 +3440,10 @@ static MagickBooleanType ExecuteRPN (FxInfo * pfx, fxRtT * pfxrt, fxFltType *res
           regA = (regA==0) ? 1.0 : 0.0;
           break;
         case oBitAnd:
-          regA = (fxFltType) ((size_t)(regA+0.5) & (size_t)(regB+0.5));
+          regA = (fxFltType) (CastDoubleToSizeT((double) regA+0.5) & CastDoubleToSizeT((double) regB+0.5));
           break;
         case oBitOr:
-          regA = (fxFltType) ((size_t)(regA+0.5) | (size_t)(regB+0.5));
+          regA = (fxFltType) (CastDoubleToSizeT((double) regA+0.5) | CastDoubleToSizeT((double) regB+0.5));
           break;
         case oBitNot:
           {
@@ -3451,7 +3451,7 @@ static MagickBooleanType ExecuteRPN (FxInfo * pfx, fxRtT * pfxrt, fxFltType *res
               new_value;
 
             /* Old fx doesn't add 0.5. */
-            new_value=~(size_t)(regA+0.5);
+            new_value=~CastDoubleToSizeT((double) regA+0.5);
             regA=(fxFltType) new_value;
             break;
           }
@@ -4161,6 +4161,7 @@ MagickPrivate MagickBooleanType FxEvaluateChannelExpression (
   assert (pfx->fxrts != NULL);
 
   pfx->fxrts[id].thisPixel = NULL;
+
 
   if (!ExecuteRPN (pfx, &pfx->fxrts[id], &ret, channel, x, y)) {
     (void) ThrowMagickException (

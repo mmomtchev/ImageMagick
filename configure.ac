@@ -86,6 +86,16 @@ MAGICK_TARGET_OS=$host_os
 AC_SUBST([MAGICK_TARGET_OS])
 AC_DEFINE_UNQUOTED([MAGICK_TARGET_OS],[$MAGICK_TARGET_OS],[Target Host OS])
 
+case "$host_os" in
+  mingw* | msys*)
+    SHELL_QUOTE="&quot;"
+    ;;
+  *)
+    SHELL_QUOTE="&apos;"
+    ;;
+esac
+
+AC_SUBST([SHELL_QUOTE])
 
 # Substitute versioning
 AC_SUBST([MAGICK_MAJOR_VERSION],[magick_major_version])
@@ -3313,6 +3323,7 @@ LaunchDelegateDefault='gimp'
 MKDIRDelegateDefault='mkdir'
 MrSIDDecodeDelegateDefault='mrsidgeodecode'
 MVDelegateDefault='mv'
+OpenDelegateDefault='open'
 PCLDelegateDefault='pcl6'
 if test "$native_win32_build" = 'yes'; then
     PSDelegateDefault='gswin32c'
@@ -3362,6 +3373,7 @@ AC_PATH_PROG([VIDEOEncodeDelegate],["$VIDEOEncodeDelegateDefault"],["$VIDEOEncod
 AC_PATH_PROG([MKDIRDelegate],["$MKDIRDelegateDefault"],["$MKDIRDelegateDefault"])
 AC_PATH_PROG([MrSIDDecodeDelegate],["$MrSIDDecodeDelegateDefault"],["$MrSIDDecodeDelegateDefault"])
 AC_PATH_PROG([MVDelegate],["$MVDelegateDefault"],["$MVDelegateDefault"])
+AC_PATH_PROG([OpenDelegate],["$OpenDelegateDefault"],["$OpenDelegateDefault"])
 AC_PATH_PROG([PCLDelegate],["$PCLDelegateDefault"],["$PCLDelegateDefault"])
 AC_PATH_PROGS([PSDelegate],[gsx gsc "$PSDelegateDefault"],["$PSDelegateDefault"])
 AC_PATH_PROG([RMDelegate],["$RMDelegateDefault"],["$RMDelegateDefault"])
@@ -3659,6 +3671,7 @@ if test "$with_frozenpaths" != 'yes'; then
   LaunchDelegate="$LaunchDelegateDefault"
   MogrifyDelegate="$MogrifyDelegateDefault"
   MrSIDDecodeDelegate="$MrSIDDecodeDelegateDefault"
+  OpenDelegate="$OpenDelegateDefault"
   PCLDelegate="$PCLDelegateDefault"
   PSDelegate="$PSDelegateDefault"
   RSVGDecodeDelegate="$RSVGDecodeDelegateDefault"
@@ -3699,6 +3712,7 @@ AC_SUBST([VIDEODecodeDelegate])
 AC_SUBST([VIDEOEncodeDelegate])
 AC_SUBST([MogrifyDelegate])
 AC_SUBST([MrSIDDecodeDelegate])
+AC_SUBST([OpenDelegate])
 AC_SUBST([PCLDelegate])
 AC_SUBST([PSDelegate])
 AC_SUBST([ShowImageDelegate])
